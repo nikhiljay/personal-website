@@ -34,7 +34,6 @@ const IndexPage = () => (
       <div className="HeroGroup">
         <h1>Nikhil D'Souza</h1>
         <p>I’m a student @ Purdue aspiring to apply technology and AI to the health industry.</p>
-        <Link to="/page-2/">Learn more</Link>
         <div className="Logos">
           <img src={require('../images/logo-sketch.png')} width="50" />
           <img src={require('../images/logo-figma.png')} width="50" />
@@ -49,53 +48,19 @@ const IndexPage = () => (
     <div className="Cards">
       <h2>My projects</h2>
       <div className="CardGroup">
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper2.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper3.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper4.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper2.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper3.jpg')}
-        />
-        <Card
-          title="React for Designers"
-          text="12 sections"
-          image={require('../images/wallpaper4.jpg')}
-        />
+        {staticdata.projects.map(project => (
+          <Card
+            title={project.title}
+            text={project.text}
+            image={project.image}
+          />
+        ))}
       </div>
     </div>
     <Section
-      image={require('../images/wallpaper2.jpg')}
-      logo={require('../images/logo-react.png')}
-      title="React for Designers"
-      text="Learn how to build a modern site using React and the most efficient libraries to get your site/product online. Get familiar with components, Grid CSS, animations, interactions, dynamic data with Contentful and deploying your site with Netlify."
+      image={require('../images/wallpaper4.jpg')}
+      title="Winner of the WWDC Scholarship."
+      text="WWDC Scholarships reward talented students and developers with the opportunity to attend this year’s conference. I demonstrated my iOS programming ability and competed with people of all ages for this scholarship. I was one of 350 students selected for the scholarship globally. WWDC tickets are valued at $1600 and assigned to paying attendees by lottery due to extremely high demand. At the conference, I worked with Apple engineers to understand and integrate latest iOS technologies and best practices into my software."
     />
     <SectionCaption>12 sections - 6 hours</SectionCaption>
     <SectionCellGroup>

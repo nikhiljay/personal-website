@@ -1,9 +1,57 @@
 {
-    "cells": [
-        {
-            "title": "Intro to React",
-            "image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
-        },
+	"projects": [{
+		"title": "Intro to React",
+		"text": "12 sections",
+		"image": "../images/wallpaper4.jpg"
+	}, {
+		"title": "Intro to React 2",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 3",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 4",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 5",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 6",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 7",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 8",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 9",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 10",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 11",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}, {
+		"title": "Intro to React 12",
+		"text": "12 sections",
+		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+	}],
+	"cells": [{
+			"title": "Intro to React",
+			"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		},
 		{
 			"title": "Basic Styling in CSS",
 			"image": "https://cl.ly/1U1F170x3D0L/download/logo-react-small.png"
@@ -48,5 +96,5 @@
 			"title": "Payment with Stripe Checkout",
 			"image": "https://cl.ly/1U1F170x3D0L/download/logo-react-small.png"
 		}
-    ]
+	]
 }

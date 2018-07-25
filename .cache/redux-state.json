@@ -16,7 +16,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "080155631645ca2e846c693d329baa27",
+        "contentDigest": "b45d229a4a8e543ecf4af65610f7a022",
         "description": "Plugin dev-404-page",
         "owner": "internal-data-bridge"
       }
@@ -443,6 +443,10 @@
             "version": "^1.9.247"
           },
           {
+            "name": "gatsby-image",
+            "version": "^1.0.55"
+          },
+          {
             "name": "gatsby-link",
             "version": "^1.6.40"
           },
@@ -495,12 +499,12 @@
       "host": "localhost",
       "pathPrefix": "",
       "polyfill": true,
-      "buildTime": "2018-07-25T06:02:08.348Z",
+      "buildTime": "2018-07-25T09:12:11.003Z",
       "id": "Site",
       "parent": "SOURCE",
       "children": [],
       "internal": {
-        "contentDigest": "8b48e32e9a7fbe75022a0b625a51c74f",
+        "contentDigest": "9c1a5aa067c9e5753a33557ad1f9c15d",
         "type": "Site",
         "owner": "internal-data-bridge"
       }
@@ -550,7 +554,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "e44a8754839633135cf7f0b191f42abc",
+        "contentDigest": "27fd907ffc072aedd6246c44b3631317",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -571,28 +575,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "e93b9fe20b648c4307415222d90488a7",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /page-2/": {
-      "layout": "index",
-      "jsonName": "page-2.json",
-      "internalComponentName": "ComponentPage2",
-      "path": "/page-2/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/page-2.js",
-      "componentChunkName": "component---src-pages-page-2-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/page-2.js",
-      "id": "SitePage /page-2/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "0ae5bd15908e947540e648eadc195b80",
+        "contentDigest": "dc8d23cc8960174ef48d103665329bab",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -613,7 +596,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "cd6ac34e585fa78eaa504e3dd062a52c",
+        "contentDigest": "4bec9dfe92acb6b2c15abc5a4af3fc97",
         "description": "Plugin prod-404",
         "owner": "internal-data-bridge"
       }
@@ -625,7 +608,7 @@
         "qd3fn9ngw366-master": "w5ZGw6JFwqZmVcKsE8Kow4grw45QdyZLOcKWw4VeXXDCtcO5ecOrdcOSwp1dwrnCj8KnHMKww7TCu8OZw7Z2GAfCtA0Swq8VwofCvXLDs2RHN8KAw6V2wpzCiwRrAcOHQWRWw5DCrMKRHBlhw54Tw7pHwp0tUQ"
       }
     },
-    "PLUGINS_HASH": "4afb89ced84065df1e32a163f51e1da9"
+    "PLUGINS_HASH": "3030dabe269589c43457bf5ce42bbf68"
   },
   "componentDataDependencies": {
     "nodes": {
@@ -634,11 +617,11 @@
       ]
     },
     "connections": {
-      "ContentfulLink": [
-        "LAYOUT___index"
-      ],
       "SitePage": [
         "/dev-404-page/"
+      ],
+      "ContentfulLink": [
+        "LAYOUT___index"
       ]
     }
   }

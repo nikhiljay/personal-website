@@ -16,7 +16,7 @@ const Layout = ({ children, data }) => (
         { name: 'keywords', content: data.site.siteMetadata.keywords }
       ]}
     />
-    <Header />
+    {/* <Header /> */}
     {children()}
     <Footer data={data}>
       © 2018, made by Nikhil D'Souza.
