@@ -17,13 +17,12 @@
 }
 
 .Card:hover img {
-    transform: translateY(-20px);
+    /* transform: translateY(-20px); */
 }
 
 .Card img {
     position: absolute;
-    top: 0;
-    height: 110%;
+    height: 101%;
     z-index: -1;
     transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }

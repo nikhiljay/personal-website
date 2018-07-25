@@ -1,52 +1,32 @@
 {
 	"projects": [{
-		"title": "Intro to React",
-		"text": "12 sections",
-		"image": "../images/wallpaper4.jpg"
+		"title": "My Blog",
+		"text": "April 2014",
+		"image": "https://cl.ly/2v0u0H2L0T18/download/pugiblog-preview.png"
 	}, {
-		"title": "Intro to React 2",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		"title": "Wolly",
+		"text": "January 2015",
+		"image": "https://cl.ly/460209282f0m/download/wolly-preview.png"
 	}, {
-		"title": "Intro to React 3",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		"title": "Prioritize",
+		"text": "February 2015",
+		"image": "https://cl.ly/0x2I16353j0Z/download/prioritize-preview.png"
 	}, {
-		"title": "Intro to React 4",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		"title": "Help Nepal",
+		"text": "April 2015",
+		"image": "https://cl.ly/1V3C3I1C1r0V/download/helpnepal-preview.png"
 	}, {
-		"title": "Intro to React 5",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		"title": "WWDC Scholars",
+		"text": "June 2015",
+		"image": "https://cl.ly/2H252k3p1C1E/download/scholars-preview.png"
 	}, {
-		"title": "Intro to React 6",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		"title": "Hack Chair",
+		"text": "October 2015",
+		"image": "https://cl.ly/1X3y1t2f281C/download/hackchair-preview.png"
 	}, {
-		"title": "Intro to React 7",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
-	}, {
-		"title": "Intro to React 8",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
-	}, {
-		"title": "Intro to React 9",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
-	}, {
-		"title": "Intro to React 10",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
-	}, {
-		"title": "Intro to React 11",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
-	}, {
-		"title": "Intro to React 12",
-		"text": "12 sections",
-		"image": "https://cl.ly/0Q1n3K431Y1S/download/logo-react-small.png"
+		"title": "Measuring Brainwaves",
+		"text": "May 2015",
+		"image": "https://cl.ly/1F172K3X1m0b/download/brainwaves-preview.png"
 	}],
 	"cells": [{
 			"title": "Intro to React",
