@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { SocialIcon } from 'react-social-icons';
 
 const FooterGroup = styled.div`
     background: #F1F3F5;
@@ -14,38 +15,33 @@ const Text = styled.p`
     max-width: 500px;
     margin: 0 auto;
 `
-const Button = styled.button`
-    background: linear-gradient(102.24deg, #9B51E0 0%, #3436E7 100%);
-    box-shadow: 0px 10px 20px rgba(101, 41, 255, 0.15);
-    border-radius: 30px;
-    color: white;
-    border: none;
-    padding: 16px 60px;
-    font-weight: 600;
-    font-size: 24px;
-    justify-self: center;
-    transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 
-    &:hover {
-        box-shadow: 0 20px 40px rgba(0,0,0, 0.15);
-        transform: translateY(-3px);
-    }
-`
-const LinkGroup = styled.div`
-    width: 500px;
-    margin: 50px auto;
+const SocialGroup = styled.div`
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 40px;
+    margin: 30px auto;
 
-    a {
-        transition: 0.8s;
-    }
-
-    a:hover {
-        color: black;
+    @media (max-width: 640px) {
+        grid-gap: 20px;
     }
 `
+
+// const LinkGroup = styled.div`
+//     width: 500px;
+//     margin: 50px auto;
+//     display: grid;
+//     grid-template-columns: repeat(2, 1fr);
+//     grid-gap: 10px;
+
+//     a {
+//         transition: 0.8s;
+//     }
+
+//     a:hover {
+//         color: black;
+//     }
+// `
 
 const Copyright = styled.div`
     color: #486791;
@@ -57,10 +53,16 @@ const Copyright = styled.div`
 const Footer = ({ data, children }) => (
     <FooterGroup>
         <Text>Let's keep in touch.</Text>
-        <Button>Tweet</Button>
-        <LinkGroup>{data.allContentfulLink.edges.map(edge => (
+        <SocialGroup>
+            <SocialIcon url="http://twitter.com/jaketrent" />
+            <SocialIcon url="https://medium.com/@nikhiljay" />
+            <SocialIcon url="https://github.com/nikhiljay" />
+            <SocialIcon url="http://linkedin.com/in/nikhiljay7" />
+            <a href="mailto:nikhiljay@purdue.edu"><SocialIcon network="email" /></a>
+        </SocialGroup>
+        {/* <LinkGroup>{data.allContentfulLink.edges.map(edge => (
             <a href={edge.node.url}>{edge.node.title}</a>
-        ))}</LinkGroup>
+        ))}</LinkGroup> */}
         <Copyright>{children}</Copyright>
     </FooterGroup>
 )
