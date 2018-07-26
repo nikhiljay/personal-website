@@ -3,22 +3,17 @@ import styled from 'styled-components'
 import Wave from './Wave';
 
 const SectionGroup = styled.div`
-    background: url(${props => props.image});
-    height: 500px;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${props => props.image});
     background-size: cover;
     margin-bottom: 80px;
     display: grid;
 `
 
 const SectionTitleGroup = styled.div`
-    width: 1280px;
-    margin: auto;
+    max-width: 1280px;
     position: relative;
-    align-self: end;
-
-    @media (max-width: 720px) {
-        grid-template-columns: 1fr;
-    }
+    margin: auto;
+    padding: 100px 50px;
 `
 
 const SectionTitle = styled.h3`
@@ -34,6 +29,7 @@ const SectionTitle = styled.h3`
 
 const SectionText = styled.p`
     color: white;
+    font-size: 24px;
 `
 
 const Section = props => (

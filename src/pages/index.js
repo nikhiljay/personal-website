@@ -60,7 +60,7 @@ const IndexPage = () => (
     <Section
       image={require('../images/wallpaper4.jpg')}
       title="Winner of the WWDC Scholarship."
-      text="WWDC Scholarships reward talented students and developers with the opportunity to attend this year’s conference. I demonstrated my iOS programming ability and competed with people of all ages for this scholarship. I was one of 350 students selected for the scholarship globally. WWDC tickets are valued at $1600 and assigned to paying attendees by lottery due to extremely high demand. At the conference, I worked with Apple engineers to understand and integrate latest iOS technologies and best practices into my software."
+      text="WWDC Scholarships reward talented students and developers with the opportunity to attend this year’s conference. I was one of 350 students selected for the scholarship globally."
     />
     <SectionCaption>12 sections - 6 hours</SectionCaption>
     <SectionCellGroup>
