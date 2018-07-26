@@ -45,6 +45,17 @@ const IndexPage = () => (
         <Wave />
       </div>
     </div>
+
+    <div className="About">
+      <div className="AboutImage"></div>
+      <div className="AboutText">
+        <h2>About Me</h2>
+        <p>
+          I have an avid interest in machine learning and digital health. I enjoy coding, designing, and playing with new technologies. Last year, I had a lot of fun organizing my high school's official student-run <a href="https://gunnhacks.com/" target="_blank">hackathon</a>. This summer, I'm a software engineering intern in the innovation lab at <a href="https://github.com/nikhiljay" target="_blank">Saama</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href="https://github.com/nikhiljay" target="_blank">resume</a>.
+        </p>
+      </div>
+    </div>
+
     <div className="Cards">
       <h2>My projects</h2>
       <div className="CardGroup">
@@ -53,6 +64,7 @@ const IndexPage = () => (
             title={project.title}
             text={project.text}
             image={project.image}
+            link={project.link}
             light={project.light}
           />
         ))}

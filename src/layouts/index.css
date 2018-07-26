@@ -12,6 +12,15 @@ a {
   font-weight: 600;
 }
 
+h2 {
+  margin: 0;
+  font-size: 60px;
+  font-weight: 700;
+  background: linear-gradient(104deg, #050A27 0%, #4A548C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .Hero {
   background: url('../images/hero.jpg');
   background-size: cover;
@@ -107,18 +116,79 @@ a {
   }
 }
 
+.About {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 120px;
+  align-items: center;
+}
+
+.AboutImage {
+  padding-top: 80%;
+  margin-left: -40%;
+  background: url('../images/about.jpg');
+  background-size: cover;
+  -webkit-mask: url('../images/about-mask.svg') right top / contain no-repeat;
+  background-position: calc(100% + 150px)
+}
+
+.AboutText {
+  padding: 2.5rem;
+}
+
+.AboutText p {
+  font-size: 30px;
+  color: #8096A3;
+  margin: 0;
+}
+
+.AboutText a {
+  color: #394044;
+}
+
+@media (max-width: 1400px) {
+  .AboutText p {
+    font-size: 25px;
+    color: #8096A3;
+    margin: 0;
+  }
+}
+
+@media (max-width: 1060px) {
+  .AboutImage {
+    background-position: calc(100% + 100px)
+  }
+  .AboutText p {
+    font-size: 20px;
+    color: #8096A3;
+    margin: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .AboutImage {
+    background-position: calc(100% + 125px)
+  }
+  .About {
+    display: grid;
+    grid-template-columns: repeat(1, 0.9fr);
+    margin-bottom: 120px;
+    align-items: center;
+  }
+  .AboutText p {
+    font-size: 22px;
+    color: #8096A3;
+    margin: 0;
+  }
+}
+
 .Cards {
   margin-top: -65px;
 }
 
 .Cards h2 {
   margin: 50px 20px;
-  font-size: 60px;
   text-align: center;
-  font-weight: 700;
-  background: linear-gradient(104deg, #050A27 0%, #4A548C 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .CardGroup {

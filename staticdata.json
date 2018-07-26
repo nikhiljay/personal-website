@@ -3,36 +3,43 @@
 		"title": "My Blog",
 		"text": "Apr 2014",
 		"image": "https://cl.ly/3e3i1u1Y150B/download/blog.jpg",
+		"link": "https://blog.nikhiljay.com",
 		"light": true
 	}, {
 		"title": "Wolly",
 		"text": "Jan 2015",
 		"image": "https://cl.ly/3b0A01123B2i/download/wolly.jpg",
+		"link": "#",
 		"light": true
 	}, {
 		"title": "Prioritize",
 		"text": "Feb 2015",
 		"image": "https://cl.ly/133k0z030B1X/download/prioritize.jpg",
+		"link": "#",
 		"light": true
 	}, {
 		"title": "Help Nepal",
 		"text": "Apr 2015",
 		"image": "https://cl.ly/2O2y1u3D1y0m/download/nepal.jpg",
+		"link": "#",
 		"light": true
 	}, {
 		"title": "WWDC Scholars",
 		"text": "Jun 2015",
 		"image": "https://cl.ly/2J2w1C1j281Y/download/scholars.jpg",
+		"link": "#",
 		"light": true
 	}, {
 		"title": "Hack Chair",
 		"text": "Oct 2015",
 		"image": "https://cl.ly/1O1A253f3T1G/download/hackchair.jpg",
+		"link": "#",
 		"light": false
 	}, {
 		"title": "Brainwaves",
 		"text": "May 2015",
 		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
+		"link": "#",
 		"light": true
 	}],
 	"cells": [{
