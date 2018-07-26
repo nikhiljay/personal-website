@@ -21,6 +21,12 @@ h2 {
   -webkit-text-fill-color: transparent;
 }
 
+@media (max-width: 720px) {
+  h2 {
+    font-size: 40px;
+  }
+}
+
 .Hero {
   background: url('../images/hero.jpg');
   background-size: cover;
