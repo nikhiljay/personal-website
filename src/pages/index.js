@@ -53,15 +53,18 @@ const IndexPage = () => (
             title={project.title}
             text={project.text}
             image={project.image}
+            light={project.light}
           />
         ))}
       </div>
     </div>
-    <Section
-      image={require('../images/wallpaper4.jpg')}
-      title="Winner of the WWDC Scholarship."
-      text="WWDC Scholarships reward talented students and developers with the opportunity to attend this year’s conference. I was one of 350 students selected for the scholarship globally."
-    />
+    <div className="SectionGroup">
+      <div className="SectionTitleGroup">
+        <h3>AI enthusiast.</h3>
+        <h3>Eagle Scout.</h3>
+        <h3>Apple WWDC Scholarship Winner.</h3>
+      </div>
+    </div>
     <SectionCaption>12 sections - 6 hours</SectionCaption>
     <SectionCellGroup>
       {staticdata.cells.map(cell => (

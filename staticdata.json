@@ -1,32 +1,39 @@
 {
 	"projects": [{
 		"title": "My Blog",
-		"text": "April 2014",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"text": "Apr 2014",
+		"image": "https://cl.ly/3e3i1u1Y150B/download/blog.jpg",
+		"light": true
 	}, {
 		"title": "Wolly",
-		"text": "January 2015",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"text": "Jan 2015",
+		"image": "https://cl.ly/3b0A01123B2i/download/wolly.jpg",
+		"light": true
 	}, {
 		"title": "Prioritize",
-		"text": "February 2015",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"text": "Feb 2015",
+		"image": "https://cl.ly/133k0z030B1X/download/prioritize.jpg",
+		"light": true
 	}, {
 		"title": "Help Nepal",
-		"text": "April 2015",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"text": "Apr 2015",
+		"image": "https://cl.ly/2O2y1u3D1y0m/download/nepal.jpg",
+		"light": true
 	}, {
 		"title": "WWDC Scholars",
-		"text": "June 2015",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"text": "Jun 2015",
+		"image": "https://cl.ly/2J2w1C1j281Y/download/scholars.jpg",
+		"light": true
 	}, {
 		"title": "Hack Chair",
-		"text": "October 2015",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"text": "Oct 2015",
+		"image": "https://cl.ly/1O1A253f3T1G/download/hackchair.jpg",
+		"light": false
 	}, {
-		"title": "Measuring Brainwaves",
+		"title": "Brainwaves",
 		"text": "May 2015",
-		"image": "https://cl.ly/390G2T3C3z1G/download/wallpaper2.jpg"
+		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
+		"light": true
 	}],
 	"cells": [{
 			"title": "Intro to React",

@@ -13,7 +13,7 @@ a {
 }
 
 .Hero {
-  background: url('../images/wallpaper3.jpg');
+  background: url('../images/hero.jpg');
   background-size: cover;
   background-position: center;
   position: relative;
@@ -148,4 +148,38 @@ a {
     max-width: 320px;
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+.SectionGroup {
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../images/purdue.jpg');
+  background-size: cover;
+  background-position-y: 65%;
+  position: relative;
+  margin-bottom: 80px;
+  display: grid;
+}
+
+.SectionTitleGroup {
+  max-width: 1280px;
+  position: relative;
+  margin: auto;
+  padding: 100px 50px;
+}
+
+.SectionTitleGroup h3 {
+  color: white;
+  font-size: 60px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media (max-width: 720px) {
+  .SectionTitleGroup h3 {
+    font-size: 40px;
+  }
+}
+
+.SectionTitleGroup p {
+  color: white;
+  font-size: 24px;
 }
