@@ -1,12 +1,11 @@
 import React from 'react'
-import styled from 'styled-components'
 import './Post.css'
 
 const Post = props => (
     <a href={props.link} target="_blank">
-        <div className="PostGroup">
+        <div className="Post">
             <div className="PostTitle">{props.title}</div>
-            <div className="PostText">{props.text}</div>
+            <img className="PostImage" src={props.image} />
             <div className="PostDate">{props.date}</div>
         </div>
     </a>

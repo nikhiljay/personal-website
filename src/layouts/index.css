@@ -242,7 +242,6 @@ h2 {
   background-size: cover;
   background-position-y: 65%;
   position: relative;
-  margin-bottom: 80px;
   display: grid;
 }
 
@@ -269,6 +268,14 @@ h2 {
 .SectionTitleGroup p {
   color: white;
   font-size: 24px;
+}
+
+.Blog {
+  background-color: #FAFAFA;
+  padding-top: 50px;
+  padding-bottom: 1px;
+  display: grid;
+  justify-content: center;
 }
 
 .Blog h2 {

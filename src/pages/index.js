@@ -104,25 +104,24 @@ const IndexPage = () => (
       <SectionBlogGroup>
         <Post
           title="Transfer Learning"
-          text="If you’ve been following my blog, you know that I have an interest to make efficient neural networks. But every so often, I’m lost on how to modify model architecture to improve accuracy..."
-          date="Jun 7"
+          image="https://cdn-images-1.medium.com/max/1600/1*yw1zbqvxvxR4tNxgKhvr3A.png"
           link="https://blog.nikhiljay.com/transfer-learning-69ca80d5a621"
+          date="Jun 7"
         />
         <Post
           title="ML Update: Keras and CoreML"
-          text="It has been a few months since I posted my previous update regarding machine learning. In that time, I have learned the fundamentals of neural networks while exploring..."
-          date="May 23"
+          image="https://cdn-images-1.medium.com/max/1600/1*U9GQMFsXAeEwQylryh16dQ.png"
           link="https://blog.nikhiljay.com/ml-update-39e68572ecc5"
+          date="May 23"
         />
         <Post
           title="My Journey into Machine Learning"
-          text="I have an interest in biology and computer science. Especially since we collect so much biological data, it becomes a challenge to use that data effectively. I want to learn how to..."
-          date="Nov 20"
+          image="https://cdn-images-1.medium.com/max/1600/1*z32UVDAY_vHuGWy-EXeN_g.jpeg"
           link="https://blog.nikhiljay.com/my-journey-into-machine-learning-44587a96289f"
+          date="Nov 20"
         />
       </SectionBlogGroup>
     </div>
-
     {/* <SectionCaption>12 sections - 6 hours</SectionCaption>
     <SectionCellGroup>
       {staticdata.cells.map(cell => (
