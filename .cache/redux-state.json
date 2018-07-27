@@ -16,7 +16,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "1ae904a173df2f3033a9d1d963173ad7",
+        "contentDigest": "d15db05d14c3aaaafb5990c3b9b218ee",
         "description": "Plugin dev-404-page",
         "owner": "internal-data-bridge"
       }
@@ -459,6 +459,10 @@
             "version": "^1.3.54"
           },
           {
+            "name": "medium-json-feed",
+            "version": "0.0.3"
+          },
+          {
             "name": "react-helmet",
             "version": "^5.2.0"
           },
@@ -499,12 +503,12 @@
       "host": "localhost",
       "pathPrefix": "",
       "polyfill": true,
-      "buildTime": "2018-07-26T20:11:35.993Z",
+      "buildTime": "2018-07-26T23:25:11.161Z",
       "id": "Site",
       "parent": "SOURCE",
       "children": [],
       "internal": {
-        "contentDigest": "ad59ce178b8eaef7e17e8120977940d5",
+        "contentDigest": "8f0d4829ebc6460587638bbbc22eb0d5",
         "type": "Site",
         "owner": "internal-data-bridge"
       }
@@ -554,7 +558,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "d72e6f0add7298bd95a9e8775cc6c121",
+        "contentDigest": "2f3b453da536aedab86e7e39a3979235",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -575,7 +579,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "51e870c9882308dda6a32c6f2416ab9c",
+        "contentDigest": "7bffa2f691a140196d54d3d35bf60a47",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -596,7 +600,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "1e84b0328b14963e91909b1c96c7d9a8",
+        "contentDigest": "def59cf171c012e61c0793ecd7191a0f",
         "description": "Plugin prod-404",
         "owner": "internal-data-bridge"
       }
@@ -608,7 +612,7 @@
         "qd3fn9ngw366-master": "w5ZGw6JFwqZmVcKsE8Kow4grw45QdyZLOcKWw4VeXXDCtcO5ecOrdcOSwp1dwrnCj8KnHMKww7TCu8OZw7Z2GAfCtA0Swq8VwofCvXLDs2RHN8KAw6V2wpzCiwRrAcOHQWRWw5DCrMKRHBlhw54Tw7pHwp0tUQ"
       }
     },
-    "PLUGINS_HASH": "3030dabe269589c43457bf5ce42bbf68"
+    "PLUGINS_HASH": "fe263e69bd674d3623bbaca83863005a"
   },
   "componentDataDependencies": {
     "nodes": {

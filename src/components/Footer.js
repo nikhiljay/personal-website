@@ -9,7 +9,7 @@ const FooterGroup = styled.div`
     grid-gap: 20px;
 `
 const Text = styled.p`
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 600;
     color: #486791;
     max-width: 500px;
@@ -20,7 +20,7 @@ const SocialGroup = styled.div`
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-gap: 40px;
-    margin: 30px auto;
+    margin: 20px auto;
 
     @media (max-width: 640px) {
         grid-gap: 20px;
@@ -54,7 +54,7 @@ const Footer = ({ data, children }) => (
     <FooterGroup>
         <Text>Let's keep in touch.</Text>
         <SocialGroup>
-            <SocialIcon url="https://twitter.com/jaketrent" />
+            <SocialIcon url="https://twitter.com/nikhiljay7" />
             <SocialIcon url="https://medium.com/@nikhiljay" />
             <SocialIcon url="https://github.com/nikhiljay" />
             <SocialIcon url="https://linkedin.com/in/nikhiljay7" />

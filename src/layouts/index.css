@@ -192,14 +192,15 @@ h2 {
   margin-top: -65px;
 }
 
-.Cards h2 {
-  margin: 50px 20px;
+.Cards h2,
+.Blog h2 {
+  margin: 30px 20px;
   text-align: center;
 }
 
 .CardGroup {
   max-width: 1280px;
-  margin: 0 auto 150px auto;
+  margin: 0 auto 150px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 40px;
@@ -258,4 +259,23 @@ h2 {
 .SectionTitleGroup p {
   color: white;
   font-size: 24px;
+}
+
+.Blog h2 {
+  margin-bottom: 0;
+}
+
+.Blog p {
+  font-size: 30px;
+  color: #6D6E7A;
+  margin: 10px 0 30px 0;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .Blog p {
+    font-size: 22px;
+    margin-left: 14px;
+    margin-right: 14px;
+  }
 }

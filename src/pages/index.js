@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import Wave from '../components/Wave';
 import staticdata from '../../staticdata.json'
 import Cell from '../components/Cell';
+import Post from '../components/Post';
 
 const SectionCaption = styled.p`
   font-weight: 600;
@@ -24,6 +25,23 @@ const SectionCellGroup = styled.div`
   padding: 0 20px;
 
   @media (max-width: 800px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+`
+
+const SectionBlogGroup = styled.div`
+  max-width: 1000px;
+  margin: 0 auto 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 40px;
+
+  @media (max-width: 1060px) {
+    max-width: 640px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+  @media (max-width: 720px) {
     grid-template-columns: repeat(1, 1fr);
   }
 `
@@ -51,7 +69,7 @@ const IndexPage = () => (
       <div className="AboutText">
         <h2>About Me</h2>
         <p>
-          I have an avid interest in machine learning and digital health. I enjoy coding, designing, and playing with new technologies. Last year, I had a lot of fun organizing my high school's official student-run <a href="https://gunnhacks.com/" target="_blank">hackathon</a>. This summer, I'm a software engineering intern in the innovation lab at <a href="https://github.com/nikhiljay" target="_blank">Saama</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href="https://github.com/nikhiljay" target="_blank">resume</a>.
+          I have an avid interest in machine learning and digital health. I enjoy coding, designing, and playing with new technologies. Last year, I had a lot of fun organizing my high school's official student-run <a href="https://gunnhacks.com/" target="_blank">hackathon</a>. This summer, I'm a software engineering intern in the innovation lab at <a href="https://www.saama.com/" target="_blank">Saama</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href="../docs/resume.pdf" target="_blank">resume</a>.
         </p>
       </div>
     </div>
@@ -70,6 +88,7 @@ const IndexPage = () => (
         ))}
       </div>
     </div>
+
     <div className="SectionGroup">
       <div className="SectionTitleGroup">
         <h3>AI enthusiast.</h3>
@@ -77,7 +96,33 @@ const IndexPage = () => (
         <h3>Apple WWDC Scholarship Winner.</h3>
       </div>
     </div>
-    <SectionCaption>12 sections - 6 hours</SectionCaption>
+
+    <div className="Blog">
+      <h2>My blog</h2>
+      <p>Dive deeper into my corner of the internet.</p>
+      <SectionBlogGroup>
+        <Post
+          title="Transfer Learning"
+          text="If you’ve been following my blog, you know that I have an interest to make efficient neural networks. But every so often, I’m lost on how to modify model architecture to improve accuracy..."
+          date="Jun 7"
+          link="https://blog.nikhiljay.com/transfer-learning-69ca80d5a621"
+        />
+        <Post
+          title="ML Update: Keras and CoreML"
+          text="It has been a few months since I posted my previous update regarding machine learning. In that time, I have learned the fundamentals of neural networks while exploring..."
+          date="May 23"
+          link="https://blog.nikhiljay.com/ml-update-39e68572ecc5"
+        />
+        <Post
+          title="My Journey into Machine Learning"
+          text="I have an interest in biology and computer science. Especially since we collect so much biological data, it becomes a challenge to use that data effectively. I want to learn how to..."
+          date="Nov 20"
+          link="https://blog.nikhiljay.com/my-journey-into-machine-learning-44587a96289f"
+        />
+      </SectionBlogGroup>
+    </div>
+
+    {/* <SectionCaption>12 sections - 6 hours</SectionCaption>
     <SectionCellGroup>
       {staticdata.cells.map(cell => (
         <Cell
@@ -85,7 +130,7 @@ const IndexPage = () => (
           image={cell.image}
         />
       ))}
-    </SectionCellGroup>
+    </SectionCellGroup> */}
   </div>
 )
 
