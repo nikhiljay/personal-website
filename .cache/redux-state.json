@@ -16,7 +16,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "d15db05d14c3aaaafb5990c3b9b218ee",
+        "contentDigest": "1732d04efdeae2d2a9943b4aebdc9960",
         "description": "Plugin dev-404-page",
         "owner": "internal-data-bridge"
       }
@@ -459,12 +459,16 @@
             "version": "^1.3.54"
           },
           {
-            "name": "medium-json-feed",
-            "version": "0.0.3"
-          },
-          {
             "name": "react-helmet",
             "version": "^5.2.0"
+          },
+          {
+            "name": "react-native-rss-parser",
+            "version": "^1.2.0"
+          },
+          {
+            "name": "rss-parser",
+            "version": "^3.4.2"
           },
           {
             "name": "styled-components",
@@ -503,12 +507,12 @@
       "host": "localhost",
       "pathPrefix": "",
       "polyfill": true,
-      "buildTime": "2018-07-26T23:25:11.161Z",
+      "buildTime": "2018-07-27T04:34:20.338Z",
       "id": "Site",
       "parent": "SOURCE",
       "children": [],
       "internal": {
-        "contentDigest": "8f0d4829ebc6460587638bbbc22eb0d5",
+        "contentDigest": "5c98d379fd899e4d3ec07db9ba50297b",
         "type": "Site",
         "owner": "internal-data-bridge"
       }
@@ -558,7 +562,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "2f3b453da536aedab86e7e39a3979235",
+        "contentDigest": "d785517a233c5464f10a78e7930858eb",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -579,7 +583,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "7bffa2f691a140196d54d3d35bf60a47",
+        "contentDigest": "06c29d4326a0e20f993bebf0c2d644fa",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -600,7 +604,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "def59cf171c012e61c0793ecd7191a0f",
+        "contentDigest": "bf18598ac6ac64012ca6b2994c688a72",
         "description": "Plugin prod-404",
         "owner": "internal-data-bridge"
       }
@@ -612,7 +616,7 @@
         "qd3fn9ngw366-master": "w5ZGw6JFwqZmVcKsE8Kow4grw45QdyZLOcKWw4VeXXDCtcO5ecOrdcOSwp1dwrnCj8KnHMKww7TCu8OZw7Z2GAfCtA0Swq8VwofCvXLDs2RHN8KAw6V2wpzCiwRrAcOHQWRWw5DCrMKRHBlhw54Tw7pHwp0tUQ"
       }
     },
-    "PLUGINS_HASH": "fe263e69bd674d3623bbaca83863005a"
+    "PLUGINS_HASH": "1129e6c4c8d9fc726eec75faeac5695b"
   },
   "componentDataDependencies": {
     "nodes": {
