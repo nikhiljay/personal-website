@@ -54,12 +54,12 @@ const IndexPage = () => (
         <h1>Nikhil D'Souza</h1>
         <p>I’m a student @ Purdue aspiring to apply technology and AI to the health industry.</p>
         <div className="Logos">
-          <img src={require('../images/logo-sketch.png')} width="50" />
-          <img src={require('../images/logo-figma.png')} width="50" />
-          <img src={require('../images/logo-studio.png')} width="50" />
-          <img src={require('../images/logo-framer.png')} width="50" />
-          <img src={require('../images/logo-react.png')} width="50" />
+          <img src={require('../images/logo-ml.png')} width="50" />
+          <img src={require('../images/logo-keras.png')} width="50" />
+          <img src={require('../images/logo-python.png')} width="50" />
           <img src={require('../images/logo-swift.png')} width="50" />
+          <img src={require('../images/logo-react.png')} width="50" />
+          <img src={require('../images/logo-sketch.png')} width="50" />
         </div>
         <Wave />
       </div>
