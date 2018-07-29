@@ -7,7 +7,7 @@ body {
 }
 
 a {
-  color: #5334F5;
+  color: #394044;
   text-decoration: none;
   font-weight: 600;
 }
@@ -146,10 +146,6 @@ h2 {
   font-size: 30px;
   color: #8096A3;
   margin: 0;
-}
-
-.AboutText a {
-  color: #394044;
 }
 
 @media (max-width: 1400px) {

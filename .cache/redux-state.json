@@ -16,7 +16,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "6db26c08a32be35f0c5c4657bc663fe7",
+        "contentDigest": "54a2733e684fe7bdda331b1cb4bd4a21",
         "description": "Plugin dev-404-page",
         "owner": "internal-data-bridge"
       }
@@ -507,12 +507,12 @@
       "host": "localhost",
       "pathPrefix": "",
       "polyfill": true,
-      "buildTime": "2018-07-28T20:42:52.759Z",
+      "buildTime": "2018-07-29T05:52:33.928Z",
       "id": "Site",
       "parent": "SOURCE",
       "children": [],
       "internal": {
-        "contentDigest": "f6d777128e7e5afd24b8b1034f7b3902",
+        "contentDigest": "9b74274c9601f7119fb57fbc6ebea209",
         "type": "Site",
         "owner": "internal-data-bridge"
       }
@@ -562,7 +562,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "73d10a445f703c3fbb13b3931c9c69f4",
+        "contentDigest": "becfb5a41cb0fb1a47d8cd79f5fff19c",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -583,7 +583,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "cb02e9524be00643c03802c988f49601",
+        "contentDigest": "42cfaa7980ce1c8487bc2d9195c8aef5",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -604,8 +604,29 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "6234455abc0771252022ab658e2aeb17",
+        "contentDigest": "3b9f71a18a37192cd050498e3d97960c",
         "description": "Plugin prod-404",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /Brainwaves/": {
+      "layout": "index",
+      "jsonName": "brainwaves.json",
+      "internalComponentName": "ComponentBrainwaves",
+      "path": "/Brainwaves/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Brainwaves.js",
+      "componentChunkName": "component---src-pages-brainwaves-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Brainwaves.js",
+      "id": "SitePage /Brainwaves/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "43e3f65fe277279f5a5a226a92c44a68",
+        "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
     }

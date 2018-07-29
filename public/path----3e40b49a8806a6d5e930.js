@@ -1,0 +1,2 @@
+webpackJsonp([60335399758886],{111:function(e,t){e.exports={data:{site:{siteMetadata:{title:"Nikhil D'Souza",description:"Nikhil's personal website.",keywords:"tech, science, machine learning, artificial intelligence, ios development, web development, palo alto, gunn, purdue"}},allContentfulLink:{edges:[{node:{title:"Home",url:"/",createdAt:"2018-07-24T23:14:18.805Z"}}]}},layoutContext:{}}}});
+//# sourceMappingURL=path----3e40b49a8806a6d5e930.js.map
