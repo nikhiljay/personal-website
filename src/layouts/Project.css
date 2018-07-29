@@ -7,6 +7,12 @@
     justify-content: center;
 }
 
+@media (max-width: 500px) {
+    #section-title {
+        height: 500px;
+    }
+}
+
 #section-title .background {
     width: 100%;
     height: 100%;

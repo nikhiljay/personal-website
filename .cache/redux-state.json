@@ -629,6 +629,153 @@
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
+    },
+    "SitePage /Wolly/": {
+      "layout": "index",
+      "jsonName": "wolly.json",
+      "internalComponentName": "ComponentWolly",
+      "path": "/Wolly/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Wolly.js",
+      "componentChunkName": "component---src-pages-wolly-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Wolly.js",
+      "id": "SitePage /Wolly/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "5ff53373bcd9e7875b9a4fd46bc29da6",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /Prioritize/": {
+      "layout": "index",
+      "jsonName": "prioritize.json",
+      "internalComponentName": "ComponentPrioritize",
+      "path": "/Prioritize/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Prioritize.js",
+      "componentChunkName": "component---src-pages-prioritize-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Prioritize.js",
+      "id": "SitePage /Prioritize/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "a683c1070d7dfe276e7fe9836e703a3f",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /HelpNepal/": {
+      "layout": "index",
+      "jsonName": "help-nepal.json",
+      "internalComponentName": "ComponentHelpNepal",
+      "path": "/HelpNepal/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
+      "componentChunkName": "component---src-pages-help-nepal-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
+      "id": "SitePage /HelpNepal/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "baa98a8245e2dd4c048c96e9d0612a5b",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /WWDCScholars/": {
+      "layout": "index",
+      "jsonName": "wwdc-scholars.json",
+      "internalComponentName": "ComponentWwdcScholars",
+      "path": "/WWDCScholars/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/WWDCScholars.js",
+      "componentChunkName": "component---src-pages-wwdc-scholars-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/WWDCScholars.js",
+      "id": "SitePage /WWDCScholars/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "42f3735250722c70d1c35e37d0da28eb",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /HackChair/": {
+      "layout": "index",
+      "jsonName": "hack-chair.json",
+      "internalComponentName": "ComponentHackChair",
+      "path": "/HackChair/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HackChair.js",
+      "componentChunkName": "component---src-pages-hack-chair-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HackChair.js",
+      "id": "SitePage /HackChair/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "6f11dfda7b00e200a2484526c937508a",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /GunnHacks/": {
+      "layout": "index",
+      "jsonName": "gunn-hacks.json",
+      "internalComponentName": "ComponentGunnHacks",
+      "path": "/GunnHacks/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/GunnHacks.js",
+      "componentChunkName": "component---src-pages-gunn-hacks-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/GunnHacks.js",
+      "id": "SitePage /GunnHacks/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "f711c8cf78201e3e77ef233dc48700ad",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /MLProjects/": {
+      "layout": "index",
+      "jsonName": "ml-projects.json",
+      "internalComponentName": "ComponentMlProjects",
+      "path": "/MLProjects/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/MLProjects.js",
+      "componentChunkName": "component---src-pages-ml-projects-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/MLProjects.js",
+      "id": "SitePage /MLProjects/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "14f5beae4291f8e259682175b2a2aa55",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
     }
   },
   "status": {

@@ -37,9 +37,21 @@
 		"light": false
 	}, {
 		"title": "Brainwaves",
-		"text": "May 2015",
+		"text": "May 2016",
 		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
 		"link": "/brainwaves",
+		"light": true
+	}, {
+		"title": "Gunn Hacks",
+		"text": "Nov 2016-17",
+		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
+		"link": "/gunnhacks",
+		"light": true
+	}, {
+		"title": "ML Projects",
+		"text": "Nov 2017",
+		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
+		"link": "/mlprojects",
 		"light": true
 	}],
 	"cells": [{
