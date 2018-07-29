@@ -1,9 +1,19 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(https://www.sciencenews.org/sites/default/files/2018/03/main/articles/030618_LS_brain-wave_feat.jpg);
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const Brainwaves = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
                 <h1>Measuring Brainwaves</h1>
                 <h2>The next dimension of technology.</h2>

@@ -1,12 +1,22 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(https://cdn-images-1.medium.com/max/1600/1*mo00W8aSQ9VumqFdCu8MUw.jpeg);
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const HackChair = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>Hack Chair</h1>
+                <h2>We hacked a chair.</h2>
             </div>
             <div className="mask"></div>
         </section>

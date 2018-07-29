@@ -44,13 +44,13 @@
 	}, {
 		"title": "Gunn Hacks",
 		"text": "Nov 2016-17",
-		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
+		"image": "https://cl.ly/343q2K3n2r1L/download/gunnhacks.png",
 		"link": "/gunnhacks",
 		"light": true
 	}, {
 		"title": "ML Projects",
 		"text": "Nov 2017",
-		"image": "https://cl.ly/1I1D1Q3W0s2w/download/brainwaves.jpg",
+		"image": "https://cl.ly/0U051C0n0i2A/download/ml-projects.png",
 		"link": "/mlprojects",
 		"light": true
 	}],

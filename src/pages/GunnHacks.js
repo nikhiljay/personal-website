@@ -1,12 +1,22 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Gunn_High_School_May_2011.jpg/1200px-Gunn_High_School_May_2011.jpg);
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const GunnHacks = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>Gunn Hacks</h1>
+                <h2>Gunn High School's annual 24-hour student hackathon.</h2>
             </div>
             <div className="mask"></div>
         </section>

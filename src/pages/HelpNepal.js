@@ -1,12 +1,22 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(https://media3.s-nbcnews.com/i/newscms/2015_18/996991/150427-nepal-quake-jhc-1326_d9fc2b306d8be4d170e2c954611f545a.JPG);
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const HelpNepal = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>Help Nepal</h1>
+                <h2>Help the victims of the earthquake.</h2>
             </div>
             <div className="mask"></div>
         </section>

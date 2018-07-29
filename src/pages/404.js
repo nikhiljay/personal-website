@@ -1,9 +1,22 @@
 import React from 'react'
 
 const NotFoundPage = () => (
-  <div>
-    <h1>NOT FOUND</h1>
-    <p>You just hit a route that doesn&#39;t exist... the sadness.</p>
+  <div className="container">
+    <div className="code-area">
+      <span className="comment">// 404 page not found.</span>
+
+      <span>
+        <span className="if">if</span>
+        <span className="condition"> (</span>
+        <span className="blue">!</span><span className="condition">found)</span>
+      </span>
+
+      <span>
+        <span className="nested blue">throw</span>
+        <span>(<span className="message">"(╯°□°)╯︵ ┻━┻"</span>);</span>
+        <span style={{ display: 'block'}}>}</span>
+      </span>
+    </div>
   </div>
 )
 

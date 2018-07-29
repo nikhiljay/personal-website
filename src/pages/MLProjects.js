@@ -1,12 +1,22 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(https://cdn-images-1.medium.com/max/2000/1*OOWSoWHeQ5kyJ4N0P2ptNA.png);
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const MLProjects = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>ML Projects</h1>
+                <h2>Machine learning projects.</h2>
             </div>
             <div className="mask"></div>
         </section>

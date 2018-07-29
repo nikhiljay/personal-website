@@ -1,12 +1,22 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(http://wondrlust.com/wp-content/uploads/2017/11/o-STUDENTS-VOLUNTEERING-facebook.jpg);
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const Wolly = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>Wolly</h1>
+                <h2>The new definition of volunteering.</h2>
             </div>
             <div className="mask"></div>
         </section>

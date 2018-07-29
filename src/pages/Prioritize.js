@@ -5,8 +5,8 @@ const Prioritize = () => (
         <section id="section-title">
             <div className="background"></div>
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>Prioritize</h1>
+                <h2>A utility to organize tasks.</h2>
             </div>
             <div className="mask"></div>
         </section>

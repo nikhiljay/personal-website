@@ -1,12 +1,23 @@
 import React from 'react'
+import styled from 'styled-components'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(https://cdn-images-1.medium.com/max/2000/1*YXOjQ06e8KzUK5CTh1cmQw.jpeg);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    position: absolute;
+`
 
 const WWDCScholars = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
-                <h1>Measuring Brainwaves</h1>
-                <h2>The next dimension of technology.</h2>
+                <h1>WWDC Scholars</h1>
+                <h2>WWDC Scholarship Winners.</h2>
             </div>
             <div className="mask"></div>
         </section>
