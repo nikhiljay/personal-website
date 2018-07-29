@@ -142,6 +142,12 @@ h2 {
   padding: 2.5rem;
 }
 
+@media (max-width: 640px) {
+  .AboutText {
+    padding: 20px;
+  }
+}
+
 .AboutText p {
   font-size: 30px;
   color: #8096A3;
