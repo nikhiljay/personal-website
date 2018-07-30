@@ -16,7 +16,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "54a2733e684fe7bdda331b1cb4bd4a21",
+        "contentDigest": "60ebc4049bbf5f8e4a202eaabe4fb899",
         "description": "Plugin dev-404-page",
         "owner": "internal-data-bridge"
       }
@@ -507,12 +507,12 @@
       "host": "localhost",
       "pathPrefix": "",
       "polyfill": true,
-      "buildTime": "2018-07-29T05:52:33.928Z",
+      "buildTime": "2018-07-29T20:57:51.913Z",
       "id": "Site",
       "parent": "SOURCE",
       "children": [],
       "internal": {
-        "contentDigest": "9b74274c9601f7119fb57fbc6ebea209",
+        "contentDigest": "e13ebb89ac46388eb5f1499b11736533",
         "type": "Site",
         "owner": "internal-data-bridge"
       }
@@ -562,50 +562,8 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "becfb5a41cb0fb1a47d8cd79f5fff19c",
+        "contentDigest": "58e4af662458996f62d572dc808a84a1",
         "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /": {
-      "layout": "index",
-      "jsonName": "index.json",
-      "internalComponentName": "ComponentIndex",
-      "path": "/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/index.js",
-      "componentChunkName": "component---src-pages-index-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/index.js",
-      "id": "SitePage /",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "42cfaa7980ce1c8487bc2d9195c8aef5",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /404.html": {
-      "layout": "index",
-      "jsonName": "404-html.json",
-      "internalComponentName": "Component404Html",
-      "path": "/404.html",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/404.js",
-      "componentChunkName": "component---src-pages-404-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin prod-404",
-      "pluginCreatorId": "Plugin prod-404",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/404.js",
-      "id": "SitePage /404.html",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "3b9f71a18a37192cd050498e3d97960c",
-        "description": "Plugin prod-404",
         "owner": "internal-data-bridge"
       }
     },
@@ -625,112 +583,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "43e3f65fe277279f5a5a226a92c44a68",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /Wolly/": {
-      "layout": "index",
-      "jsonName": "wolly.json",
-      "internalComponentName": "ComponentWolly",
-      "path": "/Wolly/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Wolly.js",
-      "componentChunkName": "component---src-pages-wolly-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Wolly.js",
-      "id": "SitePage /Wolly/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "5ff53373bcd9e7875b9a4fd46bc29da6",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /Prioritize/": {
-      "layout": "index",
-      "jsonName": "prioritize.json",
-      "internalComponentName": "ComponentPrioritize",
-      "path": "/Prioritize/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Prioritize.js",
-      "componentChunkName": "component---src-pages-prioritize-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Prioritize.js",
-      "id": "SitePage /Prioritize/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "a683c1070d7dfe276e7fe9836e703a3f",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /HelpNepal/": {
-      "layout": "index",
-      "jsonName": "help-nepal.json",
-      "internalComponentName": "ComponentHelpNepal",
-      "path": "/HelpNepal/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
-      "componentChunkName": "component---src-pages-help-nepal-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
-      "id": "SitePage /HelpNepal/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "baa98a8245e2dd4c048c96e9d0612a5b",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /WWDCScholars/": {
-      "layout": "index",
-      "jsonName": "wwdc-scholars.json",
-      "internalComponentName": "ComponentWwdcScholars",
-      "path": "/WWDCScholars/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/WWDCScholars.js",
-      "componentChunkName": "component---src-pages-wwdc-scholars-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/WWDCScholars.js",
-      "id": "SitePage /WWDCScholars/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "42f3735250722c70d1c35e37d0da28eb",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /HackChair/": {
-      "layout": "index",
-      "jsonName": "hack-chair.json",
-      "internalComponentName": "ComponentHackChair",
-      "path": "/HackChair/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HackChair.js",
-      "componentChunkName": "component---src-pages-hack-chair-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HackChair.js",
-      "id": "SitePage /HackChair/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "6f11dfda7b00e200a2484526c937508a",
+        "contentDigest": "bda413cfc43a44203e680e46fd83a66c",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -751,7 +604,70 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "f711c8cf78201e3e77ef233dc48700ad",
+        "contentDigest": "f993128b02c55d66f083e56344411f97",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /HackChair/": {
+      "layout": "index",
+      "jsonName": "hack-chair.json",
+      "internalComponentName": "ComponentHackChair",
+      "path": "/HackChair/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HackChair.js",
+      "componentChunkName": "component---src-pages-hack-chair-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HackChair.js",
+      "id": "SitePage /HackChair/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "41b2603523d3c156181d37e68e46f4f8",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /HelpNepal/": {
+      "layout": "index",
+      "jsonName": "help-nepal.json",
+      "internalComponentName": "ComponentHelpNepal",
+      "path": "/HelpNepal/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
+      "componentChunkName": "component---src-pages-help-nepal-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
+      "id": "SitePage /HelpNepal/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "4a4c51c1a964c88935320497d31fbda7",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /": {
+      "layout": "index",
+      "jsonName": "index.json",
+      "internalComponentName": "ComponentIndex",
+      "path": "/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/index.js",
+      "componentChunkName": "component---src-pages-index-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/index.js",
+      "id": "SitePage /",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "a9f5ec4471d62d0a58e43e9f3bf4d538",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -772,8 +688,92 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "14f5beae4291f8e259682175b2a2aa55",
+        "contentDigest": "ac778686287593a1ef5f09320dff67c4",
         "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /Prioritize/": {
+      "layout": "index",
+      "jsonName": "prioritize.json",
+      "internalComponentName": "ComponentPrioritize",
+      "path": "/Prioritize/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Prioritize.js",
+      "componentChunkName": "component---src-pages-prioritize-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Prioritize.js",
+      "id": "SitePage /Prioritize/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "fcc5c92c90611b8388c54d88b6aa8d5a",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /Wolly/": {
+      "layout": "index",
+      "jsonName": "wolly.json",
+      "internalComponentName": "ComponentWolly",
+      "path": "/Wolly/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Wolly.js",
+      "componentChunkName": "component---src-pages-wolly-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/Wolly.js",
+      "id": "SitePage /Wolly/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "047ae0f9d19052fe5a1dd8a8a73b1082",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /WWDCScholars/": {
+      "layout": "index",
+      "jsonName": "wwdc-scholars.json",
+      "internalComponentName": "ComponentWwdcScholars",
+      "path": "/WWDCScholars/",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/WWDCScholars.js",
+      "componentChunkName": "component---src-pages-wwdc-scholars-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin component-page-creator",
+      "pluginCreatorId": "Plugin component-page-creator",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/WWDCScholars.js",
+      "id": "SitePage /WWDCScholars/",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "598fd888c00ab325d9e9a474e066ae50",
+        "description": "Plugin component-page-creator",
+        "owner": "internal-data-bridge"
+      }
+    },
+    "SitePage /404.html": {
+      "layout": "index",
+      "jsonName": "404-html.json",
+      "internalComponentName": "Component404Html",
+      "path": "/404.html",
+      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/404.js",
+      "componentChunkName": "component---src-pages-404-js",
+      "context": {},
+      "pluginCreator___NODE": "Plugin prod-404",
+      "pluginCreatorId": "Plugin prod-404",
+      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/404.js",
+      "id": "SitePage /404.html",
+      "parent": "SOURCE",
+      "children": [],
+      "internal": {
+        "type": "SitePage",
+        "contentDigest": "f89666a53a4e5700e2bea3992ee10f70",
+        "description": "Plugin prod-404",
         "owner": "internal-data-bridge"
       }
     }
