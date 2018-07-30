@@ -23,26 +23,29 @@ const HackChair = () => (
 
         <section id="content-body">
             <div className="wrapper">
-                <h2>AAR</h2>
-                <p>As a sophomore in high school, I participated in the Advanced Authentic Research program in my school. For my project, I developed an iOS app that measures emitted brain waves using an Emotiv headset and gives feedback based on a person’s behavior.</p>
-                <center><img alt="About this Course" src="https://aar.pausd.org/sites/default/files/aar8.png" height="100" width="100" /></center>
+                <p>The Hack Chair is a creative analytical tool that is built from a chair. We used an ordinary plastic chair, cardboard, duct tape, 2 iPhones, a muse headband, and empty nacho boxes.</p>
             </div>
             <div className="wrapper">
-                <h2>The Brain</h2>
-                <p>The human brain is the most mysterious biological organs on our planet. It is so advanced that even humans are not able to understand it to our full capacity. However recently, scientists have been able to recognize that there is energy being emitted from the brain. All of our brains are made up of billions of neurons or, specialized cells transmitting nerve impulses. These neurons use electricity to communicate. When millions of these neurons communicate at once, this generates a significant amount energy. Scientists say that the brain can produce as much as 10 watts of electricity. This energy is in the form of waves, also known as “brain waves” or “neural oscillations”. Brain waves are important because they represent the activity inside our brain. All our thoughts, emotions, and behaviors are results of our neurons communicating with each other.</p>
-                <center><img alt="About this Course" src={require('../images/projects/brainwaves-app.png')} width="200" /></center>
+                <h2>Tilt Prevention</h2>
+                <p>First, the Hack Chair uses an iPhone's gyroscope to detect how far back a chair is titled. This is useful to determine the safety off student. Of the 7,000 schoolchildren admitted to hospital each year as a result of chair-related accidents, 70% were rocking back dangerously, according to the analysis of government statistics by a south London teacher. By measuring when the user reaches a tilting hazard, we give an immediate notification that also suggests other alternative chairs. This feature used the Target API.</p>
+                <center><img src={require('../images/projects/hackchair-1.jpg')} /></center>
             </div>
             <div className="wrapper">
-                <h2>Impact</h2>
-                <p>There are over 1.4 million people annually in the United States that suffer a traumatic brian injuries and over 50,000 of those people die. By improving neurotechnology, doctors will be able to save thousands of lives each year.</p>
-                <center><img alt="About this Course" src="https://4.bp.blogspot.com/-ONY7HcFl4xo/U55Ob8nve3I/AAAAAAAAJ9E/FLJjWafqok4/s1600/Computerized-brain-made-of-GPUs.jpg" width="403" /></center>
+                <h2>Sleep Tracking</h2>
+                <p>The muse brain-sensing headband on the user is used to check how sleepy a student is based on their eye movements and how the chair is positioned. Using the iPhones that we used for other features, we were able to vibrate the user if they fell asleep. This feature used the muse SDK.</p>
             </div>
             <div className="wrapper">
-                <h2>Video</h2>
-                <center><iframe width="80%" height="400" src="https://www.youtube.com/embed/X2r8DeZYR34" allowFullScreen="true"></iframe></center>
+                <h2>Posture Detection</h2>
+                <p>The Hack Chair uses the camera as a proximity sensor on the iPhone to detect how good a student's posture is when sitting on a chair. When the posture of the user is bad, Hack Chair will constantly remind the user to have a good posture. This can prevent medical problems such as scoliosis.</p>
             </div>
             <div className="wrapper">
-                <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank">Github</a>.</p>
+                <h2>Academic Dishonesty Prevention</h2>
+                <p>Also, the arm of the Hack Chair has a camera that allows teachers and other students to collaborate. This tool can also help prevent academic dishonesty. This feature used the Moxtra API.</p>
+            </div>
+            <div className="wrapper">
+                <h2>Conclusion</h2>
+                <p>At the end, we wrapped together the whole project into a Javascript Library called “hackchair.js” so that anyone could use our technology to find analytics of their chair. See the hackathon project submission on <a href="https://devpost.com/software/hack-chair">Devpost</a>. This project is open-source! Check out the repository on <a href="https://github.com/kvfrans/HackChair">Github</a>.</p>
+                <center><img alt="We won!" src={require('../images/projects/hackchair-2.jpg')} /></center>
             </div>
         </section>
     </div>

@@ -1,9 +1,20 @@
 import React from 'react'
+import styled from 'styled-components'
+import background from '../images/projects/prioritize.jpg'
+
+const Background = styled.div`
+    width: 100%;
+    height: 100%;
+    background-image: url(${background});
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+`
 
 const Prioritize = () => (
     <div>
         <section id="section-title">
-            <div className="background"></div>
+            <Background />
             <div className="title">
                 <h1>Prioritize</h1>
                 <h2>A utility to organize tasks.</h2>
@@ -13,26 +24,12 @@ const Prioritize = () => (
 
         <section id="content-body">
             <div className="wrapper">
-                <h2>AAR</h2>
-                <p>As a sophomore in high school, I participated in the Advanced Authentic Research program in my school. For my project, I developed an iOS app that measures emitted brain waves using an Emotiv headset and gives feedback based on a person’s behavior.</p>
-                <center><img alt="About this Course" src="https://aar.pausd.org/sites/default/files/aar8.png" height="100" width="100" /></center>
+                <h2>Smart Task Manager</h2>
+                <p>Prioritize analyzes real time factors and organizes tasks based on which is most convenient and essential. Based on when the stores are open, Prioritize will order things you need to do based on when they can be done. The tasks involving places that close first are put as priority. Prioritize will also organize your tasks based on which is closest to you, eliminating traveling time from one place to another.</p>
             </div>
             <div className="wrapper">
-                <h2>The Brain</h2>
-                <p>The human brain is the most mysterious biological organs on our planet. It is so advanced that even humans are not able to understand it to our full capacity. However recently, scientists have been able to recognize that there is energy being emitted from the brain. All of our brains are made up of billions of neurons or, specialized cells transmitting nerve impulses. These neurons use electricity to communicate. When millions of these neurons communicate at once, this generates a significant amount energy. Scientists say that the brain can produce as much as 10 watts of electricity. This energy is in the form of waves, also known as “brain waves” or “neural oscillations”. Brain waves are important because they represent the activity inside our brain. All our thoughts, emotions, and behaviors are results of our neurons communicating with each other.</p>
-                <center><img alt="About this Course" src={require('../images/projects/brainwaves-app.png')} width="200" /></center>
-            </div>
-            <div className="wrapper">
-                <h2>Impact</h2>
-                <p>There are over 1.4 million people annually in the United States that suffer a traumatic brian injuries and over 50,000 of those people die. By improving neurotechnology, doctors will be able to save thousands of lives each year.</p>
-                <center><img alt="About this Course" src="https://4.bp.blogspot.com/-ONY7HcFl4xo/U55Ob8nve3I/AAAAAAAAJ9E/FLJjWafqok4/s1600/Computerized-brain-made-of-GPUs.jpg" width="403" /></center>
-            </div>
-            <div className="wrapper">
-                <h2>Video</h2>
-                <center><iframe width="80%" height="400" src="https://www.youtube.com/embed/X2r8DeZYR34" allowFullScreen="true"></iframe></center>
-            </div>
-            <div className="wrapper">
-                <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank">Github</a>.</p>
+                <h2>Efficient</h2>
+                <p>Prioritize makes your life better by giving you more time to do what you want. Prioritize values efficiency, saving you time by organizing the tasks that need to be done in such a way that will limit required preparation and ensure the completion of tasks by verifying store hours. You can access your tasks across all devices, using a web-based system that allows you to view your tasks anywhere.</p>
             </div>
         </section>
     </div>

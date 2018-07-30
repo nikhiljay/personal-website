@@ -36,7 +36,7 @@
     font-weight: 400;
     color: hsla(0, 0%, 100%, .8);
     background: none;
-    -webkit-text-fill-color: unset;
+    -webkit-text-fill-color: hsla(0, 0%, 100%, .8);
     margin: 0;
 }
 
