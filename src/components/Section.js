@@ -1,11 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
-import Wave from './Wave';
+import background from '../images/purdue.jpg'
 
 const SectionGroup = styled.div`
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${props => props.image});
+    background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(${background});
     background-size: cover;
-    margin-bottom: 80px;
+    background-position-y: 65%;
+    position: relative;
     display: grid;
 `
 
@@ -27,16 +28,12 @@ const SectionTitle = styled.h3`
     }
 `
 
-const SectionText = styled.p`
-    color: white;
-    font-size: 24px;
-`
-
 const Section = props => (
-    <SectionGroup image={props.image}>
+    <SectionGroup>
         <SectionTitleGroup>
-            <SectionTitle>{props.title}</SectionTitle>
-            <SectionText>{props.text}</SectionText>
+            <SectionTitle>AI enthusiast.</SectionTitle>
+            <SectionTitle>Eagle Scout.</SectionTitle>
+            <SectionTitle>Apple WWDC Scholarship Winner.</SectionTitle>
         </SectionTitleGroup>
     </SectionGroup>
 )

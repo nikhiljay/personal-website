@@ -210,7 +210,7 @@ h2 {
 
 .CardGroup {
   max-width: 1280px;
-  margin: 0 auto 150px;
+  margin: 0 auto 100px;
   display: grid;
   grid-template-columns: repeat(4, auto);
   grid-gap: 40px;
@@ -280,6 +280,14 @@ h2 {
   justify-content: center;
 }
 
+.BlogGroup {
+  max-width: 1000px;
+  margin: 0 auto 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 40px;
+}
+
 .Blog h2 {
   margin-bottom: 0;
 }
@@ -291,7 +299,17 @@ h2 {
   text-align: center;
 }
 
+@media (max-width: 1060px) {
+  .BlogGroup {
+    max-width: 640px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 720px) {
+  .BlogGroup {
+    grid-template-columns: repeat(1, 1fr);
+  }
   .Blog p {
     font-size: 22px;
     margin-left: 14px;

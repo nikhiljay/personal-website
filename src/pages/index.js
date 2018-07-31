@@ -1,51 +1,10 @@
 import React from 'react'
-import Link from 'gatsby-link'
 import Card from '../components/Card';
 import Section from '../components/Section';
-import styled from 'styled-components'
 import Wave from '../components/Wave';
 import staticdata from '../../staticdata.json'
-import Cell from '../components/Cell';
 import Post from '../components/Post';
 import resume from '../docs/resume.pdf'
-
-const SectionCaption = styled.p`
-  font-weight: 600;
-  font-size: 18px;
-  text-transform: uppercase;
-  color: #94A4BA;
-  text-align: center;
-`
-
-const SectionCellGroup = styled.div`
-  max-width: 800px;
-  margin: 0 auto 100px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column-gap: 20px;
-  padding: 0 20px;
-
-  @media (max-width: 800px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
-`
-
-const SectionBlogGroup = styled.div`
-  max-width: 1000px;
-  margin: 0 auto 100px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 40px;
-
-  @media (max-width: 1060px) {
-    max-width: 640px;
-    grid-template-columns: repeat(2, 1fr);
-}
-
-  @media (max-width: 720px) {
-    grid-template-columns: repeat(1, 1fr);
-  }
-`
 
 const IndexPage = () => (
   <div>
@@ -90,18 +49,12 @@ const IndexPage = () => (
       </div>
     </div>
 
-    <div className="SectionGroup">
-      <div className="SectionTitleGroup">
-        <h3>AI enthusiast.</h3>
-        <h3>Eagle Scout.</h3>
-        <h3>Apple WWDC Scholarship Winner.</h3>
-      </div>
-    </div>
+    <Section />
 
     <div className="Blog">
       <h2>My blog</h2>
       <p>Dive deeper into my corner of the internet.</p>
-      <SectionBlogGroup>
+      <div className="BlogGroup">
         <Post
           title="Transfer Learning"
           image="https://cdn-images-1.medium.com/max/1600/1*yw1zbqvxvxR4tNxgKhvr3A.png"
@@ -120,17 +73,8 @@ const IndexPage = () => (
           link="https://blog.nikhiljay.com/my-journey-into-machine-learning-44587a96289f"
           date="Nov 20"
         />
-      </SectionBlogGroup>
+      </div>
     </div>
-    {/* <SectionCaption>12 sections - 6 hours</SectionCaption>
-    <SectionCellGroup>
-      {staticdata.cells.map(cell => (
-        <Cell
-          title={cell.title}
-          image={cell.image}
-        />
-      ))}
-    </SectionCellGroup> */}
   </div>
 )
 

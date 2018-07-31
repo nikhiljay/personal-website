@@ -92,6 +92,13 @@
     line-height: 120%;
 }
 
+#content-body h3 {
+    font-size: 24px;
+    text-transform: uppercase;
+    color: #8e8e93;
+    font-weight: 500;
+}
+
 #content-body p {
     color: #4a4a4a;
 }

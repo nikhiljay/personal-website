@@ -18,12 +18,6 @@
 		"link": "/prioritize",
 		"light": true
 	}, {
-		"title": "Help Nepal",
-		"text": "Apr 2015",
-		"image": "https://cl.ly/2O2y1u3D1y0m/download/nepal.jpg",
-		"link": "/helpnepal",
-		"light": true
-	}, {
 		"title": "WWDC Scholars",
 		"text": "Jun 2015",
 		"image": "https://cl.ly/2J2w1C1j281Y/download/scholars.jpg",
@@ -51,7 +45,7 @@
 		"title": "ML Projects",
 		"text": "Nov 2017",
 		"image": "https://cl.ly/0U051C0n0i2A/download/ml-projects.png",
-		"link": "/mlprojects",
+		"link": "https://blog.nikhiljay.com/ml-update-39e68572ecc5",
 		"light": true
 	}],
 	"cells": [{

@@ -35,13 +35,6 @@
         "path": "/HackChair/"
     },
     {
-        "componentChunkName": "component---src-pages-help-nepal-js",
-        "layout": "layout---index",
-        "layoutComponentChunkName": "component---src-layouts-index-js",
-        "jsonName": "help-nepal.json",
-        "path": "/HelpNepal/"
-    },
-    {
         "componentChunkName": "component---src-pages-index-js",
         "layout": "layout---index",
         "layoutComponentChunkName": "component---src-layouts-index-js",

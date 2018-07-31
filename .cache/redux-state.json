@@ -16,7 +16,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "60ebc4049bbf5f8e4a202eaabe4fb899",
+        "contentDigest": "5477e15502268f10e18873772a14ace8",
         "description": "Plugin dev-404-page",
         "owner": "internal-data-bridge"
       }
@@ -507,12 +507,12 @@
       "host": "localhost",
       "pathPrefix": "",
       "polyfill": true,
-      "buildTime": "2018-07-29T20:57:51.913Z",
+      "buildTime": "2018-07-31T06:50:38.061Z",
       "id": "Site",
       "parent": "SOURCE",
       "children": [],
       "internal": {
-        "contentDigest": "e13ebb89ac46388eb5f1499b11736533",
+        "contentDigest": "7e46119ba5534690eaff1b860c109db3",
         "type": "Site",
         "owner": "internal-data-bridge"
       }
@@ -562,7 +562,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "58e4af662458996f62d572dc808a84a1",
+        "contentDigest": "3901e2677ece16f3156154d9bcf8d70c",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -583,7 +583,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "bda413cfc43a44203e680e46fd83a66c",
+        "contentDigest": "77d646a644d61db0fd4ddd5028bdba42",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -604,7 +604,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "f993128b02c55d66f083e56344411f97",
+        "contentDigest": "080ada4e4e8fa2b6aad792ec3ca829d7",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -625,28 +625,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "41b2603523d3c156181d37e68e46f4f8",
-        "description": "Plugin component-page-creator",
-        "owner": "internal-data-bridge"
-      }
-    },
-    "SitePage /HelpNepal/": {
-      "layout": "index",
-      "jsonName": "help-nepal.json",
-      "internalComponentName": "ComponentHelpNepal",
-      "path": "/HelpNepal/",
-      "component": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
-      "componentChunkName": "component---src-pages-help-nepal-js",
-      "context": {},
-      "pluginCreator___NODE": "Plugin component-page-creator",
-      "pluginCreatorId": "Plugin component-page-creator",
-      "componentPath": "/Users/nikhildsouza/Documents/Development/Personal-Website-React/src/pages/HelpNepal.js",
-      "id": "SitePage /HelpNepal/",
-      "parent": "SOURCE",
-      "children": [],
-      "internal": {
-        "type": "SitePage",
-        "contentDigest": "4a4c51c1a964c88935320497d31fbda7",
+        "contentDigest": "1e6fa35861f94c062098d362b6cdb69f",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -667,7 +646,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "a9f5ec4471d62d0a58e43e9f3bf4d538",
+        "contentDigest": "1253a908245abcf8194c4dcf443bb05c",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -688,7 +667,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "ac778686287593a1ef5f09320dff67c4",
+        "contentDigest": "cbd3fe588b23a1056da9bca8148ab056",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -709,7 +688,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "fcc5c92c90611b8388c54d88b6aa8d5a",
+        "contentDigest": "c8337e68c22f1c3bffa74e944eedda8d",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -730,7 +709,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "047ae0f9d19052fe5a1dd8a8a73b1082",
+        "contentDigest": "dd2f47573d4853cf32cc2d8e2bd7376a",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -751,7 +730,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "598fd888c00ab325d9e9a474e066ae50",
+        "contentDigest": "647d6b0b968a11a1e0ceae70580b846c",
         "description": "Plugin component-page-creator",
         "owner": "internal-data-bridge"
       }
@@ -772,7 +751,7 @@
       "children": [],
       "internal": {
         "type": "SitePage",
-        "contentDigest": "f89666a53a4e5700e2bea3992ee10f70",
+        "contentDigest": "31b311361cc5ea0fd2214d62f03adc51",
         "description": "Plugin prod-404",
         "owner": "internal-data-bridge"
       }
