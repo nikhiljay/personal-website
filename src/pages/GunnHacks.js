@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import background from '../images/projects/gunnhacks-4.jpg'
+import background from '../images/projects/gunnhacks-2.jpg'
 
 const Background = styled.div`
     width: 100%;
