@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import Favicon from 'react-favicon';
 
 const Background = styled.div`
     width: 100%;
@@ -12,18 +13,19 @@ const Background = styled.div`
 
 const Wolly = () => (
     <div>
+        <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
             <div className="title">
                 <h1>Wolly</h1>
-                <h2>The new definition of volunteering.</h2>
+                <h2>Redifining volunteering.</h2>
             </div>
             <div className="mask"></div>
         </section>
 
         <section id="content-body">
             <div className="wrapper">
-                <h2>Volunteering App</h2>
+                <h2>A Volunteering App</h2>
                 <p>Most high schools require their students to complete a certain amount of service hours. However, most students don't really enjoy doing service hours for things that they don't like such as "babysitting" or something. Our app gives the user a list of volunteering opportunities that are relevant to the user. If they specialize in technology, then they could choose a tech support for example. People could also request for volunteers if they are hosting an event.</p>
                 <center><img src={require('../images/projects/wolly.jpg')} /></center>
             </div>

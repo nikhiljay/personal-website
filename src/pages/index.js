@@ -5,9 +5,11 @@ import Wave from '../components/Wave';
 import staticdata from '../../staticdata.json'
 import Post from '../components/Post';
 import resume from '../docs/resume.pdf'
+import Favicon from 'react-favicon';
 
 const IndexPage = () => (
   <div>
+    <Favicon url={require('../images/favicon.png')} />
     <div className="Hero">
       <div className="HeroGroup">
         <h1>Nikhil D'Souza</h1>

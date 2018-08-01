@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import background from '../images/projects/prioritize.jpg'
+import Favicon from 'react-favicon';
 
 const Background = styled.div`
     width: 100%;
@@ -13,6 +14,7 @@ const Background = styled.div`
 
 const Prioritize = () => (
     <div>
+        <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
             <div className="title">

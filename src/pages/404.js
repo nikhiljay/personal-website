@@ -1,7 +1,9 @@
 import React from 'react'
+import Favicon from 'react-favicon';
 
 const NotFoundPage = () => (
   <div className="container">
+    <Favicon url={require('../images/favicon.png')} />
     <div className="code-area">
       <span className="comment">// 404 page not found.</span>
 

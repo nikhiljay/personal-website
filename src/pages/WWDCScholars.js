@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import Favicon from 'react-favicon';
 
 const Background = styled.div`
     width: 100%;
@@ -12,11 +13,12 @@ const Background = styled.div`
 
 const WWDCScholars = () => (
     <div>
+        <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
             <div className="title">
                 <h1>WWDC Scholars</h1>
-                <h2>WWDC Scholarship Winners.</h2>
+                <h2>WWDC Scholarship winners work together to build an app.</h2>
             </div>
             <div className="mask"></div>
         </section>

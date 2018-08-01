@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import background from '../images/projects/gunnhacks-2.jpg'
+import background from '../images/projects/gunnhacks-1.jpg'
+import Favicon from 'react-favicon';
 
 const Background = styled.div`
     width: 100%;
@@ -13,6 +14,7 @@ const Background = styled.div`
 
 const GunnHacks = () => (
     <div>
+        <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
             <div className="title">
@@ -26,7 +28,13 @@ const GunnHacks = () => (
             <div className="wrapper">
                 <h2>A Student-Run Hackathon</h2>
                 <p>Throughout high school, I participated in hackathons with my friends learning more and more about technology. Eventually, I attended so many hackathons, that I had enough experience to host a hackathon at my own high school. With the help of my friends, I hosted a high school hackathon with over 200 students from all over the Bay Area after months of contacting sponsors and judges, planning prizes, and designing t-shirts.</p>
-                <center><img alt="About this Course" src={require('../images/projects/gunnhacks-1.jpg')} /></center>
+                <center>
+                    <img src={require('../images/projects/gunnhacks-2.jpg')} />
+                    <br /><br />
+                    <img src={require('../images/projects/gunnhacks-3.jpg')} />
+                    <br /><br />
+                    <img src={require('../images/projects/gunnhacks-4.jpg')} />
+                </center>
             </div>
             <div className="wrapper">
                 <p>Check out the Gunn Hacks website <a href="https://gunnhacks.com" target="_blank">here</a>.</p>
