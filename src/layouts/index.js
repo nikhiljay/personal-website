@@ -15,7 +15,8 @@ const Layout = ({ children, data }) => (
       meta={[
         { name: 'title', content: data.site.siteMetadata.title },
         { name: 'description', content: data.site.siteMetadata.description },
-        { name: 'keywords', content: data.site.siteMetadata.keywords }
+        { name: 'keywords', content: data.site.siteMetadata.keywords },
+        { property: 'og:image', content: require('../images/favicon.png') },
       ]}
     />
     {/* <Header /> */}
