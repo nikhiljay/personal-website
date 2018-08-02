@@ -16,7 +16,7 @@ const Layout = ({ children, data }) => (
         { name: 'title', content: data.site.siteMetadata.title },
         { name: 'description', content: data.site.siteMetadata.description },
         { name: 'keywords', content: data.site.siteMetadata.keywords },
-        { property: 'og:image', content: require('../images/favicon.png') },
+        { property: 'og:image', content: 'https://d12dkjq56sjcos.cloudfront.net/pub/media/catalog/product/cache/7b271a1353dabd64ae602995db97658a/s/a/san-francisco-night-tour-big-bus-tour-01.17.jpg' }
       ]}
     />
     {/* <Header /> */}

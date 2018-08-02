@@ -6,13 +6,9 @@ import staticdata from '../../staticdata.json'
 import Post from '../components/Post';
 import resume from '../docs/resume.pdf'
 import Favicon from 'react-favicon';
-import MetaTags from 'react-meta-tags';
 
 const IndexPage = () => (
   <div>
-    <MetaTags>
-      <meta property="og:image" content={require('../images/favicon.png')} />
-    </MetaTags>
     <Favicon url={require('../images/favicon.png')} />
     <div className="Hero">
       <div className="HeroGroup">
