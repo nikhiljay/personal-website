@@ -13,7 +13,7 @@ const IndexPage = () => (
     <div className="Hero">
       <div className="HeroGroup">
         <h1>Nikhil D'Souza</h1>
-        <p>I’m a student @ Purdue aspiring to apply technology and AI to the health industry.</p>
+        <p>I'm passionate about building innovative hacks with AI and technology.</p>
         <div className="Logos">
           <img src={require('../images/logo-ml.png')} width="50" />
           <img src={require('../images/logo-keras.png')} width="50" />
@@ -31,7 +31,7 @@ const IndexPage = () => (
       <div className="AboutText">
         <h2>About Me</h2>
         <p>
-          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technologies. Last year, I had a lot of fun organizing my high school's official student-run <a href="https://gunnhacks.com/" target="_blank">hackathon</a>. This summer, I'm a software engineering intern in the innovation lab at <a href="https://www.saama.com/" target="_blank">Saama</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href={resume} target="_blank">resume</a>.
+          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. This summer, I had a great experience working with <a href="https://www.saama.com/" target="_blank">Saama</a> as an AI intern. Recently, I won 2nd place at the <a href="http://2018f.pennapps.com/" target="_blank">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href={resume} target="_blank">resume</a>.
         </p>
       </div>
     </div>
