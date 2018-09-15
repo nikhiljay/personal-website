@@ -13,7 +13,7 @@ const IndexPage = () => (
     <div className="Hero">
       <div className="HeroGroup">
         <h1>Nikhil D'Souza</h1>
-        <p>I'm passionate about building innovative hacks with AI and technology.</p>
+        <p>I'm passionate about building innovative projects with AI and technology.</p>
         <div className="Logos">
           <img src={require('../images/logo-ml.png')} width="50" />
           <img src={require('../images/logo-keras.png')} width="50" />
