@@ -31,7 +31,7 @@ const IndexPage = () => (
       <div className="AboutText">
         <h2>About Me</h2>
         <p>
-          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. This summer, I had a great experience working with <a href="https://www.saama.com/" target="_blank">Saama</a> as an AI intern. Recently, I won 2nd place at the <a href="http://2018f.pennapps.com/" target="_blank">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href={resume} target="_blank">resume</a>.
+          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. Currently, I'm working with <a href="https://www.viasat.com" target="_blank">Viasat</a> as data science intern. Recently, I won 2nd place at the <a href="https://blog.nikhiljay.com/pennapps-3a0e4a4f9d60" target="_blank">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href={resume} target="_blank">resume</a>.
         </p>
       </div>
     </div>
