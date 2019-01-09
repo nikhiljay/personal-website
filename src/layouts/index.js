@@ -21,7 +21,7 @@ const Layout = ({ children, data }) => (
     {/* <Header /> */}
     {children()}
     <Footer data={data}>
-      © 2018, made by Nikhil D'Souza.
+      © 2019, made by Nikhil D'Souza.
     </Footer>
   </div>
 )

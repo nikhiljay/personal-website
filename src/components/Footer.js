@@ -54,10 +54,10 @@ const Footer = ({ data, children }) => (
     <FooterGroup>
         <Text>Let's keep in touch.</Text>
         <SocialGroup>
-            <SocialIcon url="https://twitter.com/nikhiljay7" />
-            <SocialIcon url="https://medium.com/@nikhiljay" />
-            <SocialIcon url="https://github.com/nikhiljay" />
-            <SocialIcon url="https://linkedin.com/in/nikhiljay7" />
+            <SocialIcon url="https://twitter.com/nikhiljay7" target="_blank" />
+            <SocialIcon url="https://medium.com/@nikhiljay" target="_blank" />
+            <SocialIcon url="https://github.com/nikhiljay" target="_blank" />
+            <SocialIcon url="https://linkedin.com/in/nikhiljay7" target="_blank" />
             <SocialIcon url="mailto:nikhiljay@purdue.edu" />
         </SocialGroup>
         {/* <LinkGroup>{data.allContentfulLink.edges.map(edge => (
