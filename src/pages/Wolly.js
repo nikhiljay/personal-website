@@ -18,7 +18,7 @@ const Wolly = () => (
             <Background />
             <div className="title">
                 <h1>Wolly</h1>
-                <h2>Redifining volunteering.</h2>
+                <h2>Redefining volunteering.</h2>
             </div>
             <div className="mask"></div>
         </section>
