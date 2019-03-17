@@ -1,4 +1,5 @@
 .vscode
-*.sketch
+.sketch
 project-thumbnails/
 .cache/
+node_modules/
