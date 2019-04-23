@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -12,7 +13,7 @@ const Background = styled.div`
 `
 
 const WWDCScholars = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -42,7 +43,7 @@ const WWDCScholars = () => (
                 <p>This app is available for iPhone, iPad, and Apple Watch. You can check it out right now on the <a href="https://itunes.apple.com/us/app/scholars-of-wwdc/id999731893?mt=8" target="_blank">App Store</a>. Comment and rate if you are interested! You can also check out the website right now at <a href="https://wwdcscholars.com" target="_blank">wwdcscholars.com</a>.</p>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default WWDCScholars

@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -12,7 +13,7 @@ const Background = styled.div`
 `
 
 const Wolly = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -33,7 +34,7 @@ const Wolly = () => (
                 <p>Want learn more about this app? You can check it out right now on <a href="https://devpost.com/software/nikhil-d-souza" target="_blank">Devpost</a>.</p>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default Wolly

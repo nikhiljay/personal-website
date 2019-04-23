@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import background from '../images/projects/rugby.jpg'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -13,7 +14,7 @@ const Background = styled.div`
 `
 
 const Rugby = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -41,7 +42,7 @@ const Rugby = () => (
                 </center>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default Rugby

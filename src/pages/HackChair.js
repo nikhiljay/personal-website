@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -12,7 +13,7 @@ const Background = styled.div`
 `
 
 const HackChair = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -42,7 +43,7 @@ const HackChair = () => (
                 <center><img alt="We won!" src={require('../images/projects/hackchair-2.jpg')} /></center>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default HackChair

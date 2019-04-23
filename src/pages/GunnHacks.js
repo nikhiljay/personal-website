@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import background from '../images/projects/gunnhacks-1.jpg'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -13,7 +14,7 @@ const Background = styled.div`
 `
 
 const GunnHacks = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -40,7 +41,7 @@ const GunnHacks = () => (
                 <p>Check out the Gunn Hacks website <a href="https://gunnhacks.com" target="_blank">here</a>.</p>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default GunnHacks

@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -12,7 +13,7 @@ const Background = styled.div`
 `
 
 const Brainwaves = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -47,7 +48,7 @@ const Brainwaves = () => (
                 <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank">Github</a>.</p>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default Brainwaves

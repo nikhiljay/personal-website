@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import background from '../images/projects/prioritize.jpg'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout'
 
 const Background = styled.div`
     width: 100%;
@@ -13,7 +14,7 @@ const Background = styled.div`
 `
 
 const Prioritize = () => (
-    <div>
+    <Layout>
         <Favicon url={require('../images/favicon.png')} />
         <section id="section-title">
             <Background />
@@ -34,7 +35,7 @@ const Prioritize = () => (
                 <p>Prioritize makes your life better by giving you more time to do what you want. Prioritize values efficiency, saving you time by organizing the tasks that need to be done in such a way that will limit required preparation and ensure the completion of tasks by verifying store hours. You can access your tasks across all devices, using a web-based system that allows you to view your tasks anywhere.</p>
             </div>
         </section>
-    </div>
+    </Layout>
 )
 
 export default Prioritize

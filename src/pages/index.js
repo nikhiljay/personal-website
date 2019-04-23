@@ -1,14 +1,15 @@
 import React from 'react'
-import Card from '../components/Card';
-import Section from '../components/Section';
-import Wave from '../components/Wave';
+import Card from '../components/card';
+import Section from '../components/section';
+import Wave from '../components/wave';
 import staticdata from '../../staticdata.json'
-import Post from '../components/Post';
+import Post from '../components/post';
 import resume from '../docs/resume.pdf'
 import Favicon from 'react-favicon';
+import Layout from '../components/layout';
 
 const IndexPage = () => (
-  <div>
+  <Layout>
     <Favicon url={require('../images/favicon.png')} />
     <div className="Hero">
       <div className="HeroGroup">
@@ -77,7 +78,7 @@ const IndexPage = () => (
         />
       </div>
     </div>
-  </div>
+  </Layout>
 )
 
 export default IndexPage
