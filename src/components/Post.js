@@ -1,5 +1,5 @@
 import React from 'react'
-import './Post.css'
+import './post.css'
 
 const Post = props => (
     <a href={props.link} target="_blank">
