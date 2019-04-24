@@ -28,7 +28,7 @@ const SectionTitle = styled.h3`
     }
 `
 
-const Section = props => (
+const Section = () => (
     <SectionGroup>
         <SectionTitleGroup>
             <SectionTitle>AI enthusiast.</SectionTitle>
