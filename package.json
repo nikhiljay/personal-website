@@ -7,6 +7,7 @@
     "gatsby-image": "^2.0.40",
     "gatsby-link": "^2.0.16",
     "gatsby-plugin-react-helmet": "^3.0.12",
+    "gatsby-plugin-styled-components": "^3.0.7",
     "gatsby-source-contentful": "^2.0.52",
     "hawk": "^7.0.10",
     "react": "^16.8.6",
