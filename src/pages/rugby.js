@@ -36,9 +36,9 @@ const Rugby = () => (
             </div>
             <div className="wrapper">
                 <h2>Our Solution</h2>
-                <p>We won <a href="http://llc.stat.purdue.edu/datafest2019.html" target="_blank">1st place</a> by building a tool that determines real-time fatigue levels of rugby players by identifying impacts, measuring sprint distance, and analyzing health metrics. This allows for real-time calculations of fatigue of the athletes, which is more useful than wellness surveys.</p>
+                <p>We won <a href="http://llc.stat.purdue.edu/datafest2019.html" target="_blank" rel="noopener noreferrer">1st place</a> by building a tool that determines real-time fatigue levels of rugby players by identifying impacts, measuring sprint distance, and analyzing health metrics. This allows for real-time calculations of fatigue of the athletes, which is more useful than wellness surveys.</p>
                 <center>
-                    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRSJFHCzxc1je_SQ-t-PyP81Gzjy8o0OF9iztqBqiaP3E2wb_uyKlyYuWSJLzi664KC-E7IlP-IFZw3/embed?start=true&loop=true&delayms=5000" frameborder="0" width="85.7%" height="367" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+                    <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRSJFHCzxc1je_SQ-t-PyP81Gzjy8o0OF9iztqBqiaP3E2wb_uyKlyYuWSJLzi664KC-E7IlP-IFZw3/embed?start=true&loop=true&delayms=5000" frameBorder="0" width="85.7%" height="367" allowFullScreen={true} mozallowfullscreen="true" webkitallowfullscreen="true" title="DataFest presentation"></iframe>
                 </center>
             </div>
         </section>

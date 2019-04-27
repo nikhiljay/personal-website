@@ -19,7 +19,7 @@ const GunnHacks = () => (
         <section id="section-title">
             <Background />
             <div className="title">
-                <h1>Gunn Hacks</h1>
+                <h1>GunnHacks</h1>
                 <h2>Gunn High School's annual 24-hour student hackathon.</h2>
             </div>
             <div className="mask"></div>
@@ -30,15 +30,15 @@ const GunnHacks = () => (
                 <h2>A Student-Run Hackathon</h2>
                 <p>Throughout high school, I participated in hackathons with my friends learning more and more about technology. Eventually, I attended so many hackathons, that I had enough experience to host a hackathon at my own high school. With the help of my friends, I hosted a high school hackathon with over 200 students from all over the Bay Area after months of contacting sponsors and judges, planning prizes, and designing t-shirts.</p>
                 <center>
-                    <img src={require('../images/projects/gunnhacks-2.jpg')} />
+                    <img src={require('../images/projects/gunnhacks-2.jpg')} alt="" />
                     <br /><br />
-                    <img src={require('../images/projects/gunnhacks-3.jpg')} />
+                    <img src={require('../images/projects/gunnhacks-3.jpg')} alt="" />
                     <br /><br />
-                    <img src={require('../images/projects/gunnhacks-4.jpg')} />
+                    <img src={require('../images/projects/gunnhacks-4.jpg')} alt="" />
                 </center>
             </div>
             <div className="wrapper">
-                <p>Check out the Gunn Hacks website <a href="https://gunnhacks.com" target="_blank">here</a>.</p>
+                <p>Check out the GunnHacks website <a href="https://gunnhacks.com" target="_blank" rel="noopener noreferrer">here</a>.</p>
             </div>
         </section>
     </Layout>

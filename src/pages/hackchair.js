@@ -19,7 +19,7 @@ const HackChair = () => (
             <Background />
             <div className="title">
                 <h1>Hack Chair</h1>
-                <h2>We hacked a chair.</h2>
+                <h2>HackingEDU Hackathon</h2>
             </div>
             <div className="mask"></div>
         </section>
@@ -34,13 +34,13 @@ const HackChair = () => (
             <div className="wrapper">
                 <h2>Features</h2>
                 <p>First, the Hack Chair uses the iPhone's gyroscope to detect how far back a chair is titled. The iPhone is attached to the back of the chair and is useful to determine the safety off student. The muse brain-sensing headband is used to check how sleepy a student is based on their eye movements and how the chair is positioned. When a person leans back too far or falls asleep, the chair vibrates.</p>
-                <center><img src={require('../images/projects/hackchair-1.jpg')} /></center>
+                <center><img src={require('../images/projects/hackchair-1.jpg')} alt="Hack chair demo" /></center>
                 <p>The Hack Chair uses the camera as a proximity sensor on the iPhone to detect how good a student's posture is. When a student is slouching, the distance between the chair and the proximity sensor is increased and the Hack Chair is capable of detecting the situation as bad posture. The Hack Chair will constantly remind the user to have a good posture using a series of vibrations. This can prevent medical problems such as scoliosis.</p>
             </div>
             <div className="wrapper">
                 <h2>Conclusion</h2>
                 <p>At the end, we wrapped together the whole project into a Javascript Library called “hackchair.js” so that anyone could use our technology with any chair. See the hackathon project submission on <a href="https://devpost.com/software/hack-chair">Devpost</a>. This project is open-source! Check out the repository on <a href="https://github.com/kvfrans/HackChair">Github</a>.</p>
-                <center><img alt="We won!" src={require('../images/projects/hackchair-2.jpg')} /></center>
+                <center><img src={require('../images/projects/hackchair-2.jpg')} alt="HackingEDU awards ceremony" /></center>
             </div>
         </section>
     </Layout>

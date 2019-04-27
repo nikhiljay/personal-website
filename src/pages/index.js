@@ -16,12 +16,12 @@ const IndexPage = () => (
         <h1>Nikhil D'Souza</h1>
         <p>I'm passionate about building innovative projects with AI and technology.</p>
         <div className="Logos">
-          <img src={require('../images/logo-ml.png')} width="50" />
-          <img src={require('../images/logo-keras.png')} width="50" />
-          <img src={require('../images/logo-python.png')} width="50" />
-          <img src={require('../images/logo-swift.png')} width="50" />
-          <img src={require('../images/logo-react.png')} width="50" />
-          <img src={require('../images/logo-sketch.png')} width="50" />
+          <img src={require('../images/logo-ml.png')} width="50" alt="Machine learning" />
+          <img src={require('../images/logo-keras.png')} width="50" alt="Keras" />
+          <img src={require('../images/logo-python.png')} width="50" alt="Python" />
+          <img src={require('../images/logo-swift.png')} width="50" alt="Swift" />
+          <img src={require('../images/logo-react.png')} width="50" alt="React" />
+          <img src={require('../images/logo-sketch.png')} width="50" alt="Sketch" />
         </div>
         <Wave />
       </div>
@@ -32,7 +32,7 @@ const IndexPage = () => (
       <div className="AboutText">
         <h2>About Me</h2>
         <p>
-          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. This summer, I will work with <a href="https://www.tacobell.com/" target="_blank">Taco Bell</a> as a software engineering intern. Recently, I won 2nd place at the <a href="https://blog.nikhiljay.com/pennapps-3a0e4a4f9d60" target="_blank">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank">Github</a> and <a href={resume} target="_blank">resume</a>.
+          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. This summer, I will work with <a href="https://www.tacobell.com/" target="_blank" rel="noopener noreferrer">Taco Bell</a> as a software engineering intern. Recently, I won 2nd place at the <a href="https://blog.nikhiljay.com/pennapps-3a0e4a4f9d60" target="_blank" rel="noopener noreferrer">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank" rel="noopener noreferrer">Github</a> and <a href={resume} target="_blank" rel="noopener noreferrer">resume</a>.
         </p>
       </div>
     </div>
@@ -40,13 +40,14 @@ const IndexPage = () => (
     <div className="Cards">
       <h2>My projects</h2>
       <div className="CardGroup">
-        {staticdata.projects.map(project => (
+        {staticdata.projects.map((project, i) => (
           <Card
             title={project.title}
             text={project.text}
             image={project.image}
             link={project.link}
             light={project.light}
+            key={i}
           />
         ))}
       </div>

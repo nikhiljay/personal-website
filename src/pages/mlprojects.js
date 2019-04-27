@@ -42,10 +42,10 @@ const MLProjects = () => (
             </div>
             <div className="wrapper">
                 <h2>Video</h2>
-                <center><iframe width="80%" height="400" src="https://www.youtube.com/embed/X2r8DeZYR34" allowFullScreen="true"></iframe></center>
+                <center><iframe width="80%" height="400" src="https://www.youtube.com/embed/X2r8DeZYR34" allowFullScreen="true" title="AAR Showcase"></iframe></center>
             </div>
             <div className="wrapper">
-                <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank">Github</a>.</p>
+                <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank" rel="noopener noreferrer">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank" rel="noopener noreferrer">Github</a>.</p>
             </div>
         </section>
     </Layout>

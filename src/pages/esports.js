@@ -30,19 +30,19 @@ const eSports = () => (
                 <h2>The Challenge</h2>
                 <p>eSports is a relatively new market valued at $1 billion, with room for expansion and innovation. The goal of this hackathon was to solve problems for fan experience, eSport analytics, eAthlete training and performance, and sponsor insights.</p>
                 <center>
-                    <img src={require('../images/projects/esports-2.png')} />
+                    <img src={require('../images/projects/esports-2.png')} alt="eSports stadium" />
                 </center>
             </div>
             <div className="wrapper">
                 <center>
-                    <img src={require('../images/projects/esports-3.png')} />
+                    <img src={require('../images/projects/esports-3.png')} alt="eSports industry" />
                 </center>
             </div>
             <div className="wrapper">
                 <h2>Our Solution</h2>
-                <p>We won <a href="https://twitter.com/MatthewALanham/status/1061451997822509056" target="_blank">3rd place</a> by building a tool that scrapes Twitch, Youtube, Twitter, Instagram, and tournament audio feeds to predict emerging viral eSport athletes using IBM Watson sentiment analysis.</p>
+                <p>We won <a href="https://twitter.com/MatthewALanham/status/1061451997822509056" target="_blank" rel="noopener noreferrer">3rd place</a> by building a tool that scrapes Twitch, Youtube, Twitter, Instagram, and tournament audio feeds to predict emerging viral eSport athletes using IBM Watson sentiment analysis.</p>
                 <center>
-                    <img src={require('../images/projects/esports-4.png')} />
+                    <img src={require('../images/projects/esports-4.png')} alt="" />
                 </center>
             </div>
         </section>

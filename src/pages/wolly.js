@@ -19,7 +19,7 @@ const Wolly = () => (
             <Background />
             <div className="title">
                 <h1>Wolly</h1>
-                <h2>Redefining volunteering.</h2>
+                <h2>Hacking Generation Y Hackathon</h2>
             </div>
             <div className="mask"></div>
         </section>
@@ -28,10 +28,10 @@ const Wolly = () => (
             <div className="wrapper">
                 <h2>A Volunteering App</h2>
                 <p>Most high schools require their students to complete a certain amount of service hours. However, most students don't really enjoy doing service hours for things that they don't like such as "babysitting" or something. Our app gives the user a list of volunteering opportunities that are relevant to the user. If they specialize in technology, then they could choose a tech support for example. People could also request for volunteers if they are hosting an event.</p>
-                <center><img src={require('../images/projects/wolly.jpg')} /></center>
+                <center><img src={require('../images/projects/wolly.jpg')} alt="Wolly app" /></center>
             </div>
             <div className="wrapper">
-                <p>Want learn more about this app? You can check it out right now on <a href="https://devpost.com/software/nikhil-d-souza" target="_blank">Devpost</a>.</p>
+                <p>Want learn more about this app? You can check it out right now on <a href="https://devpost.com/software/nikhil-d-souza" target="_blank" rel="noopener noreferrer">Devpost</a>.</p>
             </div>
         </section>
     </Layout>

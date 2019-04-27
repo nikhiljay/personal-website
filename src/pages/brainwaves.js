@@ -38,14 +38,14 @@ const Brainwaves = () => (
             <div className="wrapper">
                 <h2>Impact</h2>
                 <p>There are over 1.4 million people annually in the United States that suffer a traumatic brian injuries and over 50,000 of those people die. By improving neurotechnology, doctors will be able to save thousands of lives each year.</p>
-                <center><img src="https://4.bp.blogspot.com/-ONY7HcFl4xo/U55Ob8nve3I/AAAAAAAAJ9E/FLJjWafqok4/s1600/Computerized-brain-made-of-GPUs.jpg" width="403" /></center>
+                <center><img src="https://4.bp.blogspot.com/-ONY7HcFl4xo/U55Ob8nve3I/AAAAAAAAJ9E/FLJjWafqok4/s1600/Computerized-brain-made-of-GPUs.jpg" width="403" alt="" /></center>
             </div>
             <div className="wrapper">
                 <h2>Video</h2>
-                <center><iframe width="80%" height="400" src="https://www.youtube.com/embed/X2r8DeZYR34" allowFullScreen="true"></iframe></center>
+                <center><iframe width="80%" height="400" src="https://www.youtube.com/embed/X2r8DeZYR34" allowFullScreen={true} title="AAR Showcase"></iframe></center>
             </div>
             <div className="wrapper">
-                <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank">Github</a>.</p>
+                <p>Check out this <a href="http://www.paloaltopulse.com/2016/05/18/3-reasons-why-palo-alto-students-are-buzzing-about-aar/" target="_blank" rel="noopener noreferrer">article</a>, featuring a picture of me at the top. This project is open-source! See the whole project on my <a href="https://github.com/nikhiljay/brainwaves" target="_blank" rel="noopener noreferrer">Github</a>.</p>
             </div>
         </section>
     </Layout>

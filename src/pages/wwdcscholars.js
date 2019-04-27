@@ -26,7 +26,7 @@ const WWDCScholars = () => (
 
         <section id="content-body">
             <div className="wrapper">
-                <p>If you do not know about the <a href="https://developer.apple.com/wwdc/scholarships/" target="_blank">WWDC Scholarship</a>, you can check out <a href="https://blog.nikhiljay.com/winning-the-wwdc-scholarship-2693b8daf17d" target="_blank">this post</a> on my blog.</p>
+                <p>If you do not know about the <a href="https://developer.apple.com/wwdc/scholarships/" target="_blank" rel="noopener noreferrer">WWDC Scholarship</a>, you can check out <a href="https://blog.nikhiljay.com/winning-the-wwdc-scholarship-2693b8daf17d" target="_blank" rel="noopener noreferrer">this post</a> on my blog.</p>
             </div>
             <div className="wrapper">
                 <h2>Scholars</h2>
@@ -40,7 +40,7 @@ const WWDCScholars = () => (
             </div>
             <div className="wrapper">
                 <h2>Learn More</h2>
-                <p>This app is available for iPhone, iPad, and Apple Watch. You can check it out right now on the <a href="https://itunes.apple.com/us/app/scholars-of-wwdc/id999731893?mt=8" target="_blank">App Store</a>. Comment and rate if you are interested! You can also check out the website right now at <a href="https://wwdcscholars.com" target="_blank">wwdcscholars.com</a>.</p>
+                <p>This app is available for iPhone, iPad, and Apple Watch. You can check it out right now on the <a href="https://itunes.apple.com/us/app/scholars-of-wwdc/id999731893?mt=8" target="_blank" rel="noopener noreferrer">App Store</a>. Comment and rate if you are interested! You can also check out the website right now at <a href="https://wwdcscholars.com" target="_blank" rel="noopener noreferrer">wwdcscholars.com</a>.</p>
             </div>
         </section>
     </Layout>

@@ -20,7 +20,7 @@ const Prioritize = () => (
             <Background />
             <div className="title">
                 <h1>Prioritize</h1>
-                <h2>A utility to organize tasks.</h2>
+                <h2>HS Hacks II Hackathon</h2>
             </div>
             <div className="mask"></div>
         </section>
