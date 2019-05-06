@@ -4,7 +4,7 @@ import Section from '../components/section';
 import Wave from '../components/wave';
 import staticdata from '../../staticdata.json'
 import Post from '../components/post';
-import resume from '../docs/resume.pdf'
+import { withPrefix } from 'gatsby'
 import Favicon from 'react-favicon';
 import Layout from '../components/layout';
 
@@ -32,7 +32,7 @@ const IndexPage = () => (
       <div className="AboutText">
         <h2>About Me</h2>
         <p>
-          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. This summer, I will work with <a href="https://www.tacobell.com/" target="_blank" rel="noopener noreferrer">Taco Bell</a> as a software engineering intern. Recently, I won 2nd place at the <a href="https://blog.nikhiljay.com/pennapps-3a0e4a4f9d60" target="_blank" rel="noopener noreferrer">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank" rel="noopener noreferrer">Github</a> and <a href={resume} target="_blank" rel="noopener noreferrer">resume</a>.
+          I have an avid interest in machine learning and digital health. I enjoy coding, designing, attending hackathons, and playing with new technology. This summer, I will work with <a href="https://www.tacobell.com/" target="_blank" rel="noopener noreferrer">Taco Bell</a> as a software engineering intern. Recently, I won 2nd place at the <a href="https://blog.nikhiljay.com/pennapps-3a0e4a4f9d60" target="_blank" rel="noopener noreferrer">world's largest college hackathon</a>. <br /><br /> Check out my <a href="https://github.com/nikhiljay" target="_blank" rel="noopener noreferrer">Github</a> and <a href={withPrefix('/docs/resume.pdf')} target="_blank" rel="noopener noreferrer">resume</a>.
         </p>
       </div>
     </div>
