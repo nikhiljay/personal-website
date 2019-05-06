@@ -3,7 +3,7 @@ module.exports = {
     title: 'Nikhil D\'Souza',
     description: 'Nikhil\'s personal website.',
     siteURL: 'https://nikhiljay.com',
-    twitter: 'nikhiljay7',
+    twitter: '@nikhiljay7',
     image: '/images/meta_image.png',
     keywords: 'tech, science, machine learning, artificial intelligence, ios development, web development, palo alto, gunn, purdue'
   },
