@@ -1,67 +1,55 @@
-import React from 'react'
-import Helmet from 'react-helmet'
-import { StaticQuery, graphql } from 'gatsby'
+/**
+ * Layout component that queries for data
+ * with Gatsby's useStaticQuery component
+ *
+ * See: https://www.gatsbyjs.com/docs/use-static-query/
+ */
 
-import './layout.css'
-import './project.css'
-import './404.css'
-import Footer from './footer';
+import * as React from "react"
+import PropTypes from "prop-types"
+import { useStaticQuery, graphql } from "gatsby"
 
-const Layout = ({ children }) => (
-  <StaticQuery
-    query={graphql`
-      query SiteTitleQuery {
-        site {
-          siteMetadata {
-            title
-            description
-            siteURL
-            twitter
-            image
-            keywords
-          }
-        }
-        allContentfulLink(sort: {fields: [createdAt], order: ASC}) {
-          edges {
-            node {
-              title
-              url
-              createdAt
-            }
-          }
+import Header from "./header"
+import "./layout.css"
+
+const Layout = ({ children }) => {
+  const data = useStaticQuery(graphql`
+    query SiteTitleQuery {
+      site {
+        siteMetadata {
+          title
         }
       }
-    `}
-    render={data => (
-      <>
-        <Helmet title={data.site.siteMetadata.title}>
-          {/* Primary Meta Tags */}
-          <meta name="title" content={data.site.siteMetadata.title} />
-          <meta name="description" content={data.site.siteMetadata.description} />
-          <meta name="keywords" content={data.site.siteMetadata.keywords} />
+    }
+  `)
 
-          {/* Open Graph / Facebook */}
-          <meta property="og:type" content="website" />
-          <meta property="og:url" content={data.site.siteMetadata.siteURL} />
-          <meta property="og:title" content={data.site.siteMetadata.title} />
-          <meta property="og:description" content={data.site.siteMetadata.description} />
-          <meta property="og:image" content={data.site.siteMetadata.image} />
+  return (
+    <>
+      <Header siteTitle={data.site.siteMetadata?.title || `Title`} />
+      <div
+        style={{
+          margin: `0 auto`,
+          maxWidth: 960,
+          padding: `0 1.0875rem 1.45rem`,
+        }}
+      >
+        <main>{children}</main>
+        <footer
+          style={{
+            marginTop: `2rem`,
+          }}
+        >
+          © {new Date().getFullYear()}, Built with
+          {` `}
+          <a href="https://www.gatsbyjs.com">Gatsby</a>
+        </footer>
+      </div>
+    </>
+  )
+}
 
-          {/* Twitter */}
-          <meta property="twitter:card" content="summary_large_image" />
-          <meta property="twitter:url" content={data.site.siteMetadata.siteURL} />
-          <meta property="twitter:creator" content={data.site.siteMetadata.twitter} />
-          <meta property="twitter:title" content={data.site.siteMetadata.title} />
-          <meta property="twitter:description" content={data.site.siteMetadata.description} />
-          <meta property="twitter:image" content={data.site.siteMetadata.image} />
-        </Helmet>
-        {children}
-        <Footer data={data}>
-          © 2019, made by Nikhil D'Souza.
-        </Footer>
-      </>
-    )}
-  />
-)
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 export default Layout

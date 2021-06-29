@@ -1,21 +1,36 @@
 module.exports = {
   siteMetadata: {
-    title: 'Nikhil D\'Souza',
-    description: 'Nikhil\'s personal website.',
-    siteURL: 'https://nikhiljay.com',
-    twitter: '@nikhiljay7',
-    image: '/images/meta_image.jpg',
-    keywords: 'tech, science, machine learning, artificial intelligence, ios development, web development, palo alto, gunn, purdue'
+    title: `Gatsby Default Starter`,
+    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
+    author: `@gatsbyjs`,
   },
   plugins: [
-    'gatsby-plugin-react-helmet',
+    `gatsby-plugin-react-helmet`,
+    `gatsby-plugin-image`,
     {
-      resolve: 'gatsby-source-contentful',
+      resolve: `gatsby-source-filesystem`,
       options: {
-        spaceId: 'qd3fn9ngw366',
-        accessToken: 'b5101be5b4bbaace4b4b80448f99832c1b7c1207daa826c9b88ca37e275ebf77'
-      }
+        name: `images`,
+        path: `${__dirname}/src/images`,
+      },
     },
-    'gatsby-plugin-styled-components'
+    `gatsby-transformer-sharp`,
+    `gatsby-plugin-sharp`,
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `gatsby-starter-default`,
+        short_name: `starter`,
+        start_url: `/`,
+        background_color: `#663399`,
+        theme_color: `#663399`,
+        display: `minimal-ui`,
+        icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+      },
+    },
+    `gatsby-plugin-gatsby-cloud`,
+    // this (optional) plugin enables Progressive Web App + Offline functionality
+    // To learn more, visit: https://gatsby.dev/offline
+    // `gatsby-plugin-offline`,
   ],
 }
