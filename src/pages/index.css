@@ -1,0 +1,27 @@
+.header {
+  position: relative;
+  margin-top: 150px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.name {
+  width: 300px;
+}
+
+.social {
+  float: right;
+}
+
+.social a {
+  color: black;
+  margin-left: 15px;
+}
+
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 4px;
+  padding-bottom: 5px;
+}

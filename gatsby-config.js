@@ -1,8 +1,11 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Default Starter`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
+    title: 'Nikhil D\'Souza',
+    description: 'Nikhil\'s personal website.',
+    siteURL: 'https://nikhiljay.com',
+    author: '@nikhiljay7',
+    image: '/images/meta_image.jpg',
+    keywords: 'tech, artificial intelligence, data science, machine learning, palo alto, gunn, purdue'
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
@@ -31,6 +34,7 @@ module.exports = {
     `gatsby-plugin-gatsby-cloud`,
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
-    // `gatsby-plugin-offline`,
+    `gatsby-plugin-offline`,
+    `gatsby-plugin-react-svg`,
   ],
 }
