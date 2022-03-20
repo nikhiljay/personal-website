@@ -9,6 +9,7 @@ import * as React from "react"
 import PropTypes from "prop-types"
 
 import "./layout.css"
+import './404.css'
 
 const Layout = ({ children }) => {
   return (
@@ -17,7 +18,7 @@ const Layout = ({ children }) => {
         style={{
           margin: `0 auto`,
           display: `block`,
-          maxWidth: 900,
+          maxWidth: 600,
           overflow: `hidden`,
         }}
       >

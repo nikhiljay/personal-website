@@ -2,10 +2,10 @@ module.exports = {
   siteMetadata: {
     title: 'Nikhil D\'Souza',
     description: 'Nikhil\'s personal website.',
-    siteURL: 'https://nikhiljay.com',
-    author: '@nikhiljay7',
+    siteURL: 'https://nikhil.ai',
+    author: '@nikhiljdsouza',
     image: '/images/meta_image.jpg',
-    keywords: 'tech, artificial intelligence, data science, machine learning, palo alto, gunn, purdue'
+    keywords: 'tech, artificial intelligence, data science, machine learning, ai, healthcare, ml, purdue, west lafayette, palo alto, gunn'
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
