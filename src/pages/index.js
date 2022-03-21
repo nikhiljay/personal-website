@@ -56,7 +56,7 @@ const IndexPage = () => (
       </div>
     </div>
     <p className="description">
-      I’m a senior at Purdue studying computer science, data science, and
+      I'm a senior at Purdue studying computer science, data science, and
       applied statistics. I love learning, solving tough problems, and thinking
       about the intersection of health and artificial intelligence. I previously
       worked at{" "}

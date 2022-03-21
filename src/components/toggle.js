@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ThemeToggler } from "gatsby-plugin-dark-mode";
 
-const DarkToggle = () => (
+const Toggle = () => (
   <ThemeToggler>
     {({ theme, toggleTheme }) => (
       <label>
@@ -16,4 +16,4 @@ const DarkToggle = () => (
   </ThemeToggler>
 );
 
-export default DarkToggle;
+export default Toggle;
