@@ -15,10 +15,10 @@ const IndexPage = () => (
       <StaticImage 
         src={"../images/profile.png"}
         alt="sup"
-        placeholder="blurred"
+        placeholder="none"
         width="100"
         height="100"
-        style={{ float:`left`, borderRadius: `50%`}}
+        imgStyle={{ borderRadius: `100%` }}
       />
       <div className="name">
         <h1>Nikhil D'Souza</h1>
