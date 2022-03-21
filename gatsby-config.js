@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: 'Nikhil D\'Souza',
-    description: 'Nikhil\'s personal website.',
+    description: 'Passionate about building innovative projects with AI and tech. Studying computer science, data science, and applied statistics at Purdue.',
     siteURL: 'https://nikhil.ai',
     author: '@nikhiljdsouza',
     image: '/images/meta_image.jpg',
@@ -22,13 +22,13 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `gatsby-starter-default`,
-        short_name: `starter`,
+        name: `Nikhil D'Souza`,
+        short_name: `Nikhil`,
         start_url: `/`,
-        background_color: `#663399`,
-        theme_color: `#663399`,
+        background_color: `#fff`,
+        theme_color: `#fff`,
         display: `minimal-ui`,
-        icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+        icon: `src/images/rocket-icon.png`, // This path is relative to the root of the site.
       },
     },
     `gatsby-plugin-gatsby-cloud`,
