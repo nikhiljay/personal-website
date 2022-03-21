@@ -1,0 +1,57 @@
+h1 {
+  margin: 5px;
+}
+
+.header {
+  position: relative;
+  margin-top: 150px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.name {
+  margin-left: 15px;
+  font-family: -apple-system-ui-serif, ui-serif, "New York", "Georgia", serif;
+}
+
+.social {
+  display: block;
+}
+
+.social a {
+  color: black;
+  margin-right: 10px;
+}
+
+.social a:hover {
+  color: rgba(194,65,12);
+}
+
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 4px;
+  padding-bottom: 5px;
+}
+
+p {
+  font-size: 17px;
+}
+
+.description {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.description a {
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 400;
+  background-color: rgba(249,115,22, 0.15);
+  border-radius: 5px;
+  padding: 4px 2px 4px 2px;
+}
+
+.description a:hover {
+  background-color: rgba(249,115,22, 0.4);
+}
