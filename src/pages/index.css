@@ -1,5 +1,6 @@
 h1 {
   margin: 5px;
+  color: var(--color);
 }
 
 .header {
@@ -20,7 +21,7 @@ h1 {
 }
 
 .social a {
-  color: black;
+  color: var(--color);
   margin-right: 10px;
 }
 
@@ -37,6 +38,7 @@ svg {
 
 p {
   font-size: 17px;
+  color: var(--color);
 }
 
 .description {
@@ -50,6 +52,7 @@ p {
   background-color: rgba(249,115,22, 0.15);
   border-radius: 5px;
   padding: 4px 2px 4px 2px;
+  color: var(--color);
 }
 
 .description a:hover {
