@@ -71,6 +71,17 @@ function Seo({ description, lang, meta, title }) {
         {
           name: `twitter:description`,
           content: metaDescription,
+          test: `test`,
+        },
+        {
+          name: `theme-color`,
+          content: "#fff",
+          media: "(prefers-color-scheme: light)"
+        },
+        {
+          name: `theme-color`,
+          content: "#1d1f21",
+          media: "(prefers-color-scheme: dark)"
         },
       ].concat(meta)}
     />
