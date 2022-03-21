@@ -2,7 +2,7 @@ import * as React from "react"
 import { withPrefix } from "gatsby"
 import { FaTwitter, FaGithub, FaLinkedin, FaFileAlt } from 'react-icons/fa';
 import { IoArrowForwardSharp } from "react-icons/io5"
-import Profile from "../../static/profile.png"
+import { StaticImage } from "gatsby-plugin-image"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo";
@@ -12,7 +12,14 @@ const IndexPage = () => (
   <Layout>
   <Seo title="Nikhil D'Souza" />
     <div className="header">
-      <img src={Profile} alt="sup" width="100" height="100" style={{ float:`left`, borderRadius: `50%`, }} />
+      <StaticImage 
+        src={"../images/profile.png"}
+        alt="sup"
+        placeholder="blurred"
+        width="100"
+        height="100"
+        style={{ float:`left`, borderRadius: `50%`}}
+      />
       <div className="name">
         <h1>Nikhil D'Souza</h1>
         <div className="social">
