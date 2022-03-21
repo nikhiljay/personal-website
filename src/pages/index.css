@@ -11,6 +11,12 @@ h1 {
   flex-direction: row;
 }
 
+@media (max-width: 768px) {
+  .header {
+    margin-top: 135px;
+  }
+}
+
 .name {
   margin-left: 15px;
   font-family: -apple-system-ui-serif, ui-serif, "New York", "Georgia", serif;

@@ -27,8 +27,8 @@ module.exports = {
         name: `Nikhil D\'Souza`,
         short_name: `Nikhil`,
         start_url: `/`,
-        background_color: `#000`,
-        theme_color: `#000`,
+        background_color: `#1d1f21`,
+        theme_color: `#1d1f21`,
         display: `minimal-ui`,
         icon: `src/images/rocket-icon.png`, // This path is relative to the root of the site.
       },
