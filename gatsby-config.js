@@ -4,7 +4,7 @@ module.exports = {
     description: 'Passionate about building innovative projects with AI and tech. Studying computer science, data science, and applied statistics at Purdue.',
     siteURL: 'https://nikhil.ai',
     author: '@nikhiljdsouza',
-    image: '/images/meta_image.jpg',
+    image: '/images/screenshot.png',
     keywords: 'tech, artificial intelligence, data science, machine learning, ai, healthcare, ml, purdue, west lafayette, palo alto, gunn'
   },
   plugins: [
