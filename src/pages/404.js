@@ -1,9 +1,11 @@
 import * as React from "react"
 
+import Seo from "../components/seo"
 import Layout from "../components/layout"
 
 const NotFoundPage = () => (
   <Layout>
+    <Seo title="404: Not found" />
     <div className="container">
       <div className="code-area">
         {/* eslint-disable-next-line */}

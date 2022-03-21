@@ -5,10 +5,12 @@ import { IoArrowForwardSharp } from "react-icons/io5"
 import Profile from "../../static/profile.png"
 
 import Layout from "../components/layout"
+import Seo from "../components/seo";
 import "./index.css"
 
 const IndexPage = () => (
   <Layout>
+  <Seo title="Nikhil D'Souza" />
     <div className="header">
       <img src={Profile} alt="sup" width="100" style={{ float:`left`, borderRadius: `50%`, }} />
       <div className="name">
