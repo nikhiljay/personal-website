@@ -12,7 +12,7 @@ const IndexPage = () => (
   <Layout>
   <Seo title="Nikhil D'Souza" />
     <div className="header">
-      <img src={Profile} alt="sup" width="100" style={{ float:`left`, borderRadius: `50%`, }} />
+      <img src={Profile} alt="sup" width="100" height="100" style={{ float:`left`, borderRadius: `50%`, }} />
       <div className="name">
         <h1>Nikhil D'Souza</h1>
         <div className="social">
