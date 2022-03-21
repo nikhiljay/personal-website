@@ -46,7 +46,7 @@ const IndexPage = () => (
             <FaLinkedin size={20} />
           </a>
           <a
-            href={withPrefix("/docs/nikhil_dsouza_resume.pdf")}
+            href={withPrefix("/nikhil_dsouza_resume.pdf")}
             target="_blank"
             rel="noreferrer"
           >
@@ -77,7 +77,7 @@ const IndexPage = () => (
       </a>
       , and{" "}
       <a
-        href={withPrefix("/docs/nikhil_dsouza_resume.pdf")}
+        href={withPrefix("/nikhil_dsouza_resume.pdf")}
         target="_blank"
         rel="noreferrer"
       >
