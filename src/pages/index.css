@@ -13,7 +13,7 @@ h1 {
 
 @media (max-width: 768px) {
   .header {
-    margin-top: 135px;
+    margin-top: 50px;
   }
 }
 
@@ -48,8 +48,8 @@ p {
 }
 
 .description {
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 25px;
 }
 
 .description a {
