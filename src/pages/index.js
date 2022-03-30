@@ -16,8 +16,8 @@ const IndexPage = () => (
         src={"../images/profile.png"}
         alt="sup"
         placeholder="none"
-        width="100"
-        height="100"
+        width="110"
+        height="110"
         quality={100}
         imgStyle={{ borderRadius: `100%` }}
       />
@@ -56,18 +56,30 @@ const IndexPage = () => (
       </div>
     </div>
     <p className="description">
-      I'm a senior at Purdue studying computer science, data science, and
-      applied statistics. I love learning, solving tough problems, and thinking
-      about the intersection of health and artificial intelligence. I previously
-      worked at{" "}
-      <a href="https://www.lilly.com/" target="_blank" rel="noreferrer">
-        Eli Lilly
+      I am a senior at Purdue University graduating in data science, computer
+      science, and applied statistics with a focus on AI/ML. I am the Co-Founder
+      & CTO of{" "}
+      <a href="https://vitalize.tech/" target="_blank" rel="noreferrer">
+        Vitalize
       </a>
-      ,{" "}
+      , where we are building a digital wellness platform for the healthcare
+      workforce.
+      <br />
+      <br />
+      Before Vitalize, I was an early engineer at{" "}
       <a href="https://www.vincere.health/" target="_blank" rel="noreferrer">
         Vincere Health
       </a>
-      , & others. Check out my{" "}
+      , a digital health startup out of Harvard Innovation Labs. I also recently
+      worked with{" "}
+      <a href="https://www.lilly.com/" target="_blank" rel="noreferrer">
+        Eli Lilly
+      </a>{" "}
+      to use predictive analytics with clinical data and bring new drugs to
+      market.
+      <br />
+      <br />I love learning, solving tough problems, and thinking about the
+      intersection of health and artificial intelligence. Check out my{" "}
       <a href="https://blog.nikhil.ai/" target="_blank" rel="noreferrer">
         blog
       </a>
