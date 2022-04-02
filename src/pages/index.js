@@ -25,6 +25,13 @@ const IndexPage = () => (
         <h1>Nikhil D'Souza</h1>
         <div className="social">
           <a
+            href="https://linkedin.com/in/nikhiljay7"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <FaLinkedin size={20} />
+          </a>
+          <a
             href="https://twitter.com/nikhiljdsouza"
             target="_blank"
             rel="noreferrer"
@@ -38,13 +45,7 @@ const IndexPage = () => (
           >
             <FaGithub size={20} />
           </a>
-          <a
-            href="https://linkedin.com/in/nikhiljay7"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <FaLinkedin size={20} />
-          </a>
+
           <a
             href={withPrefix("/nikhil_dsouza_resume.pdf")}
             target="_blank"
@@ -56,30 +57,16 @@ const IndexPage = () => (
       </div>
     </div>
     <p className="description">
-      I am a senior at Purdue University graduating in data science, computer
-      science, and applied statistics with a focus on AI/ML. I am the Co-Founder
-      & CTO of{" "}
+      I am the Co-Founder & CTO of{" "}
       <a href="https://vitalize.tech/" target="_blank" rel="noreferrer">
         Vitalize
       </a>
       , where we are building a digital wellness platform for the healthcare
       workforce.
       <br />
-      <br />
-      Before Vitalize, I was an early engineer at{" "}
-      <a href="https://www.vincere.health/" target="_blank" rel="noreferrer">
-        Vincere Health
-      </a>
-      , a digital health startup out of Harvard Innovation Labs. I also recently
-      worked with{" "}
-      <a href="https://www.lilly.com/" target="_blank" rel="noreferrer">
-        Eli Lilly
-      </a>{" "}
-      to use predictive analytics with clinical data and bring new drugs to
-      market.
-      <br />
       <br />I love learning, solving tough problems, and thinking about the
-      intersection of health and artificial intelligence. Check out my{" "}
+      intersection of health and artificial intelligence. In my free time, I
+      enjoy playing chess, tennis, and the piano! Check out my{" "}
       <a href="https://blog.nikhil.ai/" target="_blank" rel="noreferrer">
         blog
       </a>
@@ -99,7 +86,7 @@ const IndexPage = () => (
     </p>
     <p>
       <a href="mailto:nikhiljay7@gmail.com">
-        Contact me
+        Get in touch
         <IoArrowForwardSharp size={22} />
       </a>
     </p>
