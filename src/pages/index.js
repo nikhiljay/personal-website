@@ -58,7 +58,7 @@ const IndexPage = () => (
     </div>
     <p className="description">
       I am the Co-Founder & CTO of{" "}
-      <a href="https://vitalize.tech/" target="_blank" rel="noreferrer">
+      <a href="https://vitalizecare.co" target="_blank" rel="noreferrer">
         Vitalize
       </a>
       , where we are building a digital wellness platform for the healthcare
