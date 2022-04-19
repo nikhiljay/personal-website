@@ -65,7 +65,7 @@ const IndexPage = () => (
       workforce.
       <br />
       <br />I love learning, solving tough problems, and thinking about the
-      intersection of health and artificial intelligence. In my free time, I
+      intersection of artificial intelligence, health, and finance. In my free time, I
       enjoy playing chess, tennis, and the piano! Check out my{" "}
       <a href="https://blog.nikhil.ai/" target="_blank" rel="noreferrer">
         blog
@@ -85,7 +85,7 @@ const IndexPage = () => (
       .
     </p>
     <p>
-      <a href="mailto:nikhiljay7@gmail.com">
+      <a href="mailto:nikhil.d@columbia.edu">
         Get in touch
         <IoArrowForwardSharp size={22} />
       </a>
