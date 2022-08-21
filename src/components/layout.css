@@ -6,11 +6,11 @@ body {
   --link-color: rgba(249,115,22, 0.15);
 }
 
-body.dark {
+/* body.dark {
   background-color: #1d1f21;
   --text-color: #fff;
   --link-color: rgba(249,115,22, 0.20);
-}
+} */
 
 p {
   font-style: normal;
