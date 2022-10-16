@@ -57,12 +57,7 @@ const IndexPage = () => (
       </div>
     </div>
     <p className="description">
-      I am the Co-Founder & CTO of{" "}
-      <a href="https://vitalizecare.co" target="_blank" rel="noreferrer">
-        Vitalize
-      </a>
-      , where we are building a digital wellness platform for the healthcare
-      workforce.
+      I am pursuing a Master's in Data Science at Columbia University. I recently graduated from Purdue University majoring in Computer Science, Data Science, and Applied Statistics.
       <br />
       <br />I love learning, solving tough problems, and thinking about the
       intersection of artificial intelligence, health, and finance. In my free time, I
