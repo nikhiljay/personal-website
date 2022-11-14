@@ -57,11 +57,17 @@ const IndexPage = () => (
       </div>
     </div>
     <p className="description">
-      I am pursuing a Master's in Data Science at Columbia University. I recently graduated from Purdue University in Computer Science, Data Science, and Applied Statistics.
-      <br />
-      <br />I love learning, solving tough problems, and thinking about the
-      intersection of artificial intelligence, health, and finance. In my free time, I
-      enjoy playing chess, tennis, and the piano! Check out my{" "}
+      Currently building{" "}
+      <a href="https://vitalizecare.co" target="_blank" rel="noreferrer">
+        Vitalize
+      </a>. See more on my {" "}
+      <a href="https://www.linkedin.com/in/nikhiljdsouza/" target="_blank" rel="noreferrer">
+        LinkedIn
+      </a>.
+
+      <br /><br />
+      
+      I love learning, telling stories with data, and thinking about the intersection of AI & health. In my free time, I enjoy playing chess, tennis, and the piano! Check out my{" "}
       <a href="https://blog.nikhil.ai/" target="_blank" rel="noreferrer">
         blog
       </a>
