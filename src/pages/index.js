@@ -11,11 +11,13 @@ const IndexPage = () => (
     <img
       src='../images/blue-ellipse.svg'
       alt=""
+      draggable="false"
       className="fixed top-0 left-0 select-none"
     />
     <img
       src='../images/orange-ellipse.svg'
       alt=""
+      draggable="false"
       className="fixed -bottom-20 -right-20 select-none"
     />
     <div className="relative mx-auto max-w-2xl py-40 px-4">
