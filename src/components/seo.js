@@ -28,6 +28,7 @@ function Seo({ description, title, children }) {
 
   return (
     <>
+      <html lang="en" />
       <title>{defaultTitle}</title>
       <meta name="description" content={metaDescription} />
       <meta property="og:title" content={title} />
