@@ -8,7 +8,7 @@ import Seo from "../components/seo"
 
 const IndexPage = () => (
   <Layout>
-    <img
+    {/* <img
       src='../images/blue-ellipse.svg'
       alt=""
       draggable="false"
@@ -19,7 +19,7 @@ const IndexPage = () => (
       alt=""
       draggable="false"
       className="fixed -bottom-10 -right-10 select-none"
-    />
+    /> */}
     <div className="relative mx-auto max-w-3xl py-24 sm:py-40 px-10">
       <div className="sm:flex justify-between items-center">
         <div className="flex items-center">
