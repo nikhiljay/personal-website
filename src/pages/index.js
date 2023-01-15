@@ -77,7 +77,7 @@ const IndexPage = () => (
           </a>
         </div>
       </div>
-      <p className="text-slate-400 antialiased my-7 text-lg">Currently Co-Founder & CTO of <a href="https://vitalizecare.co" target="_blank" rel="noreferrer" className="transition ease-in-out duration-200 text-orange-400 hover:text-orange-500 font-semibold">Vitalize Care</a>, where we're building a platform to help improve the mental health of our healthcare workers. I love learning, telling stories with data, and thinking about the intersection of AI & health. In my free time, I enjoy playing chess, tennis, and the piano.</p>
+      <p className="text-slate-400 antialiased my-8 text-lg">Currently Co-Founder & CTO of <a href="https://vitalizecare.co" target="_blank" rel="noreferrer" className="transition ease-in-out duration-200 text-orange-400 hover:text-orange-500 font-semibold">Vitalize Care</a>, where we're building a platform to help improve the mental health of our healthcare workers. I love learning, telling stories with data, and thinking about the intersection of AI & health. In my free time, I enjoy playing chess, tennis, and the piano.</p>
       <a
         href="mailto:nikhiljay7@gmail.com"
         className="transition ease-in-out duration-200 inline-block text-md antialiased font-medium rounded-md bg-orange-400 px-4 mr-3 py-2 text-white shadow-sm hover:bg-orange-500"
