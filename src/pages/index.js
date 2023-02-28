@@ -27,10 +27,10 @@ const IndexPage = () => (
             src={"../images/profile.png"}
             alt="sup"
             placeholder="none"
-            quality={100}
+            quality={10}
             draggable="false"
             imgStyle={{ borderRadius: `100%` }}
-            className="select-none w-20 sm:w-25"
+            className="select-none w-24 sm:w-28"
           />
           <div className="ml-4">
             <h1 className="font-extrabold text-2xl sm:text-4xl text-white antialiased -mb-1">Nikhil D'Souza</h1>
