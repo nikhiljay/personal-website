@@ -1,12 +1,12 @@
-import * as React from "react";
 import { withPrefix } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
+import * as React from "react";
 import {
-  FaTwitter,
+  FaFileAlt,
   FaGithub,
   FaLinkedin,
-  FaFileAlt,
   FaLocationArrow,
+  FaTwitter,
 } from "react-icons/fa";
 
 import Layout from "../components/layout";
@@ -100,10 +100,10 @@ const IndexPage = () => (
         >
           Vitalize Care (YC W23)
         </a>
-        , where we're building a platform to improve the mental health of
-        healthcare professionals. I love learning, telling stories with data,
-        and thinking about the intersection of AI & health. In my free time, I
-        enjoy playing chess, tennis, and the piano.
+        , where we're building a platform to address the most critical nursing
+        workforce and capacity challenges for health systems. I love learning,
+        telling stories with data, and thinking about the intersection of AI &
+        health. In my free time, I enjoy playing chess, tennis, and the piano.
       </p>
       <a
         href="mailto:nikhiljay7@gmail.com"
