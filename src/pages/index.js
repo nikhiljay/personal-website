@@ -93,7 +93,7 @@ const IndexPage = () => (
       <p className="text-slate-400 antialiased my-8 text-lg">
         Currently Co-Founder & CTO of{" "}
         <a
-          href="https://vitalizecare.co"
+          href="https://vitalize.care"
           target="_blank"
           rel="noreferrer"
           className="transition ease-in-out duration-200 text-orange-400 hover:text-orange-500 font-semibold"
