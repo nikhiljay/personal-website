@@ -39,7 +39,7 @@ const IndexPage = () => (
             className="select-none w-20 sm:w-24"
           />
           <div className="ml-5">
-            <h1 className="font-extrabold text-2xl sm:text-4xl text-white antialiased -mb-1">
+            <h1 className="font-extrabold text-2xl sm:text-4xl text-white antialiased mb-1">
               Nikhil D'Souza
             </h1>
             <FaLocationArrow
@@ -91,7 +91,7 @@ const IndexPage = () => (
         </div>
       </div>
       <p className="text-slate-400 antialiased my-8 text-lg">
-        Currently Co-Founder & CTO of{" "}
+        Co-Founder & CTO of{" "}
         <a
           href="https://vitalize.care"
           target="_blank"
@@ -100,10 +100,11 @@ const IndexPage = () => (
         >
           Vitalize Care (YC W23)
         </a>
-        , where we're building a platform to address the most critical nursing
-        workforce and capacity challenges for health systems. I love learning,
-        telling stories with data, and thinking about the intersection of AI &
-        health. In my free time, I enjoy playing chess, tennis, and the piano.
+        , where we're building technology to address the most critical nursing
+        workforce challenges. I'm passionate about continuous growth, using data
+        to tell compelling stories, and solving the toughest engineering
+        problems in healthcare. In my free time, you'll find me salsa dancing,
+        swimming, playing tennis, or enjoying the piano!
       </p>
       <a
         href="mailto:nikhiljay7@gmail.com"
