@@ -3,7 +3,27 @@
 @tailwind utilities;
 
 @layer base {
-    body {
-        @apply bg-slate-900;
-    }
+  html {
+    @apply antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg text-fg;
+  }
+
+  ::selection {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+@layer components {
+  .site-link {
+    @apply text-fg underline decoration-white/20 underline-offset-[3px] transition-colors duration-200 hover:decoration-white/50;
+  }
+
+  .footer-link {
+    @apply text-muted transition-colors duration-200 hover:text-fg;
+  }
 }

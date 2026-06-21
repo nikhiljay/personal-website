@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: [
@@ -10,17 +10,17 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+        sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        'linkedin-blue': '#0077B5',
-        'twitter-blue': '#1DA1F2',
-        'github-purple': '#7041BF',
-      }
+        bg: "#0a0a0a",
+        fg: "#ededed",
+        muted: "#888888",
+      },
     },
   },
   future: {
     hoverOnlyWhenSupported: true,
   },
   plugins: [],
-}
+};
