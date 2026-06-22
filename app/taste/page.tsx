@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { AnimateIn } from "../components/animate-in";
 import { PageBackLink } from "../components/page-back-link";
 import { SiteShell } from "../components/site-shell";
 import { TasteGrid } from "../components/taste-grid";
@@ -13,10 +14,18 @@ export const metadata: Metadata = {
 export default function TastePage() {
   return (
     <SiteShell>
-      <PageBackLink />
-      <h1 className="text-[15px] font-normal text-fg">Taste</h1>
-      <p className="mb-10 text-muted">Stack, reading, and food.</p>
-      <TasteGrid sections={tasteSections} />
+      <AnimateIn>
+        <PageBackLink />
+      </AnimateIn>
+      <AnimateIn as="h1" className="text-[15px] font-normal text-fg" stagger={1}>
+        Taste
+      </AnimateIn>
+      <AnimateIn as="p" className="mb-10 text-muted" stagger={2}>
+        Stack, reading, and food.
+      </AnimateIn>
+      <AnimateIn stagger={3}>
+        <TasteGrid sections={tasteSections} />
+      </AnimateIn>
     </SiteShell>
   );
 }

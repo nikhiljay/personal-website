@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AnimateIn } from "./components/animate-in";
 import { Connect } from "./components/connect";
 import { ExternalLink } from "./components/external-link";
 import { GlowName } from "./components/glow-name";
@@ -10,34 +11,34 @@ import { SiteStatusBar } from "./components/site-status-bar";
 export default function HomePage() {
   return (
     <SiteShell>
-      <div className="mb-7 flex w-full items-center">
-        <GlowName />
+      <AnimateIn className="mb-7 flex w-full items-center">
+        <GlowName>Nikhil D&apos;Souza</GlowName>
         <div className="ml-auto min-w-0 shrink-0 pl-4">
           <SiteStatusBar />
         </div>
-      </div>
+      </AnimateIn>
 
       <div className="text-[15px] leading-[1.7] [&>p:not(:last-child)]:mb-4">
-        <p>
-          Co-founded{" "}
+        <AnimateIn as="p" stagger={1}>
+          Co-founder of{" "}
           <ExternalLink href="https://vitalize.care">Vitalize</ExternalLink>,
           where I built autonomous labor optimization for hospitals.
-        </p>
-        <p>
+        </AnimateIn>
+        <AnimateIn as="p" stagger={2}>
           I&apos;m passionate about
           continuous growth, using data to tell compelling stories, and solving
           tough engineering problems in healthcare. Based in San Francisco, CA.
-        </p>
-        <p>
+        </AnimateIn>
+        <AnimateIn as="p" stagger={3}>
           <SerifEm>Chasing novel experiences</SerifEm>. In my free time, you&apos;ll find me{" "}
           <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
             training
           </ExternalLink>{" "}
           for a triathlon, salsa dancing, playing tennis, or at the piano.
-        </p>
+        </AnimateIn>
       </div>
 
-      <section className="my-12">
+      <AnimateIn as="section" className="my-12" stagger={4}>
         <div className="my-5 w-48">
           <Link
             href="/taste"
@@ -49,9 +50,11 @@ export default function HomePage() {
             Stack, reading, and food.
           </p>
         </div>
-      </section>
+      </AnimateIn>
 
-      <Connect />
+      <AnimateIn stagger={5}>
+        <Connect />
+      </AnimateIn>
     </SiteShell>
   );
 }

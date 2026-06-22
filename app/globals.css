@@ -73,4 +73,78 @@
     font: 400 italic calc(1em + 1px) / normal var(--font-serif);
     color: var(--color-fg);
   }
+
+  .name-lamp {
+    --name-glow: light-dark(
+      0 0 10px rgba(17, 17, 17, 0.22),
+      0 0 14px rgba(242, 242, 242, 0.45)
+    );
+    --name-glow-dim: light-dark(
+      0 0 4px rgba(17, 17, 17, 0.1),
+      0 0 6px rgba(242, 242, 242, 0.18)
+    );
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--color-muted);
+    text-shadow: none;
+    cursor: pointer;
+  }
+
+  .name-lamp--on {
+    color: var(--color-fg);
+    text-shadow: var(--name-glow);
+  }
+
+  .name-lamp--flicker {
+    animation: name-lamp-flicker-in 1s steps(1, end) forwards;
+  }
+
+  @keyframes name-lamp-flicker-in {
+    0%,
+    4%,
+    19%,
+    23%,
+    47%,
+    61% {
+      color: var(--color-muted);
+      text-shadow: none;
+    }
+
+    2% {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow);
+    }
+
+    17%,
+    21% {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow);
+    }
+
+    38%,
+    40% {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow);
+    }
+
+    58% {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow-dim);
+    }
+
+    68%,
+    100% {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .name-lamp--flicker {
+      animation: none;
+    }
+  }
 }
