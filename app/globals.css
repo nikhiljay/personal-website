@@ -23,10 +23,10 @@
 }
 
 @theme {
-  --color-bg: #1a1a1a;
-  --color-fg: #f2f2f2;
-  --color-body: #e5e5e5;
-  --color-muted: #a0a0a0;
+  --color-bg: light-dark(#ffffff, #1a1a1a);
+  --color-fg: light-dark(#111111, #f2f2f2);
+  --color-body: light-dark(#3a3a3a, #e5e5e5);
+  --color-muted: light-dark(#737373, #a0a0a0);
   --font-display: Inter, system-ui, sans-serif;
   --font-sans: Sohne, Inter, system-ui, sans-serif;
   --font-serif: Newsreader, Signifier, Times, serif;
@@ -34,6 +34,7 @@
 
 @layer base {
   html {
+    color-scheme: light dark;
     @apply antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -46,13 +47,22 @@
   }
 
   ::selection {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.15));
   }
 }
 
 @layer components {
   .site-link {
-    @apply text-body underline decoration-[#505050] underline-offset-[2.5px] transition-colors duration-200 hover:decoration-[#888888];
+    color: var(--color-body);
+    text-underline-offset: 2.5px;
+    text-decoration-line: underline;
+    text-decoration-color: light-dark(#c8c8c8, #505050);
+    transition-property: color, text-decoration-color;
+    transition-duration: 200ms;
+  }
+
+  .site-link:hover {
+    text-decoration-color: light-dark(#888888, #888888);
   }
 
   .section-label {
