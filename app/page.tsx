@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <SiteShell>
       <div className="mb-7 flex w-full items-center">
-        <GlowName>Nikhil D&apos;Souza</GlowName>
+        <GlowName />
         <div className="ml-auto min-w-0 shrink-0 pl-4">
           <SiteStatusBar />
         </div>
