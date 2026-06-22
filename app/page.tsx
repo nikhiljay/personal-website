@@ -4,13 +4,19 @@ import { Connect } from "./components/connect";
 import { ExternalLink } from "./components/external-link";
 import { SerifEm } from "./components/serif-em";
 import { SiteShell } from "./components/site-shell";
+import { SiteStatusBar } from "./components/site-status-bar";
 
 export default function HomePage() {
   return (
     <SiteShell>
-      <h1 className="mb-7 font-display text-base font-medium text-body">
-        Nikhil D&apos;Souza
-      </h1>
+      <div className="mb-7 flex w-full items-center">
+        <h1 className="shrink-0 whitespace-nowrap font-display text-base font-medium text-body">
+          Nikhil D&apos;Souza
+        </h1>
+        <div className="ml-auto min-w-0 shrink-0 pl-4">
+          <SiteStatusBar />
+        </div>
+      </div>
 
       <div className="[&>p:not(:last-child)]:mb-4">
         <p>

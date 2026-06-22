@@ -9,9 +9,20 @@ type VisitorResponse = {
 const timeZone = "America/Los_Angeles";
 
 function getClockHands(date: Date) {
-  const hours = date.getHours() % 12;
-  const minutes = date.getMinutes();
-  const seconds = date.getSeconds();
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(date);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((part) => part.type === type)?.value ?? 0);
+
+  const hours = get("hour") % 12;
+  const minutes = get("minute");
+  const seconds = get("second");
 
   return {
     hourRotation: hours * 30 + minutes * 0.5 + seconds * (0.5 / 60),
@@ -97,11 +108,11 @@ export function SiteStatusBar() {
   }, []);
 
   if (!now) {
-    return null;
+    return <div className="h-4 w-24" aria-hidden="true" />;
   }
 
   return (
-    <div className="mb-7 flex h-4 w-full items-center gap-2 font-mono text-xs text-muted">
+    <div className="flex h-4 items-center justify-end gap-2 text-right font-mono text-xs text-muted">
       <span className="flex items-center gap-1.5">
         <AnalogClock date={now} />
         {formatDigitalTime(now)}
