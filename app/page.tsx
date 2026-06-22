@@ -1,73 +1,53 @@
-function ExternalLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a href={href} target="_blank" rel="noreferrer" className="site-link">
-      {children}
-    </a>
-  );
-}
+import Link from "next/link";
 
-function FooterLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <a href={href} target="_blank" rel="noreferrer" className="footer-link">
-      {children}
-    </a>
-  );
-}
+import { Connect } from "./components/connect";
+import { ExternalLink } from "./components/external-link";
+import { SerifEm } from "./components/serif-em";
+import { SiteShell } from "./components/site-shell";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-bg">
-      <main className="mx-auto max-w-[540px] px-6 py-24 sm:py-32">
-        <header className="mb-4">
-          <h1 className="text-lg font-medium tracking-[-0.01em] text-fg">
-            Nikhil D&apos;Souza
-          </h1>
-        </header>
+    <SiteShell>
+      <h1 className="mb-7 font-display text-base font-medium text-body">
+        Nikhil D&apos;Souza
+      </h1>
 
-        <div className="space-y-3 text-[15px] leading-[1.7] text-muted">
-          <p>
-            Co-founded {" "}
-            <ExternalLink href="https://vitalize.care">
-              Vitalize
-            </ExternalLink>
-            , where I built autonomous labor optimization for hospitals.
-          </p>
-          <p>
-            I&apos;m passionate about continuous growth, using data to tell
-            compelling stories, and solving tough engineering problems in
-            healthcare. Based in San Francisco, CA.
-          </p>
-          <p>
-            In my free time you&apos;ll find me{" "}
-            <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
-              training
-            </ExternalLink>{" "}
-            for a triathlon, salsa dancing, playing tennis, or at the piano.
+      <div className="[&>p:not(:last-child)]:mb-4">
+        <p>
+          Co-founded{" "}
+          <ExternalLink href="https://vitalize.care">Vitalize</ExternalLink>,
+          where I built autonomous labor optimization for hospitals.
+        </p>
+        <p>
+          <SerifEm>I&apos;m passionate</SerifEm> about continuous growth, using data to tell compelling
+          stories, and solving tough engineering problems in healthcare. Based
+          in San Francisco, CA.
+        </p>
+        <p>
+          In my free time you&apos;ll find me{" "}
+          <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
+            training
+          </ExternalLink>{" "}
+          for a triathlon, salsa dancing, playing tennis, or at the piano.
+        </p>
+      </div>
+
+      <section className="mt-16">
+        <h2 className="section-label">Building</h2>
+        <div className="mt-5 w-48">
+          <Link
+            href="/taste"
+            className="text-body no-underline transition-colors hover:text-fg"
+          >
+            Taste
+          </Link>
+          <p className="text-[13px] leading-5 text-muted">
+            Stack, reading, and food.
           </p>
         </div>
+      </section>
 
-        <footer className="mt-6 text-[11px] font-medium uppercase tracking-[0.12em] text-muted">
-          <FooterLink href="https://www.linkedin.com/in/nikhiljdsouza/">
-            LinkedIn
-          </FooterLink>
-          <span className="mx-2 text-fg/15">/</span>
-          <FooterLink href="https://github.com/nikhiljay">GitHub</FooterLink>
-          <span className="mx-2 text-fg/15">/</span>
-          <FooterLink href="https://twitter.com/nikhiljdsouza">X</FooterLink>
-        </footer>
-      </main>
-    </div>
+      <Connect />
+    </SiteShell>
   );
 }

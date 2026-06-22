@@ -1,10 +1,35 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: Inter;
+  font-display: block;
+  src: url("/fonts/inter-subset.woff2") format("woff2");
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: Newsreader;
+  font-display: block;
+  src: url("/fonts/newsreader-subset-0.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: Sohne;
+  font-display: block;
+  src: url("/fonts/sohne-subset-0.woff2") format("woff2");
+  font-weight: 400;
+}
+
 @theme {
-  --color-bg: #0a0a0a;
-  --color-fg: #ededed;
-  --color-muted: #888888;
-  --font-sans: var(--font-inter);
+  --color-bg: #1a1a1a;
+  --color-fg: #f2f2f2;
+  --color-body: #e5e5e5;
+  --color-muted: #a0a0a0;
+  --font-display: Inter, system-ui, sans-serif;
+  --font-sans: Sohne, Inter, system-ui, sans-serif;
+  --font-serif: Newsreader, Signifier, Times, serif;
 }
 
 @layer base {
@@ -12,10 +37,12 @@
     @apply antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-bg text-fg font-sans;
+    @apply bg-bg font-sans text-base leading-7;
+    color: var(--color-body);
   }
 
   ::selection {
@@ -25,10 +52,15 @@
 
 @layer components {
   .site-link {
-    @apply text-fg underline decoration-white/20 underline-offset-[3px] transition-colors duration-200 hover:decoration-white/50;
+    @apply text-body underline decoration-[#505050] underline-offset-[2.5px] transition-colors duration-200 hover:decoration-[#888888];
   }
 
-  .footer-link {
-    @apply text-muted transition-colors duration-200 hover:text-fg;
+  .section-label {
+    @apply text-[13px] font-normal text-muted;
+  }
+
+  .serif-em {
+    font: 400 italic calc(1em + 1px) / normal var(--font-serif);
+    color: var(--color-fg);
   }
 }
