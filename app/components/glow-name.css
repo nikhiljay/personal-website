@@ -1,0 +1,66 @@
+.glow-name {
+  --name-glow: light-dark(
+    0 0 10px rgba(17, 17, 17, 0.22),
+    0 0 14px rgba(242, 242, 242, 0.45)
+  );
+  --name-glow-dim: light-dark(
+    0 0 4px rgba(17, 17, 17, 0.1),
+    0 0 6px rgba(242, 242, 242, 0.18)
+  );
+  color: var(--color-muted);
+  text-shadow: none;
+  animation: name-flicker-in 1s steps(1, end) forwards;
+}
+
+@keyframes name-flicker-in {
+  0%,
+  4%,
+  19%,
+  23%,
+  47%,
+  61% {
+    color: var(--color-muted);
+    text-shadow: none;
+  }
+
+  /* false start */
+  2% {
+    color: var(--color-fg);
+    text-shadow: var(--name-glow);
+  }
+
+  /* uneven double-stutter */
+  17%,
+  21% {
+    color: var(--color-fg);
+    text-shadow: var(--name-glow);
+  }
+
+  /* longer flash, then drop */
+  38%,
+  40% {
+    color: var(--color-fg);
+    text-shadow: var(--name-glow);
+  }
+
+  /* almost holds, then one last dip */
+  58% {
+    color: var(--color-fg);
+    text-shadow: var(--name-glow-dim);
+  }
+
+  /* settle */
+  68%,
+  100% {
+    color: var(--color-fg);
+    text-shadow: var(--name-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-name {
+    animation: none;
+    color: var(--color-body);
+    text-shadow: none;
+  }
+}
