@@ -1,7 +1,15 @@
 import type { VisitorLocation } from "./visitor-store";
 
+function decodeGeoValue(value: string) {
+  try {
+    return decodeURIComponent(value.replace(/\+/g, " "));
+  } catch {
+    return value.replace(/%20/gi, " ").replace(/\+/g, " ");
+  }
+}
+
 function titleCase(value: string) {
-  return value
+  return decodeGeoValue(value)
     .split(/\s+/)
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
@@ -32,5 +40,5 @@ export function getVisitorLocationFromHeaders(
 }
 
 export function formatVisitorLocation(location: VisitorLocation) {
-  return `${location.city}, ${location.region}`;
+  return `${titleCase(location.city)}, ${location.region.toUpperCase()}`;
 }
