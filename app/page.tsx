@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Connect } from "./components/connect";
 import { ExternalLink } from "./components/external-link";
+import { GlowName } from "./components/glow-name";
 import { SerifEm } from "./components/serif-em";
 import { SiteShell } from "./components/site-shell";
 import { SiteStatusBar } from "./components/site-status-bar";
@@ -10,27 +11,25 @@ export default function HomePage() {
   return (
     <SiteShell>
       <div className="mb-7 flex w-full items-center">
-        <h1 className="shrink-0 whitespace-nowrap font-display text-base font-medium text-body">
-          Nikhil D&apos;Souza
-        </h1>
+        <GlowName>Nikhil D&apos;Souza</GlowName>
         <div className="ml-auto min-w-0 shrink-0 pl-4">
           <SiteStatusBar />
         </div>
       </div>
 
-      <div className="[&>p:not(:last-child)]:mb-4">
+      <div className="text-[15px] leading-[1.7] [&>p:not(:last-child)]:mb-4">
         <p>
           Co-founded{" "}
           <ExternalLink href="https://vitalize.care">Vitalize</ExternalLink>,
           where I built autonomous labor optimization for hospitals.
         </p>
         <p>
-          <SerifEm>Chasing novel experiences</SerifEm>. I&apos;m passionate about
+          I&apos;m passionate about
           continuous growth, using data to tell compelling stories, and solving
           tough engineering problems in healthcare. Based in San Francisco, CA.
         </p>
         <p>
-          In my free time you&apos;ll find me{" "}
+          <SerifEm>Chasing novel experiences</SerifEm>. In my free time, you&apos;ll find me{" "}
           <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
             training
           </ExternalLink>{" "}
@@ -38,12 +37,11 @@ export default function HomePage() {
         </p>
       </div>
 
-      <section className="mt-16">
-        <h2 className="section-label">Building</h2>
-        <div className="mt-5 w-48">
+      <section className="my-12">
+        <div className="my-5 w-48">
           <Link
             href="/taste"
-            className="text-body no-underline transition-colors hover:text-fg"
+            className="text-[15px] no-underline transition-colors hover:text-fg"
           >
             Taste
           </Link>

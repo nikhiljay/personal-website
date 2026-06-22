@@ -73,4 +73,50 @@
     font: 400 italic calc(1em + 1px) / normal var(--font-serif);
     color: var(--color-fg);
   }
+
+  .glow-name {
+    --name-glow: light-dark(
+      0 0 10px rgba(17, 17, 17, 0.22),
+      0 0 14px rgba(242, 242, 242, 0.45)
+    );
+    color: var(--color-muted);
+    text-shadow: none;
+    animation: name-flicker-in 1s ease-out forwards;
+  }
+
+  @keyframes name-flicker-in {
+    0%,
+    6%,
+    8%,
+    14%,
+    16%,
+    28%,
+    30%,
+    42%,
+    44%,
+    58%,
+    60% {
+      color: var(--color-muted);
+      text-shadow: none;
+    }
+
+    7%,
+    15%,
+    29%,
+    43%,
+    59%,
+    72%,
+    100% {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow-name {
+      animation: none;
+      color: var(--color-body);
+      text-shadow: none;
+    }
+  }
 }
