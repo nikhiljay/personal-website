@@ -25,9 +25,9 @@ export default function HomePage() {
           where I built autonomous labor optimization for hospitals.
         </p>
         <p>
-          <SerifEm>I&apos;m passionate</SerifEm> about continuous growth, using data to tell compelling
-          stories, and solving tough engineering problems in healthcare. Based
-          in San Francisco, CA.
+          <SerifEm>Chasing novel experiences</SerifEm>. I&apos;m passionate about
+          continuous growth, using data to tell compelling stories, and solving
+          tough engineering problems in healthcare. Based in San Francisco, CA.
         </p>
         <p>
           In my free time you&apos;ll find me{" "}

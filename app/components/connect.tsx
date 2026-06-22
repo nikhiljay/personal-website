@@ -1,11 +1,11 @@
 const socialLinks = [
   {
     href: "https://www.linkedin.com/in/nikhiljdsouza/",
-    label: "LinkedIn",
+    label: "LINKEDIN",
   },
   {
     href: "https://github.com/nikhiljay",
-    label: "GitHub",
+    label: "GITHUB",
   },
   {
     href: "https://twitter.com/nikhiljdsouza",
@@ -15,7 +15,7 @@ const socialLinks = [
 
 export function Connect() {
   return (
-    <footer className="mt-6 flex flex-wrap items-center gap-x-1.5 text-[13px] text-muted">
+    <footer className="mt-6 flex flex-wrap items-center gap-x-1.5 font-mono text-xs uppercase text-muted">
       {socialLinks.map((link, index) => (
         <span key={link.href} className="contents">
           {index > 0 ? (
