@@ -2,10 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-type VisitorResponse = {
-  lastVisitorLabel: string | null;
-};
-
 const timeZone = "America/Los_Angeles";
 
 function getClockHands(date: Date) {
@@ -86,7 +82,6 @@ function AnalogClock({ date }: { date: Date }) {
 
 export function SiteStatusBar() {
   const [now, setNow] = useState<Date | null>(null);
-  const [lastVisitor, setLastVisitor] = useState<string | null>(null);
 
   useEffect(() => {
     setNow(new Date());
@@ -96,15 +91,6 @@ export function SiteStatusBar() {
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/visitor")
-      .then((response) => response.json())
-      .then((data: VisitorResponse) => {
-        setLastVisitor(data.lastVisitorLabel);
-      })
-      .catch(() => {});
   }, []);
 
   if (!now) {
@@ -117,9 +103,6 @@ export function SiteStatusBar() {
         <AnalogClock date={now} />
         {formatDigitalTime(now)}
       </span>
-      {lastVisitor ? (
-        <span className="hidden sm:inline">• Last visitor from {lastVisitor}</span>
-      ) : null}
     </div>
   );
 }
