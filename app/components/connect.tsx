@@ -1,3 +1,5 @@
+import { ExternalLink } from "./external-link";
+
 const socialLinks = [
   {
     href: "https://www.linkedin.com/in/nikhiljdsouza/",
@@ -23,14 +25,12 @@ export function Connect() {
               /
             </span>
           ) : null}
-          <a
+          <ExternalLink
             href={link.href}
-            target="_blank"
-            rel="noreferrer"
             className="no-underline transition-colors hover:text-body"
           >
             {link.label}
-          </a>
+          </ExternalLink>
         </span>
       ))}
     </footer>
