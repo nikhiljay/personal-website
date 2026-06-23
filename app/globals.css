@@ -102,6 +102,22 @@
     animation: name-lamp-flicker-in 1s steps(1, end) forwards;
   }
 
+  .name-lamp--fade-out {
+    animation: name-lamp-fade-out 0.35s ease-out forwards;
+  }
+
+  @keyframes name-lamp-fade-out {
+    from {
+      color: var(--color-fg);
+      text-shadow: var(--name-glow);
+    }
+
+    to {
+      color: var(--color-muted);
+      text-shadow: none;
+    }
+  }
+
   @keyframes name-lamp-flicker-in {
     0%,
     4%,
@@ -143,7 +159,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .name-lamp--flicker {
+    .name-lamp--flicker,
+    .name-lamp--fade-out {
       animation: none;
     }
   }
