@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { AnimateIn } from "./components/animate-in";
 import { Connect } from "./components/connect";
 import { ExternalLink } from "./components/external-link";
@@ -7,6 +5,8 @@ import { GlowName } from "./components/glow-name";
 import { SerifEm } from "./components/serif-em";
 import { SiteShell } from "./components/site-shell";
 import { SiteStatusBar } from "./components/site-status-bar";
+import { TasteGrid } from "./components/taste-grid";
+import { tasteSections } from "./lib/taste";
 
 export default function HomePage() {
   return (
@@ -38,18 +38,8 @@ export default function HomePage() {
         </AnimateIn>
       </div>
 
-      <AnimateIn as="section" className="my-12" stagger={4}>
-        <div className="my-5 w-48">
-          <Link
-            href="/taste"
-            className="text-[15px] no-underline transition-colors hover:text-fg"
-          >
-            Taste
-          </Link>
-          <p className="text-[13px] leading-5 text-muted">
-            Stack, reading, and food.
-          </p>
-        </div>
+      <AnimateIn as="section" className="my-12 text-[13px] leading-5" stagger={4}>
+        <TasteGrid sections={tasteSections} />
       </AnimateIn>
 
       <AnimateIn stagger={5}>

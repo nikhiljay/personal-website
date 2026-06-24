@@ -1,7 +1,6 @@
 export type TasteItem = {
   title: string;
   href?: string;
-  description?: string;
 };
 
 export type TasteSection = {
@@ -14,24 +13,33 @@ export const tasteSections: TasteSection[] = [
     title: "Stack",
     items: [
       {
-        title: "Tissot PRX Powermatic 80",
-        href: "https://www.tissotwatches.com/en-us/t1244071104100.html",
-        description: "Daily wear.",
+        title: "Garmin Forerunner 970",
+        href: "https://www.garmin.com/en-US/c/sports-fitness/running-smartwatches/",
       },
       {
-        title: "Garmin Forerunner 965",
-        href: "https://www.garmin.com/en-US/p/802104",
-        description: "Workouts and race prep.",
-      },
-      {
-        title: "Whoop 4.0",
+        title: "Whoop 5.0",
         href: "https://www.whoop.com",
-        description: "Recovery and sleep.",
       },
       {
-        title: "Cursor",
-        href: "https://cursor.com",
-        description: "Editor.",
+        title: "Things 3",
+        href: "https://culturedcode.com/things/",
+      },
+      { title: "Obsidian / iA Writer" },
+      {
+        title: "Warp",
+        href: "https://www.warp.dev",
+      },
+      {
+        title: "Notion Calendar",
+        href: "https://www.notion.com/product/calendar",
+      },
+      {
+        title: "Copilot Money",
+        href: "https://copilot.money",
+      },
+      {
+        title: "Dia",
+        href: "https://www.diabrowser.com",
       },
     ],
   },
@@ -39,29 +47,30 @@ export const tasteSections: TasteSection[] = [
     title: "Reading",
     items: [
       {
-        title: "The Hard Thing About Hard Things",
-        href: "https://www.amazon.com/Hard-Thing-About-Things-Building/dp/0062273205",
-        description: "Ben Horowitz.",
+        title: "Can't Hurt Me",
+        href: "https://www.amazon.com/Cant-Hurt-Me-Master-Your-Mind/dp/1544512279",
       },
       {
-        title: "Shoe Dog",
-        href: "https://www.amazon.com/Shoe-Dog-Phil-Knight-Memoir/dp/1501135910",
-        description: "Phil Knight.",
+        title: "Becoming",
+        href: "https://www.amazon.com/Becoming-Michelle-Obama/dp/1524763136",
       },
       {
-        title: "Thinking, Fast and Slow",
-        href: "https://www.amazon.com/Thinking-Fast-Slow-Daniel-Kahneman/dp/0374533555",
-        description: "Daniel Kahneman.",
+        title: "The Speed of Trust",
+        href: "https://www.amazon.com/Speed-Trust-Thing-affects/dp/0743273296",
+      },
+      {
+        title: "Mistborn",
+        href: "https://www.amazon.com/Mistborn-Final-Empire-Brandon-Sanderson/dp/0765311789",
       },
     ],
   },
   {
     title: "Food",
     items: [
-      { title: "Nari", description: "Japantown." },
-      { title: "Delfina", description: "Mission." },
-      { title: "Tartine Manufactory", description: "Mission Bay." },
-      { title: "Rintaro", description: "SOMA." },
+      { title: "Nari" },
+      { title: "Delfina" },
+      { title: "Tartine Manufactory" },
+      { title: "Rintaro" },
     ],
   },
 ];

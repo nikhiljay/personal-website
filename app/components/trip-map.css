@@ -1,0 +1,37 @@
+.trip-map-shell {
+  border: 1px solid light-dark(#e8e8e8, #333333);
+  border-radius: 8px;
+  background: light-dark(#fafafa, #222222);
+}
+
+.trip-map-popup .maplibregl-popup-content {
+  padding: 10px 12px;
+  border-radius: 0;
+  border: 1px solid light-dark(#e8e8e8, #333333);
+  background: var(--color-bg);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+.trip-map-popup .maplibregl-popup-tip {
+  border-top-color: light-dark(#e8e8e8, #333333);
+}
+
+.trip-map-popup .maplibregl-popup-close-button {
+  color: var(--color-muted);
+  font-size: 16px;
+  padding: 4px 8px;
+}
+
+.trip-map-popup-title {
+  color: var(--color-fg);
+  font-size: 14px;
+}
+
+.trip-map-popup-address {
+  color: var(--color-muted);
+  margin-top: 2px;
+}
