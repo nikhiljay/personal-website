@@ -17,8 +17,8 @@ export default async function KaviNycTripPage() {
   const tripEvents = await getTripEventsFromCalendar();
 
   return (
-    <SiteShell>
-      <AnimateIn className="mb-7">
+    <SiteShell compact mobileBleed>
+      <AnimateIn className="mb-7 px-6 md:px-0">
         <h1 className="text-[26px] leading-[1.25] font-normal text-fg">
           Welcome to New York, <SerifEm>Kavi</SerifEm>.
         </h1>

@@ -1,7 +1,15 @@
 .trip-map-shell {
   border: 1px solid light-dark(#e8e8e8, #333333);
-  border-radius: 8px;
+  border-radius: 6px;
   background: light-dark(#fafafa, #222222);
+}
+
+@media (max-width: 767px) {
+  .trip-map-shell {
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+  }
 }
 
 .trip-map-popup .maplibregl-popup-content {
