@@ -24,8 +24,28 @@
   box-shadow: none;
 }
 
-.trip-map-popup .maplibregl-popup-tip {
-  border-top-color: light-dark(#e8e8e8, #333333);
+.trip-map-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--color-bg);
+}
+
+.trip-map-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--color-bg);
+}
+
+.trip-map-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-left-top .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-left-bottom .maplibregl-popup-tip {
+  border-right-color: var(--color-bg);
+}
+
+.trip-map-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-right-top .maplibregl-popup-tip,
+.trip-map-popup.maplibregl-popup-anchor-right-bottom .maplibregl-popup-tip {
+  border-left-color: var(--color-bg);
 }
 
 .trip-map-popup .maplibregl-popup-close-button {
@@ -34,9 +54,35 @@
   padding: 4px 8px;
 }
 
+.trip-map-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .trip-map-popup-title {
   color: var(--color-fg);
   font-size: 14px;
+  min-width: 0;
+}
+
+.trip-map-popup-citymapper {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+  opacity: 0.92;
+}
+
+.trip-map-popup-citymapper:hover {
+  opacity: 1;
+}
+
+.trip-map-popup-citymapper img {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
 }
 
 .trip-map-popup-address {
@@ -44,13 +90,20 @@
   margin-top: 2px;
 }
 
-.trip-map-popup-link {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 12px;
-}
-
 .trip-map-popup-note {
   color: var(--color-body);
   margin-top: 8px;
+}
+
+.trip-map-popup-photo {
+  margin-top: 8px;
+}
+
+.trip-map-popup-photo img {
+  display: block;
+  width: 112px;
+  height: auto;
+  max-height: 128px;
+  object-fit: cover;
+  border-radius: 4px;
 }

@@ -17,8 +17,6 @@ import {
   mapHighlightIds,
   mapHighlights,
   tripStops,
-  type MapHighlight,
-  type TripStop,
 } from "../lib/ahla-nyc-trip";
 import { savedSpots, type SavedSpot } from "../lib/nikhil-saved-spots";
 import { citymapperDirectionsUrl } from "../lib/citymapper";
@@ -70,6 +68,7 @@ const STOPS_LAYER = "trip-stops-dot";
 const HIGHLIGHT_SOURCE = "map-highlights";
 const HIGHLIGHT_RING_LAYER = "map-highlights-ring";
 const HIGHLIGHT_LAYER = "map-highlights-dot";
+const HIGHLIGHT_SQUARE_LAYER = "map-highlights-square";
 const HIGHLIGHT_LABELS_LAYER = "map-highlight-labels";
 
 const MARKER_LAYERS = [
@@ -77,6 +76,7 @@ const MARKER_LAYERS = [
   SAVED_VISITED_LAYER,
   STOPS_LAYER,
   HIGHLIGHT_RING_LAYER,
+  HIGHLIGHT_SQUARE_LAYER,
   HIGHLIGHT_LAYER,
   HIGHLIGHT_LABELS_LAYER,
 ] as const;
@@ -166,18 +166,27 @@ function popupHtml(place: {
   lat: number;
   lng: number;
   note?: string;
+  photo?: string;
 }) {
   const note = place.note
     ? `<div class="trip-map-popup-note">${escapeHtml(place.note)}</div>`
+    : "";
+  const photo = place.photo
+    ? `<div class="trip-map-popup-photo"><img src="${escapeHtml(place.photo)}" alt="" width="112" height="149" loading="lazy" decoding="async" /></div>`
     : "";
   const citymapperUrl = citymapperDirectionsUrl(place);
 
   return `
     <div>
-      <div class="trip-map-popup-title">${escapeHtml(place.name)}</div>
+      <div class="trip-map-popup-header">
+        <div class="trip-map-popup-title">${escapeHtml(place.name)}</div>
+        <a class="trip-map-popup-citymapper" href="${escapeHtml(citymapperUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(place.name)} in Citymapper">
+          <img src="/images/citymapper-icon.png" alt="" width="18" height="18" />
+        </a>
+      </div>
       <div class="trip-map-popup-address">${escapeHtml(place.address)}</div>
-      <a class="trip-map-popup-link site-link" href="${escapeHtml(citymapperUrl)}" target="_blank" rel="noopener noreferrer">Open in Citymapper</a>
       ${note}
+      ${photo}
     </div>
   `;
 }
@@ -214,6 +223,7 @@ function savedSpotsGeoJson(): GeoJSON.FeatureCollection {
         address: spot.address,
         kind: spot.kind,
         ...(spot.note ? { note: spot.note } : {}),
+        ...(spot.photo ? { photo: spot.photo } : {}),
         ...(spot.visited ? { visited: true } : {}),
       },
     })),
@@ -255,6 +265,7 @@ function highlightsGeoJson(): GeoJSON.FeatureCollection {
         address: place.address,
         fill: place.fill,
         ring: place.ring,
+        ...(place.shape ? { shape: place.shape } : {}),
       },
     })),
   };
@@ -446,6 +457,78 @@ function visitedSquareLayerLayout(
   };
 }
 
+function squareHighlights() {
+  return mapHighlights.filter((place) => place.shape === "square");
+}
+
+function highlightSquareImageId(id: string, theme: "light" | "dark") {
+  return `highlight-square-${id}-${theme}`;
+}
+
+function ensureHighlightSquareImages(map: maplibregl.Map, theme: "light" | "dark") {
+  const stroke = labelColors(theme).stroke;
+
+  for (const place of squareHighlights()) {
+    const imageId = highlightSquareImageId(place.id, theme);
+    if (map.hasImage(imageId)) {
+      map.removeImage(imageId);
+    }
+
+    map.addImage(imageId, createVisitedSquareImage(place.fill, stroke));
+  }
+}
+
+function highlightSquareImageExpression(
+  theme: "light" | "dark",
+): ExpressionSpecification {
+  return [
+    "match",
+    ["get", "id"],
+    "shobha-home",
+    highlightSquareImageId("shobha-home", theme),
+    highlightSquareImageId("shobha-home", theme),
+  ];
+}
+
+function highlightSquareLayerLayout(
+  theme: "light" | "dark",
+): maplibregl.SymbolLayerSpecification["layout"] {
+  return {
+    "icon-image": highlightSquareImageExpression(theme),
+    "icon-size": VISITED_ICON_SIZE,
+    "icon-allow-overlap": true,
+    "icon-ignore-placement": true,
+  };
+}
+
+function ensureHighlightSquareLayer(map: maplibregl.Map, theme: "light" | "dark") {
+  ensureHighlightSquareImages(map, theme);
+
+  if (!map.getSource(HIGHLIGHT_SOURCE)) {
+    return;
+  }
+
+  if (map.getLayer(HIGHLIGHT_SQUARE_LAYER)) {
+    map.setLayoutProperty(
+      HIGHLIGHT_SQUARE_LAYER,
+      "icon-image",
+      highlightSquareImageExpression(theme),
+    );
+    return;
+  }
+
+  map.addLayer(
+    {
+      id: HIGHLIGHT_SQUARE_LAYER,
+      type: "symbol",
+      source: HIGHLIGHT_SOURCE,
+      filter: ["==", ["get", "shape"], "square"],
+      layout: highlightSquareLayerLayout(theme),
+    },
+    HIGHLIGHT_LAYER,
+  );
+}
+
 function applySavedSpotSelection(
   map: maplibregl.Map,
   selectedId: string | null,
@@ -596,10 +679,12 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
 
   if (map.getSource(HIGHLIGHT_SOURCE)) {
     (map.getSource(HIGHLIGHT_SOURCE) as GeoJSONSource).setData(data);
+    map.setFilter(HIGHLIGHT_LAYER, ["!=", ["get", "shape"], "square"]);
     map.setPaintProperty(HIGHLIGHT_RING_LAYER, "circle-radius", HIGHLIGHT_RING_RADIUS);
     map.setPaintProperty(HIGHLIGHT_LAYER, "circle-radius", MARKER_DOT_RADIUS);
     map.setPaintProperty(HIGHLIGHT_LAYER, "circle-stroke-width", MARKER_STROKE_WIDTH);
     map.setPaintProperty(HIGHLIGHT_LAYER, "circle-stroke-color", colors.stroke);
+    ensureHighlightSquareLayer(map, theme);
     map.setLayoutProperty(
       HIGHLIGHT_LABELS_LAYER,
       "text-size",
@@ -634,6 +719,7 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
     id: HIGHLIGHT_LAYER,
     type: "circle",
     source: HIGHLIGHT_SOURCE,
+    filter: ["!=", ["get", "shape"], "square"],
     paint: {
       "circle-radius": MARKER_DOT_RADIUS,
       "circle-color": ["get", "fill"],
@@ -641,6 +727,8 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
       "circle-stroke-color": colors.stroke,
     },
   });
+
+  ensureHighlightSquareLayer(map, theme);
 
   map.addLayer({
     id: HIGHLIGHT_LABELS_LAYER,
@@ -692,7 +780,7 @@ export function TripMap({
   const showPlacePopup = useCallback(
     (
       coordinates: [number, number],
-      properties: { name: string; address: string; note?: string },
+      properties: { name: string; address: string; note?: string; photo?: string },
     ) => {
       const map = mapRef.current;
       if (!map) {
@@ -704,7 +792,7 @@ export function TripMap({
       popupRef.current?.remove();
       popupRef.current = new maplibregl.Popup({
         offset: 12,
-        closeButton: true,
+        closeButton: false,
         className: "trip-map-popup",
       })
         .setLngLat(coordinates)
@@ -794,7 +882,7 @@ export function TripMap({
 
     const showStopPopup = (
       coordinates: [number, number],
-      properties: { name: string; address: string; note?: string },
+      properties: { name: string; address: string; note?: string; photo?: string },
     ) => {
       showPlacePopup(coordinates, properties);
     };
@@ -825,6 +913,7 @@ export function TripMap({
           name: string;
           address: string;
           note?: string;
+          photo?: string;
         };
 
         if (layerId === SAVED_LAYER || layerId === SAVED_VISITED_LAYER) {
@@ -836,6 +925,7 @@ export function TripMap({
         } else if (
           (layerId === STOPS_LAYER ||
             layerId === HIGHLIGHT_LAYER ||
+            layerId === HIGHLIGHT_SQUARE_LAYER ||
             layerId === HIGHLIGHT_RING_LAYER ||
             layerId === HIGHLIGHT_LABELS_LAYER) &&
           properties.id
@@ -862,6 +952,7 @@ export function TripMap({
         SAVED_VISITED_LAYER,
         STOPS_LAYER,
         HIGHLIGHT_RING_LAYER,
+        HIGHLIGHT_SQUARE_LAYER,
         HIGHLIGHT_LAYER,
         HIGHLIGHT_LABELS_LAYER,
       ]) {

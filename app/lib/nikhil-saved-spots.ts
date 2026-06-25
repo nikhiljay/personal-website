@@ -9,16 +9,19 @@ export type SavedSpot = {
   kind: SavedSpotKind;
   note?: string;
   visited?: boolean;
+  /** Path under /public, e.g. /images/saved-spots/mitr-thai.png */
+  photo?: string;
 };
 
 export const savedSpots: SavedSpot[] = [
-  { id: "adda", name: "Adda", address: "107 1st Ave", lat: 40.7268472, lng: -73.986228, kind: "nice", visited: true, note: "I've already told you about this one, but must go if you're not tired of Indian food after Musaafer!" },
+  { id: "adda", name: "Adda", address: "107 1st Ave", lat: 40.7268472, lng: -73.986228, kind: "nice", visited: true, note: "I've already told you about this one, but must go if you're not tired of Indian food after Musaafer!", photo: "/images/saved-spots/adda.png" },
   { id: "au-zaatar", name: "Au Za'atar", address: "188 Avenue A", lat: 40.7289381, lng: -73.9812454, kind: "casual" },
   { id: "ayat", name: "Ayat", address: "107 Loisaida Ave", lat: 40.7242306, lng: -73.9789217, kind: "casual" },
   { id: "birdland", name: "Birdland", address: "315 W 44th St", lat: 40.7590853, lng: -73.9896379, kind: "bar" },
   { id: "bleecker-street-pizza", name: "Bleecker Street Pizza", address: "69 7th Ave S", lat: 40.7317056, lng: -74.0037793, kind: "casual" },
   { id: "brooklyn-bridge", name: "Brooklyn Bridge", address: "Brooklyn Bridge", lat: 40.7062175, lng: -73.9970208, kind: "activity", visited: true },
   { id: "by-antidote", name: "By Antidote", address: "30 E 20th St", lat: 40.7385926, lng: -73.988887, kind: "cafe" },
+  { id: "7th-st-burger", name: "7th Street Burger", address: "91 E 7th St", lat: 40.7269803, lng: -73.9854205, kind: "casual", visited: true, photo: "/images/saved-spots/7th-st-burger.png" },
   { id: "c-and-b", name: "C&B", address: "178 E 7th St", lat: 40.7250538, lng: -73.9816964, kind: "cafe" },
   { id: "cava", name: "CAVA", address: "708 3rd Ave", lat: 40.7522516, lng: -73.9736217, kind: "casual", visited: true },
   { id: "cafe-maud", name: "Cafe Maud", address: "132 2nd Ave", lat: 40.7286121, lng: -73.9874271, kind: "nice", visited: true, note: "Cute Australian brunch spot with great food + near Shobha's!" },
@@ -60,22 +63,23 @@ export const savedSpots: SavedSpot[] = [
   { id: "love-mama", name: "Love Mama", address: "174 2nd Ave", lat: 40.7304045, lng: -73.9861256, kind: "casual", visited: true },
   { id: "marea", name: "Marea", address: "240 Central Park S", lat: 40.7673344, lng: -73.9811711, kind: "nice" },
   { id: "magnolia-bakery", name: "Magnolia Bakery", address: "1794 Broadway", lat: 40.7672083, lng: -73.9814833, kind: "cafe", visited: true },
-  { id: "mitr-thai", name: "Mitr Thai", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice", visited: true, note: "This is where I went with Pranav and it was excellent. Highly recommend getting a drink here too" },
+  { id: "manjul", name: "Manjul", address: "31 Howard St", lat: 40.71954, lng: -74.00079, kind: "cafe", visited: true, photo: "/images/saved-spots/manjul.png" },
+  { id: "mitr-thai", name: "Mitr Thai", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice", visited: true, note: "This is where I went with Pranav and it was excellent. Highly recommend getting a drink here too", photo: "/images/saved-spots/mitr-thai.png" },
   { id: "nolita-pizza", name: "Nolita Pizza", address: "68 Kenmare St", lat: 40.7209123, lng: -73.9961959, kind: "casual" },
   { id: "nom-wah", name: "Nom Wah", address: "10 Kenmare St", lat: 40.7203696, lng: -73.9945824, kind: "casual" },
-  { id: "prince-st-pizza", name: "Prince St. Pizza", address: "27 Prince St", lat: 40.7230823, lng: -73.9945374, kind: "casual", visited: true },
+  { id: "prince-st-pizza", name: "Prince St. Pizza", address: "27 Prince St", lat: 40.7230823, lng: -73.9945374, kind: "casual", visited: true, photo: "/images/saved-spots/prince-st-pizza.png" },
   { id: "ramen-ishida", name: "Ramen Ishida", address: "122 Ludlow St", lat: 40.7195965, lng: -73.9883524, kind: "casual" },
   { id: "santo-taco", name: "Santo Taco", address: "94 University Pl", lat: 40.7338821, lng: -73.9930035, kind: "casual" },
   { id: "sappe", name: "Sappe", address: "240 W 14th St", lat: 40.7391677, lng: -74.0017632, kind: "casual" },
   { id: "serafina", name: "Serafina", address: "241 Madison Ave", lat: 40.7500156, lng: -73.9811517, kind: "nice", visited: true },
   { id: "singlish", name: "Singlish", address: "17 E 13th St", lat: 40.7349936, lng: -73.993015, kind: "bar" },
-  { id: "shobha-home", name: "Shobha's", address: "305 E 11th St", lat: 40.7302392, lng: -73.9856293, kind: "nice", visited: true },
   { id: "soothr", name: "Soothr", address: "204 E 13th St", lat: 40.7322692, lng: -73.9873518, kind: "nice" },
   { id: "the-high-line", name: "The High Line", address: "820 Washington St", lat: 40.7397293, lng: -74.0082119, kind: "activity", visited: true },
   { id: "the-odeon", name: "The Odeon", address: "145 W Broadway", lat: 40.7169082, lng: -74.0079209, kind: "nice" },
-  { id: "thisbowl-nyc", name: "Thisbowl NYC", address: "65 Bleecker St", lat: 40.7263784, lng: -73.9949921, kind: "casual" },
+  { id: "thisbowl-nyc", name: "Thisbowl NYC", address: "65 Bleecker St", lat: 40.7263784, lng: -73.9949921, kind: "casual", photo: "/images/saved-spots/thisbowl-nyc.png" },
   { id: "tomi-jazz", name: "Tomi Jazz", address: "239 E 53rd St", lat: 40.7572284, lng: -73.9677693, kind: "bar" },
-  { id: "uluh", name: "uluh", address: "152 Second Ave", lat: 40.7294457, lng: -73.9868292, kind: "nice", visited: true, note: "Insane dan dan noodles" },
+  { id: "uluh", name: "uluh", address: "152 Second Ave", lat: 40.7294457, lng: -73.9868292, kind: "nice", visited: true, note: "Insane dan dan noodles", photo: "/images/saved-spots/uluh.png" },
   { id: "village-east", name: "Village East by Angelika", address: "181-189 Second Ave", lat: 40.7292, lng: -73.9858, kind: "activity" },
+  { id: "wayan", name: "Wayan", address: "20 Spring St", lat: 40.7212142, lng: -73.9951519, kind: "nice", visited: true },
   { id: "win-son-bakery", name: "Win Son Bakery", address: "23 2nd Ave", lat: 40.7246056, lng: -73.9909301, kind: "cafe" },
 ];

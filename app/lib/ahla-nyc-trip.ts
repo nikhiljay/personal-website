@@ -120,6 +120,7 @@ export type MapHighlight = {
   lng: number;
   fill: string;
   ring: string;
+  shape?: "square";
 };
 
 export const mapHighlights: MapHighlight[] = [
@@ -131,6 +132,16 @@ export const mapHighlights: MapHighlight[] = [
     lng: -73.9797,
     fill: "#006BB6",
     ring: "rgba(0, 107, 182, 0.35)",
+  },
+  {
+    id: "shobha-home",
+    name: "Shobha's",
+    address: "305 E 11th St",
+    lat: 40.7302392,
+    lng: -73.9856293,
+    fill: "#F58426",
+    ring: "rgba(245, 132, 38, 0.35)",
+    shape: "square",
   },
 ];
 
