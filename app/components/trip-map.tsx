@@ -28,6 +28,7 @@ const STYLES: Record<"light" | "dark", string> = {
 
 const LABEL_FONT = ["Inter", "system-ui", "sans-serif"];
 const MARKER_DOT_RADIUS = 5;
+const MOBILE_MARKER_HIT_PADDING = 16;
 const HIGHLIGHT_RING_RADIUS = 8;
 const MARKER_STROKE_WIDTH = 2;
 const HIGHLIGHT_LABEL_SIZE = 11;
@@ -44,6 +45,55 @@ const HIGHLIGHT_SOURCE = "map-highlights";
 const HIGHLIGHT_RING_LAYER = "map-highlights-ring";
 const HIGHLIGHT_LAYER = "map-highlights-dot";
 const HIGHLIGHT_LABELS_LAYER = "map-highlight-labels";
+
+const MARKER_LAYERS = [
+  SAVED_LAYER,
+  STOPS_LAYER,
+  HIGHLIGHT_RING_LAYER,
+  HIGHLIGHT_LAYER,
+  HIGHLIGHT_LABELS_LAYER,
+] as const;
+
+function markerHitPadding() {
+  return window.matchMedia("(pointer: coarse)").matches
+    ? MOBILE_MARKER_HIT_PADDING
+    : 0;
+}
+
+function queryMarkerFeatures(map: maplibregl.Map, point: maplibregl.PointLike) {
+  const padding = markerHitPadding();
+  const features =
+    padding > 0
+      ? map.queryRenderedFeatures(
+          [
+            [point.x - padding, point.y - padding],
+            [point.x + padding, point.y + padding],
+          ],
+          { layers: [...MARKER_LAYERS] },
+        )
+      : map.queryRenderedFeatures(point, { layers: [...MARKER_LAYERS] });
+
+  if (features.length <= 1) {
+    return features;
+  }
+
+  return [...features].sort((left, right) => {
+    const distance = (feature: (typeof features)[number]) => {
+      if (feature.geometry.type !== "Point") {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      const projected = map.project(
+        feature.geometry.coordinates as [number, number],
+      );
+      const dx = projected.x - point.x;
+      const dy = projected.y - point.y;
+      return dx * dx + dy * dy;
+    };
+
+    return distance(left) - distance(right);
+  });
+}
 
 async function ensureInterLoaded() {
   if (!("fonts" in document)) {
@@ -547,30 +597,35 @@ export function TripMap({
       interactionsBound = true;
 
       const onPlaceClick = (event: MapLayerMouseEvent) => {
-        const feature = event.features?.[0];
+        const map = mapRef.current;
+        if (!map) {
+          return;
+        }
+
+        const features = queryMarkerFeatures(map, event.point);
+        const feature = features[0];
         if (!feature || feature.geometry.type !== "Point") {
           return;
         }
 
+        const layerId = feature.layer?.id;
         const properties = feature.properties as {
           id?: string;
           name: string;
           address: string;
         };
 
-        if (event.features?.some((entry) => entry.layer?.id === SAVED_LAYER)) {
+        if (layerId === SAVED_LAYER) {
           const nextId =
             properties.id === selectedSavedSpotIdRef.current
               ? null
               : (properties.id ?? null);
           onSavedSpotSelectRef.current?.(nextId);
         } else if (
-          event.features?.some(
-            (entry) =>
-              entry.layer?.id === STOPS_LAYER ||
-              entry.layer?.id === HIGHLIGHT_LAYER ||
-              entry.layer?.id === HIGHLIGHT_RING_LAYER,
-          ) &&
+          (layerId === STOPS_LAYER ||
+            layerId === HIGHLIGHT_LAYER ||
+            layerId === HIGHLIGHT_RING_LAYER ||
+            layerId === HIGHLIGHT_LABELS_LAYER) &&
           properties.id
         ) {
           const nextId =
@@ -578,6 +633,8 @@ export function TripMap({
               ? null
               : properties.id;
           onStopSelectRef.current?.(nextId);
+        } else {
+          return;
         }
 
         showStopPopup(
@@ -586,11 +643,7 @@ export function TripMap({
         );
       };
 
-      map.on("click", SAVED_LAYER, onPlaceClick);
-      map.on("click", STOPS_LAYER, onPlaceClick);
-      map.on("click", HIGHLIGHT_RING_LAYER, onPlaceClick);
-      map.on("click", HIGHLIGHT_LAYER, onPlaceClick);
-      map.on("click", HIGHLIGHT_LABELS_LAYER, onPlaceClick);
+      map.on("click", onPlaceClick);
 
       for (const layer of [
         SAVED_LAYER,
