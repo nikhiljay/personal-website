@@ -33,6 +33,14 @@ export const tripStops: TripStop[] = [
     kind: "conference",
   },
   {
+    id: "il-gattopardo",
+    name: "Il Gattopardo",
+    address: "13 W 54th St",
+    lat: 40.7616453,
+    lng: -73.9763252,
+    kind: "dinner",
+  },
+  {
     id: "limani",
     name: "Limani",
     address: "45 Rockefeller Plaza",

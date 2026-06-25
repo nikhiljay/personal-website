@@ -60,7 +60,7 @@ export const savedSpots: SavedSpot[] = [
   { id: "ramen-ishida", name: "Ramen Ishida", address: "122 Ludlow St", lat: 40.7195965, lng: -73.9883524, kind: "casual" },
   { id: "santo-taco", name: "Santo Taco", address: "94 University Pl", lat: 40.7338821, lng: -73.9930035, kind: "casual" },
   { id: "sappe", name: "Sappe", address: "240 W 14th St", lat: 40.7391677, lng: -74.0017632, kind: "casual" },
-  { id: "singlish", name: "Singlish", address: "17 E 13th St", lat: 40.7349936, lng: -73.993015, kind: "casual" },
+  { id: "singlish", name: "Singlish", address: "17 E 13th St", lat: 40.7349936, lng: -73.993015, kind: "bar" },
   { id: "soothr", name: "Soothr", address: "204 E 13th St", lat: 40.7322692, lng: -73.9873518, kind: "nice" },
   { id: "the-high-line", name: "The High Line", address: "820 Washington St", lat: 40.7397293, lng: -74.0082119, kind: "activity" },
   { id: "the-odeon", name: "The Odeon", address: "145 W Broadway", lat: 40.7169082, lng: -74.0079209, kind: "nice" },

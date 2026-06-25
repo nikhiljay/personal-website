@@ -60,18 +60,23 @@ function markerHitPadding() {
     : 0;
 }
 
+function toScreenPoint(point: maplibregl.PointLike) {
+  return Array.isArray(point) ? { x: point[0], y: point[1] } : point;
+}
+
 function queryMarkerFeatures(map: maplibregl.Map, point: maplibregl.PointLike) {
+  const { x, y } = toScreenPoint(point);
   const padding = markerHitPadding();
   const features =
     padding > 0
       ? map.queryRenderedFeatures(
           [
-            [point.x - padding, point.y - padding],
-            [point.x + padding, point.y + padding],
+            [x - padding, y - padding],
+            [x + padding, y + padding],
           ],
           { layers: [...MARKER_LAYERS] },
         )
-      : map.queryRenderedFeatures(point, { layers: [...MARKER_LAYERS] });
+      : map.queryRenderedFeatures([x, y], { layers: [...MARKER_LAYERS] });
 
   if (features.length <= 1) {
     return features;
@@ -86,8 +91,8 @@ function queryMarkerFeatures(map: maplibregl.Map, point: maplibregl.PointLike) {
       const projected = map.project(
         feature.geometry.coordinates as [number, number],
       );
-      const dx = projected.x - point.x;
-      const dy = projected.y - point.y;
+      const dx = projected.x - x;
+      const dy = projected.y - y;
       return dx * dx + dy * dy;
     };
 

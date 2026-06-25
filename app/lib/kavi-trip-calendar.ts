@@ -22,6 +22,7 @@ const stopPatterns: Record<string, RegExp[]> = {
     /network reception/i,
     /welcome reception/i,
   ],
+  "il-gattopardo": [/gattopardo/i],
   limani: [/limani/i, /rockefeller plaza/i],
   moma: [/moma/i],
   paley: [/paley/i],
