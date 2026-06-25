@@ -66,7 +66,7 @@
   }
 
   .section-label {
-    @apply text-[13px] font-normal text-muted;
+    @apply m-0 text-[13px] font-normal leading-5 text-muted;
   }
 
   .serif-em {

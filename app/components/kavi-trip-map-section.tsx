@@ -3,11 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { TripEvent } from "../lib/ahla-nyc-trip";
+import { distanceInMiles, formatDistanceMiles } from "../lib/geo";
 import { savedSpots } from "../lib/nikhil-saved-spots";
 import {
   savedSpotKindMeta,
   type SavedSpotKind,
 } from "../lib/saved-spot-kinds";
+
+import { useCurrentLocation } from "../hooks/use-current-location";
 
 import { KaviTripSchedule } from "./kavi-trip-schedule";
 import { SavedSpotKindDot } from "./saved-spot-kind-dot";
@@ -23,6 +26,7 @@ export function KaviTripMapSection({
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [activeKinds, setActiveKinds] = useState<SavedSpotKind[]>([]);
+  const currentLocation = useCurrentLocation();
 
   const filteredSpots = useMemo(
     () =>
@@ -68,9 +72,9 @@ export function KaviTripMapSection({
         />
       </div>
 
-      <section className="px-6 md:px-0">
+      <section className="flex flex-col gap-3 px-6 md:px-0">
         <h2 className="section-label">Nikhil&apos;s saved spots</h2>
-        <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] leading-5">
+        <ul className="m-0 flex flex-wrap gap-x-4 gap-y-1 p-0 text-[12px] leading-5">
           {savedSpotKinds.map((kind) => {
             const isKindActive = activeKinds.includes(kind);
 
@@ -95,9 +99,17 @@ export function KaviTripMapSection({
             );
           })}
         </ul>
-        <ol className="mt-4 list-none space-y-2 text-[15px] leading-[1.7]">
+        <ol className="m-0 list-none space-y-2 p-0 text-[15px] leading-5">
           {filteredSpots.map((spot) => {
             const isSelected = selectedSpotId === spot.id;
+            const distanceLabel = currentLocation
+              ? formatDistanceMiles(
+                  distanceInMiles(currentLocation, {
+                    lat: spot.lat,
+                    lng: spot.lng,
+                  }),
+                )
+              : null;
 
             return (
               <li key={spot.id}>
@@ -116,7 +128,11 @@ export function KaviTripMapSection({
                     <span className={isSelected ? "text-fg" : undefined}>
                       {spot.name}
                     </span>
-                    <span className="text-muted"> — {spot.address}</span>
+                    <span className="text-muted">
+                      {" "}
+                      — {spot.address}
+                      {distanceLabel ? `, ${distanceLabel}` : ""}
+                    </span>
                   </span>
                 </button>
               </li>

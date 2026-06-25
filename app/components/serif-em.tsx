@@ -1,3 +1,9 @@
-export function SerifEm({ children }: { children: React.ReactNode }) {
-  return <em className="serif-em">{children}</em>;
+export function SerifEm({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <em className={className ? `serif-em ${className}` : "serif-em"}>{children}</em>;
 }

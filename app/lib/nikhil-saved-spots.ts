@@ -18,6 +18,7 @@ export const savedSpots: SavedSpot[] = [
   { id: "brooklyn-bridge", name: "Brooklyn Bridge", address: "Brooklyn Bridge", lat: 40.7062175, lng: -73.9970208, kind: "activity" },
   { id: "by-antidote", name: "By Antidote", address: "30 E 20th St", lat: 40.7385926, lng: -73.988887, kind: "cafe" },
   { id: "c-and-b", name: "C&B", address: "178 E 7th St", lat: 40.7250538, lng: -73.9816964, kind: "cafe" },
+  { id: "cafe-maud", name: "Cafe Maud", address: "132 2nd Ave", lat: 40.7286121, lng: -73.9874271, kind: "nice" },
   { id: "cafe-mogador", name: "Cafe Mogador", address: "101 St Marks Pl", lat: 40.7274166, lng: -73.9843381, kind: "casual" },
   { id: "caffe-panna-irving", name: "Caffè Panna", address: "77 Irving Pl", lat: 40.7369641, lng: -73.9868018, kind: "cafe" },
   { id: "casa-mono", name: "Casa Mono and Bar Jamón", address: "52 Irving Pl", lat: 40.7359257, lng: -73.9871655, kind: "nice" },
