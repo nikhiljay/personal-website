@@ -52,6 +52,7 @@ export const savedSpots: SavedSpot[] = [
   { id: "levain-18th", name: "Levain Bakery", address: "2 W 18th St", lat: 40.7386759, lng: -73.9924807, kind: "cafe" },
   { id: "locanda-verde", name: "Locanda Verde", address: "377 Greenwich St", lat: 40.7198779, lng: -74.010019, kind: "nice" },
   { id: "lindustrie", name: "L'industrie Pizzeria", address: "104 Christopher St", lat: 40.7332057, lng: -74.0049379, kind: "casual" },
+  { id: "love-mama", name: "Love Mama", address: "174 2nd Ave", lat: 40.7304045, lng: -73.9861256, kind: "casual" },
   { id: "marea", name: "Marea", address: "240 Central Park S", lat: 40.7673344, lng: -73.9811711, kind: "nice" },
   { id: "mitr-thai", name: "Mitr Thai", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice" },
   { id: "nolita-pizza", name: "Nolita Pizza", address: "68 Kenmare St", lat: 40.7209123, lng: -73.9961959, kind: "casual" },
