@@ -125,11 +125,20 @@ async function fetchMapStyle(url: string) {
   return styleWithoutGlyphs;
 }
 
-function popupHtml(place: Pick<TripStop | SavedSpot | MapHighlight, "name" | "address">) {
+function popupHtml(place: {
+  name: string;
+  address: string;
+  note?: string;
+}) {
+  const note = place.note
+    ? `<div class="trip-map-popup-note">${place.note}</div>`
+    : "";
+
   return `
     <div>
       <div class="trip-map-popup-title">${place.name}</div>
       <div class="trip-map-popup-address">${place.address}</div>
+      ${note}
     </div>
   `;
 }
@@ -165,6 +174,7 @@ function savedSpotsGeoJson(): GeoJSON.FeatureCollection {
         name: spot.name,
         address: spot.address,
         kind: spot.kind,
+        ...(spot.note ? { note: spot.note } : {}),
       },
     })),
   };
@@ -488,7 +498,7 @@ export function TripMap({
   const showPlacePopup = useCallback(
     (
       coordinates: [number, number],
-      properties: { name: string; address: string },
+      properties: { name: string; address: string; note?: string },
     ) => {
       const map = mapRef.current;
       if (!map) {
@@ -588,7 +598,7 @@ export function TripMap({
 
     const showStopPopup = (
       coordinates: [number, number],
-      properties: { name: string; address: string },
+      properties: { name: string; address: string; note?: string },
     ) => {
       showPlacePopup(coordinates, properties);
     };
@@ -618,6 +628,7 @@ export function TripMap({
           id?: string;
           name: string;
           address: string;
+          note?: string;
         };
 
         if (layerId === SAVED_LAYER) {

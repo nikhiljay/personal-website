@@ -7,10 +7,11 @@ export type SavedSpot = {
   lat: number;
   lng: number;
   kind: SavedSpotKind;
+  note?: string;
 };
 
 export const savedSpots: SavedSpot[] = [
-  { id: "adda", name: "Adda", address: "107 1st Ave", lat: 40.7268472, lng: -73.986228, kind: "nice" },
+  { id: "adda", name: "Adda", address: "107 1st Ave", lat: 40.7268472, lng: -73.986228, kind: "nice", note: "I've already told you about this one, but must go if you're not tired of Indian food after Musaafer!" },
   { id: "au-zaatar", name: "Au Za'atar", address: "188 Avenue A", lat: 40.7289381, lng: -73.9812454, kind: "casual" },
   { id: "ayat", name: "Ayat", address: "107 Loisaida Ave", lat: 40.7242306, lng: -73.9789217, kind: "casual" },
   { id: "birdland", name: "Birdland", address: "315 W 44th St", lat: 40.7590853, lng: -73.9896379, kind: "bar" },
@@ -18,12 +19,12 @@ export const savedSpots: SavedSpot[] = [
   { id: "brooklyn-bridge", name: "Brooklyn Bridge", address: "Brooklyn Bridge", lat: 40.7062175, lng: -73.9970208, kind: "activity" },
   { id: "by-antidote", name: "By Antidote", address: "30 E 20th St", lat: 40.7385926, lng: -73.988887, kind: "cafe" },
   { id: "c-and-b", name: "C&B", address: "178 E 7th St", lat: 40.7250538, lng: -73.9816964, kind: "cafe" },
-  { id: "cafe-maud", name: "Cafe Maud", address: "132 2nd Ave", lat: 40.7286121, lng: -73.9874271, kind: "nice" },
+  { id: "cafe-maud", name: "Cafe Maud", address: "132 2nd Ave", lat: 40.7286121, lng: -73.9874271, kind: "nice", note: "Cute Australian brunch spot with great food + near Shobha's!" },
   { id: "cafe-mogador", name: "Cafe Mogador", address: "101 St Marks Pl", lat: 40.7274166, lng: -73.9843381, kind: "casual" },
   { id: "caffe-panna-irving", name: "Caffè Panna", address: "77 Irving Pl", lat: 40.7369641, lng: -73.9868018, kind: "cafe" },
   { id: "casa-mono", name: "Casa Mono and Bar Jamón", address: "52 Irving Pl", lat: 40.7359257, lng: -73.9871655, kind: "nice" },
   { id: "chama-mama", name: "Chama Mama", address: "149 W 14th St", lat: 40.7384827, lng: -73.9988578, kind: "casual" },
-  { id: "chili", name: "CHILI", address: "13 E 37th St", lat: 40.7501079, lng: -73.9820782, kind: "nice" },
+  { id: "chili", name: "CHILI", address: "13 E 37th St", lat: 40.7501079, lng: -73.9820782, kind: "nice", note: "Solo dined here a lot when I was living near Grand Central. Not as cute because it's in Midtown, but great schezuan food" },
   { id: "devocion", name: "Devoción", address: "25 E 20th St", lat: 40.7391158, lng: -73.9891065, kind: "cafe" },
   { id: "fairfax", name: "Fairfax", address: "234 W 4th St", lat: 40.7343436, lng: -74.0031007, kind: "casual" },
   { id: "fish-cheeks", name: "Fish Cheeks", address: "55 Bond St", lat: 40.7257377, lng: -73.9927035, kind: "nice" },
@@ -52,10 +53,10 @@ export const savedSpots: SavedSpot[] = [
   { id: "levain-lafayette", name: "Levain Bakery", address: "340 Lafayette St", lat: 40.7262725, lng: -73.9946961, kind: "cafe" },
   { id: "levain-18th", name: "Levain Bakery", address: "2 W 18th St", lat: 40.7386759, lng: -73.9924807, kind: "cafe" },
   { id: "locanda-verde", name: "Locanda Verde", address: "377 Greenwich St", lat: 40.7198779, lng: -74.010019, kind: "nice" },
-  { id: "lindustrie", name: "L'industrie Pizzeria", address: "104 Christopher St", lat: 40.7332057, lng: -74.0049379, kind: "casual" },
+  { id: "lindustrie", name: "L'industrie Pizzeria", address: "104 Christopher St", lat: 40.7332057, lng: -74.0049379, kind: "casual", note: "Supposedly the best slice in NYC although I think it's overrated after waiting in an hour line lol" },
   { id: "love-mama", name: "Love Mama", address: "174 2nd Ave", lat: 40.7304045, lng: -73.9861256, kind: "casual" },
   { id: "marea", name: "Marea", address: "240 Central Park S", lat: 40.7673344, lng: -73.9811711, kind: "nice" },
-  { id: "mitr-thai", name: "Mitr Thai", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice" },
+  { id: "mitr-thai", name: "Mitr Thai", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice", note: "This is where I went with Pranav and it was excellent. Highly recommend getting a drink here too" },
   { id: "nolita-pizza", name: "Nolita Pizza", address: "68 Kenmare St", lat: 40.7209123, lng: -73.9961959, kind: "casual" },
   { id: "nom-wah", name: "Nom Wah", address: "10 Kenmare St", lat: 40.7203696, lng: -73.9945824, kind: "casual" },
   { id: "prince-st-pizza", name: "Prince St. Pizza", address: "27 Prince St", lat: 40.7230823, lng: -73.9945374, kind: "casual" },
@@ -68,7 +69,7 @@ export const savedSpots: SavedSpot[] = [
   { id: "the-odeon", name: "The Odeon", address: "145 W Broadway", lat: 40.7169082, lng: -74.0079209, kind: "nice" },
   { id: "thisbowl-nyc", name: "Thisbowl NYC", address: "65 Bleecker St", lat: 40.7263784, lng: -73.9949921, kind: "casual" },
   { id: "tomi-jazz", name: "Tomi Jazz", address: "239 E 53rd St", lat: 40.7572284, lng: -73.9677693, kind: "bar" },
-  { id: "uluh", name: "uluh", address: "152 Second Ave", lat: 40.7294457, lng: -73.9868292, kind: "nice" },
+  { id: "uluh", name: "uluh", address: "152 Second Ave", lat: 40.7294457, lng: -73.9868292, kind: "nice", note: "Insane dan dan noodles" },
   { id: "village-east", name: "Village East by Angelika", address: "181-189 Second Ave", lat: 40.7292, lng: -73.9858, kind: "activity" },
   { id: "win-son-bakery", name: "Win Son Bakery", address: "23 2nd Ave", lat: 40.7246056, lng: -73.9909301, kind: "cafe" },
 ];

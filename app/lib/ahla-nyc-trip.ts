@@ -14,6 +14,7 @@ export type TripEvent = {
   time: string;
   stopId?: string;
   note?: string;
+  url?: string;
 };
 
 export type Neighborhood = {
@@ -26,7 +27,7 @@ export type Neighborhood = {
 export const tripStops: TripStop[] = [
   {
     id: "hilton",
-    name: "New York Hilton Midtown",
+    name: "Hilton Midtown",
     address: "1335 Avenue of the Americas",
     lat: 40.7622,
     lng: -73.9797,
@@ -121,7 +122,7 @@ export type MapHighlight = {
 export const mapHighlights: MapHighlight[] = [
   {
     id: "hilton",
-    name: "New York Hilton Midtown",
+    name: "Hilton Midtown",
     address: "1335 Avenue of the Americas",
     lat: 40.7622,
     lng: -73.9797,

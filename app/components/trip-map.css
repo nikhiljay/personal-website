@@ -43,3 +43,8 @@
   color: var(--color-muted);
   margin-top: 2px;
 }
+
+.trip-map-popup-note {
+  color: var(--color-body);
+  margin-top: 8px;
+}

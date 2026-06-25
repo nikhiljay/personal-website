@@ -3,6 +3,23 @@ export type Coordinates = {
   lng: number;
 };
 
+/** Approximate NYC city bounds (all boroughs). */
+const NYC_BOUNDS = {
+  minLat: 40.477,
+  maxLat: 40.917,
+  minLng: -74.259,
+  maxLng: -73.7,
+};
+
+export function isInNyc({ lat, lng }: Coordinates) {
+  return (
+    lat >= NYC_BOUNDS.minLat &&
+    lat <= NYC_BOUNDS.maxLat &&
+    lng >= NYC_BOUNDS.minLng &&
+    lng <= NYC_BOUNDS.maxLng
+  );
+}
+
 export function distanceInMiles(from: Coordinates, to: Coordinates) {
   const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
   const earthRadiusMiles = 3958.8;

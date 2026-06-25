@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { TripEvent } from "../lib/ahla-nyc-trip";
-import { distanceInMiles, formatDistanceMiles } from "../lib/geo";
+import { distanceInMiles, formatDistanceMiles, isInNyc } from "../lib/geo";
 import { savedSpots } from "../lib/nikhil-saved-spots";
 import {
   savedSpotKindMeta,
@@ -102,14 +102,15 @@ export function KaviTripMapSection({
         <ol className="m-0 list-none space-y-2 p-0 text-[15px] leading-5">
           {filteredSpots.map((spot) => {
             const isSelected = selectedSpotId === spot.id;
-            const distanceLabel = currentLocation
-              ? formatDistanceMiles(
-                  distanceInMiles(currentLocation, {
-                    lat: spot.lat,
-                    lng: spot.lng,
-                  }),
-                )
-              : null;
+            const distanceLabel =
+              currentLocation && isInNyc(currentLocation)
+                ? formatDistanceMiles(
+                    distanceInMiles(currentLocation, {
+                      lat: spot.lat,
+                      lng: spot.lng,
+                    }),
+                  )
+                : null;
 
             return (
               <li key={spot.id}>

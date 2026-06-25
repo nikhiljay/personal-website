@@ -10,6 +10,7 @@ import {
 
 import { MapMarkerDot } from "./map-marker-dot";
 import { ExpandableAside } from "./expandable-aside";
+import { ExternalLink } from "./external-link";
 
 const TITLE_ASIDES = [
   {
@@ -114,7 +115,7 @@ export function KaviTripSchedule({
                     <div className="pt-0.5 text-[13px] leading-5 text-muted tabular-nums">
                       {event.time}
                     </div>
-                    <div className="flex min-w-0 flex-col gap-0.5 text-[15px] leading-[1.7]">
+                    <div className="flex min-w-0 flex-col gap-0 text-[15px] leading-[1.7]">
                       <EventTitle title={event.title} />
                       {stop ? (
                         <button
@@ -135,7 +136,11 @@ export function KaviTripSchedule({
                       ) : null}
                       {event.note ? (
                         <div className="text-[13px] leading-5 text-muted">
-                          {event.note}
+                          {event.url ? (
+                            <ExternalLink href={event.url}>{event.note}</ExternalLink>
+                          ) : (
+                            event.note
+                          )}
                         </div>
                       ) : null}
                     </div>

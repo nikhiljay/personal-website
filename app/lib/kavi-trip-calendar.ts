@@ -1,8 +1,9 @@
 import { type TripEvent, tripStops } from "./ahla-nyc-trip";
 
 const TRIP_TIMEZONE = "America/New_York";
-const TRIP_START = new Date("2026-06-26T00:00:00-04:00");
-const TRIP_END = new Date("2026-07-03T00:00:00-04:00");
+const SF_TIMEZONE = "America/Los_Angeles";
+const TRIP_START = new Date("2026-06-25T00:00:00-04:00");
+const TRIP_END = new Date("2026-07-04T00:00:00-04:00");
 
 export const CALENDAR_REVALIDATE_SECONDS = 900;
 
@@ -37,6 +38,39 @@ type ParsedIcsEvent = {
   status?: string;
   start: Date;
 };
+
+const STATIC_EVENT_URLS: Record<string, string> = {
+  "flight-outbound-dl365":
+    "https://live.flighty.app/22b947272-3ac9-461b-b67d-8205cd341685",
+  "flight-return-dl679":
+    "https://live.flighty.app/28d386992-f86a-47b3-bf95-268dd3f971a7",
+};
+
+const CALENDAR_EVENT_EXCLUSIONS = [
+  /jd health law advising/i,
+  /flight\s+jfk\s*(?:-->|→|->)\s*sfo/i,
+];
+
+const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
+  {
+    uid: "flight-outbound-dl365",
+    summary: "Fly to NYC",
+    location: "DL 365 · SFO 10:40 PM → JFK 6:53 AM",
+    start: new Date("2026-06-25T22:40:00-07:00"),
+  },
+  {
+    uid: "flight-return-dl679",
+    summary: "Fly home",
+    location: "DL 679 · JFK 2:55 PM → SFO 6:30 PM",
+    start: new Date("2026-07-03T14:55:00-04:00"),
+  },
+  {
+    uid: "july-4-weekend-sf",
+    summary: "Enjoy 4th of July weekend with Nikhil!",
+    location: "",
+    start: new Date("2026-07-03T18:30:00-07:00"),
+  },
+];
 
 function unfoldIcs(text: string) {
   const lines: string[] = [];
@@ -137,21 +171,32 @@ function parseIcsEvents(text: string): ParsedIcsEvent[] {
   return events;
 }
 
-function formatEventDate(date: Date) {
+function formatEventDate(date: Date, timeZone = TRIP_TIMEZONE) {
   return date.toLocaleDateString("en-US", {
-    timeZone: TRIP_TIMEZONE,
+    timeZone,
     weekday: "short",
     month: "short",
     day: "numeric",
   });
 }
 
-function formatEventTime(date: Date) {
+function formatEventTime(date: Date, timeZone = TRIP_TIMEZONE) {
   return date.toLocaleTimeString("en-US", {
-    timeZone: TRIP_TIMEZONE,
+    timeZone,
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+function eventTimeZone(event: ParsedIcsEvent) {
+  if (
+    event.uid === "flight-outbound-dl365" ||
+    event.uid === "july-4-weekend-sf"
+  ) {
+    return SF_TIMEZONE;
+  }
+
+  return TRIP_TIMEZONE;
 }
 
 function cleanIcsText(value: string) {
@@ -181,8 +226,17 @@ function locationNote(location: string) {
   return venue || cleaned;
 }
 
+function isExcludedCalendarEvent(event: ParsedIcsEvent) {
+  const summary = cleanIcsText(event.summary);
+  return CALENDAR_EVENT_EXCLUSIONS.some((pattern) => pattern.test(summary));
+}
+
 function isTripEvent(event: ParsedIcsEvent) {
   if (event.status === "CANCELLED") {
+    return false;
+  }
+
+  if (isExcludedCalendarEvent(event)) {
     return false;
   }
 
@@ -193,14 +247,16 @@ function toTripEvent(event: ParsedIcsEvent): TripEvent {
   const summary = cleanIcsText(event.summary || "Untitled");
   const location = cleanIcsText(event.location);
   const stopId = matchStop(summary, location);
+  const timeZone = eventTimeZone(event);
 
   return {
     id: event.uid || `${summary}-${event.start.toISOString()}`,
     title: summary,
-    date: formatEventDate(event.start),
-    time: formatEventTime(event.start),
+    date: formatEventDate(event.start, timeZone),
+    time: formatEventTime(event.start, timeZone),
     stopId,
     note: !stopId && location ? locationNote(location) : undefined,
+    url: STATIC_EVENT_URLS[event.uid],
   };
 }
 
@@ -224,7 +280,7 @@ async function fetchCalendarIcs() {
 export async function getTripEventsFromCalendar(): Promise<TripEvent[]> {
   const ics = await fetchCalendarIcs();
 
-  return parseIcsEvents(ics)
+  return [...parseIcsEvents(ics), ...STATIC_TRIP_EVENTS]
     .filter(isTripEvent)
     .sort((a, b) => a.start.getTime() - b.start.getTime())
     .map(toTripEvent);

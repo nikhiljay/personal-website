@@ -7,11 +7,11 @@ export const savedSpotKindColors: Record<
   Record<SavedSpotKind, string>
 > = {
   light: {
-    cafe: "#8B5E3C",
-    casual: "#5C7A5C",
-    nice: "#6B5B7B",
-    bar: "#A67C00",
-    activity: "#4A7389",
+    cafe: "#B06A35",
+    casual: "#3D8B47",
+    nice: "#7550A0",
+    bar: "#C99200",
+    activity: "#2E7DAF",
   },
   dark: {
     cafe: "#C4926A",
@@ -26,11 +26,11 @@ export const savedSpotKindMeta: Record<
   SavedSpotKind,
   { label: string; color: string }
 > = {
-  cafe: { label: "Café", color: "light-dark(#8B5E3C, #C4926A)" },
-  casual: { label: "Casual", color: "light-dark(#5C7A5C, #8FAF8F)" },
-  nice: { label: "Sit-Down", color: "light-dark(#6B5B7B, #A898B8)" },
-  bar: { label: "Bar", color: "light-dark(#A67C00, #D4AA50)" },
-  activity: { label: "Activity", color: "light-dark(#4A7389, #7AACC4)" },
+  cafe: { label: "Café", color: "light-dark(#B06A35, #C4926A)" },
+  casual: { label: "Casual", color: "light-dark(#3D8B47, #8FAF8F)" },
+  nice: { label: "Sit-Down", color: "light-dark(#7550A0, #A898B8)" },
+  bar: { label: "Bar", color: "light-dark(#C99200, #D4AA50)" },
+  activity: { label: "Activity", color: "light-dark(#2E7DAF, #7AACC4)" },
 };
 
 export function savedSpotKindColorExpression(
