@@ -16,7 +16,8 @@ import {
   type TripStop,
 } from "../lib/ahla-nyc-trip";
 import { savedSpots, type SavedSpot } from "../lib/nikhil-saved-spots";
-import { savedSpotKindColorExpression } from "../lib/saved-spot-kinds";
+import type { ExpressionSpecification } from "maplibre-gl";
+import { savedSpotKindColorExpression, savedSpotKindColors, type SavedSpotKind } from "../lib/saved-spot-kinds";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./trip-map.css";
@@ -28,6 +29,21 @@ const STYLES: Record<"light" | "dark", string> = {
 
 const LABEL_FONT = ["Inter", "system-ui", "sans-serif"];
 const MARKER_DOT_RADIUS = 5;
+const SELECTED_MARKER_DOT_RADIUS = 6.5;
+const VISITED_MARKER_IMAGE_PX = 24;
+const VISITED_MARKER_INSET = 2;
+const VISITED_MARKER_CORNER_RADIUS = 3;
+const VISITED_MARKER_KINDS: SavedSpotKind[] = [
+  "cafe",
+  "casual",
+  "nice",
+  "bar",
+  "activity",
+];
+const VISITED_ICON_SIZE =
+  (MARKER_DOT_RADIUS * 2 + 1) / VISITED_MARKER_IMAGE_PX;
+const SELECTED_VISITED_ICON_SIZE =
+  (SELECTED_MARKER_DOT_RADIUS * 2 + 1) / VISITED_MARKER_IMAGE_PX;
 const MOBILE_MARKER_HIT_PADDING = 16;
 const HIGHLIGHT_RING_RADIUS = 8;
 const MARKER_STROKE_WIDTH = 2;
@@ -38,6 +54,7 @@ const styleCache = new Map<string, StyleSpecification>();
 const NEIGHBORHOODS_SOURCE = "neighborhoods";
 const NEIGHBORHOOD_LABELS_LAYER = "neighborhood-labels";
 const SAVED_SOURCE = "saved-spots";
+const SAVED_VISITED_LAYER = "saved-spots-visited";
 const SAVED_LAYER = "saved-spots-dot";
 const STOPS_SOURCE = "trip-stops";
 const STOPS_LAYER = "trip-stops-dot";
@@ -48,6 +65,7 @@ const HIGHLIGHT_LABELS_LAYER = "map-highlight-labels";
 
 const MARKER_LAYERS = [
   SAVED_LAYER,
+  SAVED_VISITED_LAYER,
   STOPS_LAYER,
   HIGHLIGHT_RING_LAYER,
   HIGHLIGHT_LAYER,
@@ -175,6 +193,7 @@ function savedSpotsGeoJson(): GeoJSON.FeatureCollection {
         address: spot.address,
         kind: spot.kind,
         ...(spot.note ? { note: spot.note } : {}),
+        ...(spot.visited ? { visited: true } : {}),
       },
     })),
   };
@@ -305,6 +324,107 @@ function setupNeighborhoodLayers(map: maplibregl.Map, theme: "light" | "dark") {
   });
 }
 
+function visitedMarkerImageId(kind: SavedSpotKind, theme: "light" | "dark") {
+  return `saved-visited-${kind}-${theme}`;
+}
+
+function roundRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + width, y, x + width, y + height, radius);
+  ctx.arcTo(x + width, y + height, x, y + height, radius);
+  ctx.arcTo(x, y + height, x, y, radius);
+  ctx.arcTo(x, y, x + width, y, radius);
+  ctx.closePath();
+}
+
+function createVisitedSquareImage(fill: string, stroke: string) {
+  const size = VISITED_MARKER_IMAGE_PX;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("Could not create visited marker canvas");
+  }
+
+  const side = size - VISITED_MARKER_INSET * 2;
+
+  roundRectPath(
+    ctx,
+    VISITED_MARKER_INSET,
+    VISITED_MARKER_INSET,
+    side,
+    side,
+    VISITED_MARKER_CORNER_RADIUS,
+  );
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = MARKER_STROKE_WIDTH;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  return ctx.getImageData(0, 0, size, size);
+}
+
+function ensureVisitedMarkerImages(map: maplibregl.Map, theme: "light" | "dark") {
+  const colors = savedSpotKindColors[theme];
+  const stroke = labelColors(theme).stroke;
+
+  for (const legacyId of ["saved-visited-square", "saved-visited-square-v2"]) {
+    if (map.hasImage(legacyId)) {
+      map.removeImage(legacyId);
+    }
+  }
+
+  for (const kind of VISITED_MARKER_KINDS) {
+    const id = visitedMarkerImageId(kind, theme);
+    if (map.hasImage(id)) {
+      map.removeImage(id);
+    }
+
+    map.addImage(id, createVisitedSquareImage(colors[kind], stroke));
+  }
+}
+
+function visitedMarkerImageExpression(theme: "light" | "dark"): ExpressionSpecification {
+  return [
+    "match",
+    ["get", "kind"],
+    "cafe",
+    visitedMarkerImageId("cafe", theme),
+    "casual",
+    visitedMarkerImageId("casual", theme),
+    "nice",
+    visitedMarkerImageId("nice", theme),
+    "bar",
+    visitedMarkerImageId("bar", theme),
+    "activity",
+    visitedMarkerImageId("activity", theme),
+    visitedMarkerImageId("cafe", theme),
+  ];
+}
+
+function visitedSquareLayerLayout(
+  theme: "light" | "dark",
+  iconSize: number = VISITED_ICON_SIZE,
+): maplibregl.SymbolLayerSpecification["layout"] {
+  return {
+    "icon-image": visitedMarkerImageExpression(theme),
+    "icon-size": iconSize,
+    "icon-allow-overlap": true,
+    "icon-ignore-placement": true,
+  };
+}
+
 function applySavedSpotSelection(
   map: maplibregl.Map,
   selectedId: string | null,
@@ -318,7 +438,7 @@ function applySavedSpotSelection(
   map.setPaintProperty(SAVED_LAYER, "circle-radius", [
     "case",
     ["==", ["get", "id"], match],
-    6.5,
+    SELECTED_MARKER_DOT_RADIUS,
     MARKER_DOT_RADIUS,
   ]);
   map.setPaintProperty(SAVED_LAYER, "circle-stroke-width", [
@@ -327,6 +447,46 @@ function applySavedSpotSelection(
     2.5,
     MARKER_STROKE_WIDTH,
   ]);
+
+  if (map.getLayer(SAVED_VISITED_LAYER)) {
+    map.setLayoutProperty(SAVED_VISITED_LAYER, "icon-size", [
+      "case",
+      ["==", ["get", "id"], match],
+      SELECTED_VISITED_ICON_SIZE,
+      VISITED_ICON_SIZE,
+    ]);
+  }
+}
+
+function ensureSavedVisitedLayer(
+  map: maplibregl.Map,
+  theme: "light" | "dark",
+) {
+  ensureVisitedMarkerImages(map, theme);
+
+  if (map.getLayer(SAVED_VISITED_LAYER)) {
+    map.setLayoutProperty(
+      SAVED_VISITED_LAYER,
+      "icon-image",
+      visitedMarkerImageExpression(theme),
+    );
+    return;
+  }
+
+  if (!map.getSource(SAVED_SOURCE)) {
+    return;
+  }
+
+  map.addLayer(
+    {
+      id: SAVED_VISITED_LAYER,
+      type: "symbol",
+      source: SAVED_SOURCE,
+      filter: ["==", ["get", "visited"], true],
+      layout: visitedSquareLayerLayout(theme),
+    },
+    SAVED_LAYER,
+  );
 }
 
 function setupSavedSpotLayers(
@@ -339,8 +499,10 @@ function setupSavedSpotLayers(
 
   if (map.getSource(SAVED_SOURCE)) {
     (map.getSource(SAVED_SOURCE) as GeoJSONSource).setData(savedSpotsGeoJson());
+    map.setFilter(SAVED_LAYER, ["!=", ["get", "visited"], true]);
     map.setPaintProperty(SAVED_LAYER, "circle-color", kindColors);
     map.setPaintProperty(SAVED_LAYER, "circle-stroke-color", colors.stroke);
+    ensureSavedVisitedLayer(map, theme);
     applySavedSpotSelection(map, selectedId);
     return;
   }
@@ -350,10 +512,21 @@ function setupSavedSpotLayers(
     data: savedSpotsGeoJson(),
   });
 
+  ensureVisitedMarkerImages(map, theme);
+
+  map.addLayer({
+    id: SAVED_VISITED_LAYER,
+    type: "symbol",
+    source: SAVED_SOURCE,
+    filter: ["==", ["get", "visited"], true],
+    layout: visitedSquareLayerLayout(theme),
+  });
+
   map.addLayer({
     id: SAVED_LAYER,
     type: "circle",
     source: SAVED_SOURCE,
+    filter: ["!=", ["get", "visited"], true],
     paint: {
       "circle-radius": MARKER_DOT_RADIUS,
       "circle-color": kindColors,
@@ -631,7 +804,7 @@ export function TripMap({
           note?: string;
         };
 
-        if (layerId === SAVED_LAYER) {
+        if (layerId === SAVED_LAYER || layerId === SAVED_VISITED_LAYER) {
           const nextId =
             properties.id === selectedSavedSpotIdRef.current
               ? null
@@ -663,6 +836,7 @@ export function TripMap({
 
       for (const layer of [
         SAVED_LAYER,
+        SAVED_VISITED_LAYER,
         STOPS_LAYER,
         HIGHLIGHT_RING_LAYER,
         HIGHLIGHT_LAYER,

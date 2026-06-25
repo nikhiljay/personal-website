@@ -1,3 +1,6 @@
+import { savedSpotKindMeta } from "./saved-spot-kinds";
+import { savedSpots } from "./nikhil-saved-spots";
+
 export type TripStop = {
   id: string;
   name: string;
@@ -129,15 +132,6 @@ export const mapHighlights: MapHighlight[] = [
     fill: "#006BB6",
     ring: "rgba(0, 107, 182, 0.35)",
   },
-  {
-    id: "shobha-home",
-    name: "Shobha's",
-    address: "305 E 11th St",
-    lat: 40.7302392,
-    lng: -73.9856293,
-    fill: "#F58426",
-    ring: "rgba(245, 132, 38, 0.35)",
-  },
 ];
 
 export const mapHighlightIds = new Set(mapHighlights.map((place) => place.id));
@@ -156,13 +150,22 @@ export function getStopById(id: string) {
 }
 
 export function getPlaceByStopId(id: string) {
-  return mapHighlights.find((place) => place.id === id) ?? getStopById(id);
+  return (
+    mapHighlights.find((place) => place.id === id) ??
+    getStopById(id) ??
+    savedSpots.find((spot) => spot.id === id)
+  );
 }
 
 export function getScheduleMarkerColor(stopId: string) {
   const highlight = mapHighlights.find((place) => place.id === stopId);
   if (highlight) {
     return highlight.fill;
+  }
+
+  const savedSpot = savedSpots.find((spot) => spot.id === stopId);
+  if (savedSpot) {
+    return savedSpotKindMeta[savedSpot.kind].color;
   }
 
   return "light-dark(#111111, #f2f2f2)";

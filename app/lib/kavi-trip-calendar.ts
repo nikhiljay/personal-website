@@ -59,6 +59,12 @@ const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
     start: new Date("2026-06-25T22:40:00-07:00"),
   },
   {
+    uid: "solo-adventure-jun-26",
+    summary: "Solo adventure",
+    location: "",
+    start: new Date("2026-06-26T19:00:00-04:00"),
+  },
+  {
     uid: "flight-return-dl679",
     summary: "Fly home",
     location: "DL 679 · JFK 2:55 PM → SFO 6:30 PM",

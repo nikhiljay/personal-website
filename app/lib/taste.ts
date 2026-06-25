@@ -1,6 +1,7 @@
 export type TasteItem = {
   title: string;
   href?: string;
+  links?: { label: string; href: string }[];
 };
 
 export type TasteSection = {
@@ -24,7 +25,13 @@ export const tasteSections: TasteSection[] = [
         title: "Things 3",
         href: "https://culturedcode.com/things/",
       },
-      { title: "Obsidian / iA Writer" },
+      {
+        title: "Obsidian & iA Writer",
+        links: [
+          { label: "Obsidian", href: "https://obsidian.md" },
+          { label: "iA Writer", href: "https://ia.net/writer" },
+        ],
+      },
       {
         title: "Warp",
         href: "https://www.warp.dev",

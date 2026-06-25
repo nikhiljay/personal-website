@@ -124,7 +124,7 @@ export function KaviTripMapSection({
                     isSelected ? "text-fg" : "text-body hover:text-fg"
                   }`}
                 >
-                  <SavedSpotKindDot kind={spot.kind} />
+                  <SavedSpotKindDot kind={spot.kind} visited={spot.visited} />
                   <span className="min-w-0">
                     <span className={isSelected ? "text-fg" : undefined}>
                       {spot.name}

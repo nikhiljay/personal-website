@@ -65,6 +65,23 @@
     text-decoration-color: light-dark(#888888, #888888);
   }
 
+  .site-link-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 1;
+    color: var(--color-body);
+    text-decoration: none;
+    border-bottom: 1px solid light-dark(#c8c8c8, #505050);
+    padding-bottom: 2.5px;
+    transition-property: color, border-color;
+    transition-duration: 200ms;
+  }
+
+  .site-link-icon:hover {
+    border-bottom-color: light-dark(#888888, #888888);
+  }
+
   .section-label {
     @apply m-0 text-[13px] font-normal leading-5 text-muted;
   }

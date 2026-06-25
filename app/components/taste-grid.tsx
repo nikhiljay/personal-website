@@ -2,6 +2,19 @@ import { ExternalLink } from "./external-link";
 import type { TasteItem, TasteSection } from "../lib/taste";
 
 function TasteEntry({ item }: { item: TasteItem }) {
+  if (item.links) {
+    return (
+      <span>
+        {item.links.map((link, index) => (
+          <span key={link.href}>
+            {index > 0 ? " & " : null}
+            <ExternalLink href={link.href}>{link.label}</ExternalLink>
+          </span>
+        ))}
+      </span>
+    );
+  }
+
   if (item.href) {
     return <ExternalLink href={item.href}>{item.title}</ExternalLink>;
   }

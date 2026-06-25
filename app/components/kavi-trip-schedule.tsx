@@ -11,6 +11,7 @@ import {
 import { MapMarkerDot } from "./map-marker-dot";
 import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
+import { DeltaLogo } from "./delta-logo";
 
 const TITLE_ASIDES = [
   {
@@ -28,6 +29,11 @@ const TITLE_ASIDES = [
   {
     pattern: /\b(hoyt)\b/i,
     explanation: "Shoutout to our homie #1",
+  },
+  {
+    pattern: /(solo adventure)/i,
+    explanation:
+      "Why wait for company? Let go and enjoy the city by yourself! You're in the best city to explore.",
   },
 ] as const;
 
@@ -67,6 +73,34 @@ function EventTitle({ title }: { title: string }) {
   }
 
   return <div className="text-fg">{title}</div>;
+}
+
+function EventNote({ note, url }: { note: string; url?: string }) {
+  const showLogo = note.startsWith("DL ");
+
+  if (url) {
+    return (
+      <ExternalLink
+        href={url}
+        target="_blank"
+        className="site-link-icon text-[13px]"
+      >
+        {showLogo ? <DeltaLogo /> : null}
+        {note}
+      </ExternalLink>
+    );
+  }
+
+  if (showLogo) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[13px] leading-5 text-muted">
+        <DeltaLogo />
+        {note}
+      </span>
+    );
+  }
+
+  return <span className="text-muted">{note}</span>;
 }
 
 function groupEventsByDate(events: TripEvent[]) {
@@ -135,12 +169,8 @@ export function KaviTripSchedule({
                         </button>
                       ) : null}
                       {event.note ? (
-                        <div className="text-[13px] leading-5 text-muted">
-                          {event.url ? (
-                            <ExternalLink href={event.url}>{event.note}</ExternalLink>
-                          ) : (
-                            event.note
-                          )}
+                        <div className="text-[13px] leading-5">
+                          <EventNote note={event.note} url={event.url} />
                         </div>
                       ) : null}
                     </div>

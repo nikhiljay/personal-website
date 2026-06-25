@@ -2,16 +2,16 @@ import { savedSpotKindMeta, type SavedSpotKind } from "../lib/saved-spot-kinds";
 
 export function SavedSpotKindDot({
   kind,
-  className = "inline-block h-2 w-2 shrink-0 rounded-full",
+  visited = false,
 }: {
   kind: SavedSpotKind;
-  className?: string;
+  visited?: boolean;
 }) {
   const meta = savedSpotKindMeta[kind];
 
   return (
     <span
-      className={className}
+      className={`inline-block shrink-0 ${visited ? "size-[7.75px] rounded-[1px]" : "size-2 rounded-full"}`}
       style={{ backgroundColor: meta.color }}
       aria-label={meta.label}
       title={meta.label}
