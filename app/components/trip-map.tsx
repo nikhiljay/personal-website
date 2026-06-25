@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
-import type { GeoJSONSource, MapLayerMouseEvent, StyleSpecification } from "maplibre-gl";
+import type {
+  ExpressionSpecification,
+  GeoJSONSource,
+  MapLayerMouseEvent,
+  StyleSpecification,
+} from "maplibre-gl";
 
 import {
   getPlaceByStopId,
@@ -16,8 +21,12 @@ import {
   type TripStop,
 } from "../lib/ahla-nyc-trip";
 import { savedSpots, type SavedSpot } from "../lib/nikhil-saved-spots";
-import type { ExpressionSpecification } from "maplibre-gl";
-import { savedSpotKindColorExpression, savedSpotKindColors, type SavedSpotKind } from "../lib/saved-spot-kinds";
+import { citymapperDirectionsUrl } from "../lib/citymapper";
+import {
+  savedSpotKindColorExpression,
+  savedSpotKindColors,
+  type SavedSpotKind,
+} from "../lib/saved-spot-kinds";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./trip-map.css";
@@ -143,19 +152,31 @@ async function fetchMapStyle(url: string) {
   return styleWithoutGlyphs;
 }
 
+function escapeHtml(text: string) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 function popupHtml(place: {
   name: string;
   address: string;
+  lat: number;
+  lng: number;
   note?: string;
 }) {
   const note = place.note
-    ? `<div class="trip-map-popup-note">${place.note}</div>`
+    ? `<div class="trip-map-popup-note">${escapeHtml(place.note)}</div>`
     : "";
+  const citymapperUrl = citymapperDirectionsUrl(place);
 
   return `
     <div>
-      <div class="trip-map-popup-title">${place.name}</div>
-      <div class="trip-map-popup-address">${place.address}</div>
+      <div class="trip-map-popup-title">${escapeHtml(place.name)}</div>
+      <div class="trip-map-popup-address">${escapeHtml(place.address)}</div>
+      <a class="trip-map-popup-link site-link" href="${escapeHtml(citymapperUrl)}" target="_blank" rel="noopener noreferrer">Open in Citymapper</a>
       ${note}
     </div>
   `;
@@ -678,6 +699,8 @@ export function TripMap({
         return;
       }
 
+      const [lng, lat] = coordinates;
+
       popupRef.current?.remove();
       popupRef.current = new maplibregl.Popup({
         offset: 12,
@@ -685,7 +708,7 @@ export function TripMap({
         className: "trip-map-popup",
       })
         .setLngLat(coordinates)
-        .setHTML(popupHtml(properties))
+        .setHTML(popupHtml({ ...properties, lat, lng }))
         .addTo(map);
     },
     [],

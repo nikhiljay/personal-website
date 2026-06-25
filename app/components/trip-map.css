@@ -44,6 +44,12 @@
   margin-top: 2px;
 }
 
+.trip-map-popup-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
 .trip-map-popup-note {
   color: var(--color-body);
   margin-top: 8px;
