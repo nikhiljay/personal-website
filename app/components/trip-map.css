@@ -4,46 +4,83 @@
   background: light-dark(#fafafa, #222222);
 }
 
-/* Matches map circle markers: 5px fill radius + 2px centered stroke ≈ 12px outer. */
+/* Slightly larger than map markers so current location reads clearly. */
 .trip-map-current-location {
-  width: 12px;
-  height: 12px;
+  position: relative;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
+}
+
+.trip-map-current-location-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.trip-map-current-location-label {
+  position: absolute;
+  top: calc(50% + var(--location-label-offset, 0.65em));
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: var(--location-label-size, 11px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: var(--location-label-tracking, -0.02em);
+  color: #007aff;
+  white-space: nowrap;
+  -webkit-text-stroke: var(--location-label-halo, 3px) #ffffff;
+  paint-order: stroke fill;
 }
 
 .trip-map-current-location-dot {
   display: block;
-  box-sizing: border-box;
-  width: 12px;
-  height: 12px;
-  border: 2px solid #ffffff;
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
   border-radius: 999px;
   background: #007aff;
-  animation: trip-map-location-breathe 6s ease-in-out infinite;
+  transform: scale(0.88);
+  animation: trip-map-location-breathe 3.5s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 @keyframes trip-map-location-breathe {
   0%,
   100% {
-    border-width: 2.5px;
+    transform: scale(0.88);
   }
 
-  50% {
-    border-width: 1px;
+  28% {
+    transform: scale(1.06);
+  }
+
+  48% {
+    transform: scale(1.06);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   .trip-map-current-location-dot {
     background: #0a84ff;
-    border-color: #ffffff;
+  }
+
+  .trip-map-current-location-label {
+    color: #0a84ff;
+    -webkit-text-stroke: var(--location-label-halo, 3px) #1a1a1a;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .trip-map-current-location-dot {
     animation: none;
-    border-width: 2px;
+    transform: scale(1);
   }
 }
 

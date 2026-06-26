@@ -64,6 +64,9 @@ const MOBILE_MARKER_HIT_PADDING = 16;
 const HIGHLIGHT_RING_RADIUS = 8;
 const MARKER_STROKE_WIDTH = 2;
 const HIGHLIGHT_LABEL_SIZE = 11;
+const HIGHLIGHT_LABEL_LETTER_SPACING = 0.01;
+const CURRENT_LOCATION_LABEL_LETTER_SPACING = -0.02;
+const HIGHLIGHT_LABEL_HALO_WIDTH = 1.5;
 const HIGHLIGHT_LABEL_OFFSET: [number, number] = [0, 0.65];
 const styleCache = new Map<string, StyleSpecification>();
 
@@ -142,6 +145,7 @@ async function ensureInterLoaded() {
   }
 
   await Promise.all([
+    document.fonts.load('400 11px "Inter"'),
     document.fonts.load('400 12px "Inter"'),
     document.fonts.load('500 13px "Inter"'),
   ]);
@@ -811,12 +815,12 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
       "text-offset": HIGHLIGHT_LABEL_OFFSET,
       "text-anchor": "top",
       "text-max-width": 10,
-      "text-letter-spacing": 0.01,
+      "text-letter-spacing": HIGHLIGHT_LABEL_LETTER_SPACING,
     },
     paint: {
       "text-color": ["get", "fill"],
       "text-halo-color": colors.halo,
-      "text-halo-width": 1.5,
+      "text-halo-width": HIGHLIGHT_LABEL_HALO_WIDTH,
     },
   });
 }
@@ -825,11 +829,35 @@ function createCurrentLocationMarkerElement() {
   const marker = document.createElement("div");
   marker.className = "trip-map-current-location";
   marker.setAttribute("aria-hidden", "true");
+  marker.style.setProperty(
+    "--location-label-size",
+    `${HIGHLIGHT_LABEL_SIZE}px`,
+  );
+  marker.style.setProperty(
+    "--location-label-tracking",
+    `${CURRENT_LOCATION_LABEL_LETTER_SPACING}em`,
+  );
+  marker.style.setProperty(
+    "--location-label-offset",
+    `${HIGHLIGHT_LABEL_OFFSET[1]}em`,
+  );
+  marker.style.setProperty(
+    "--location-label-halo",
+    `${HIGHLIGHT_LABEL_HALO_WIDTH * 2}px`,
+  );
+
+  const ring = document.createElement("span");
+  ring.className = "trip-map-current-location-ring";
 
   const dot = document.createElement("span");
   dot.className = "trip-map-current-location-dot";
 
-  marker.append(dot);
+  const label = document.createElement("span");
+  label.className = "trip-map-current-location-label";
+  label.textContent = "Kavi";
+
+  ring.append(dot);
+  marker.append(ring, label);
   return marker;
 }
 
