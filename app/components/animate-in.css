@@ -16,10 +16,13 @@
   --start: 0s;
   animation: enter 0.6s both;
   animation-delay: calc(var(--stagger) * var(--delay) + var(--start));
+  overflow-anchor: none;
+  will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
   [data-animate] {
     animation: none;
+    will-change: auto;
   }
 }

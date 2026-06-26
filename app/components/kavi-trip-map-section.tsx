@@ -12,6 +12,7 @@ import {
 
 import { useCurrentLocation } from "../hooks/use-current-location";
 
+import { AnimateIn } from "./animate-in";
 import { KaviTripSchedule } from "./kavi-trip-schedule";
 import { LazyTripMap } from "./lazy-trip-map";
 import { SavedSpotKindDot } from "./saved-spot-kind-dot";
@@ -26,7 +27,13 @@ export function KaviTripMapSection({
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [activeKinds, setActiveKinds] = useState<SavedSpotKind[]>([]);
+  const [showDistances, setShowDistances] = useState(false);
   const currentLocation = useCurrentLocation();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShowDistances(true), 900);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const filteredSpots = useMemo(
     () =>
@@ -57,7 +64,7 @@ export function KaviTripMapSection({
 
   return (
     <>
-      <div className="mb-10">
+      <AnimateIn stagger={1} className="mb-10">
         <LazyTripMap
           activeSavedSpotKinds={activeKinds}
           selectedSavedSpotId={selectedSpotId}
@@ -71,9 +78,10 @@ export function KaviTripMapSection({
             setSelectedStopId(stopId);
           }}
         />
-      </div>
+      </AnimateIn>
 
-      <section className="flex flex-col gap-3">
+      <AnimateIn stagger={2}>
+        <section className="flex flex-col gap-3">
         <h2 className="section-label">Nikhil&apos;s saved spots</h2>
         <ul className="m-0 flex flex-wrap gap-x-4 gap-y-1 p-0 text-[12px] leading-5">
           {savedSpotKinds.map((kind) => {
@@ -104,7 +112,9 @@ export function KaviTripMapSection({
           {filteredSpots.map((spot) => {
             const isSelected = selectedSpotId === spot.id;
             const distanceLabel =
-              currentLocation && isInNyc(currentLocation)
+              showDistances &&
+              currentLocation &&
+              isInNyc(currentLocation)
                 ? formatDistanceMiles(
                     distanceInMiles(currentLocation, {
                       lat: spot.lat,
@@ -141,17 +151,20 @@ export function KaviTripMapSection({
             );
           })}
         </ol>
-      </section>
+        </section>
+      </AnimateIn>
 
       {tripEvents.length > 0 ? (
-        <KaviTripSchedule
-          events={tripEvents}
-          selectedStopId={selectedStopId}
-          onStopSelect={(stopId) => {
-            setSelectedSpotId(null);
-            setSelectedStopId(stopId);
-          }}
-        />
+        <AnimateIn stagger={3}>
+          <KaviTripSchedule
+            events={tripEvents}
+            selectedStopId={selectedStopId}
+            onStopSelect={(stopId) => {
+              setSelectedSpotId(null);
+              setSelectedStopId(stopId);
+            }}
+          />
+        </AnimateIn>
       ) : null}
     </>
   );

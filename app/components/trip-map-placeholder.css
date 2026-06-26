@@ -1,0 +1,92 @@
+.trip-map-placeholder {
+  position: relative;
+  overflow: hidden;
+}
+
+.trip-map-placeholder--bare {
+  height: 100%;
+}
+
+.trip-map-placeholder--bare .trip-map-placeholder__surface {
+  height: 100%;
+}
+
+.trip-map-placeholder__surface {
+  position: relative;
+  height: min(480px, 68vh);
+  width: 100%;
+  overflow: hidden;
+}
+
+.trip-map-placeholder__grid {
+  position: absolute;
+  inset: -40%;
+  background-image:
+    linear-gradient(
+      light-dark(rgba(17, 17, 17, 0.05), rgba(242, 242, 242, 0.06)) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      light-dark(rgba(17, 17, 17, 0.05), rgba(242, 242, 242, 0.06)) 1px,
+      transparent 1px
+    );
+  background-size: 16px 16px;
+  transform: rotate(-12deg) scale(1.08);
+  animation: trip-map-grid-in 1.1s ease-out both;
+}
+
+.trip-map-placeholder__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 45% at 50% 46%,
+    light-dark(rgba(17, 17, 17, 0.04), rgba(242, 242, 242, 0.05)),
+    transparent 72%
+  );
+  animation: trip-map-glow-in 1.2s ease-out both;
+}
+
+.trip-map-placeholder--exit {
+  animation: trip-map-placeholder-out 0.45s ease-out forwards;
+}
+
+@keyframes trip-map-grid-in {
+  from {
+    opacity: 0;
+    transform: rotate(-12deg) scale(1.02);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(-12deg) scale(1.08);
+  }
+}
+
+@keyframes trip-map-glow-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes trip-map-placeholder-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-map-placeholder__grid,
+  .trip-map-placeholder__glow,
+  .trip-map-placeholder--exit {
+    animation: none;
+  }
+}

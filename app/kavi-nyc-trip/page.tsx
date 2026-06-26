@@ -22,9 +22,7 @@ export default async function KaviNycTripPage() {
         <KaviTripWelcome />
       </AnimateIn>
 
-      <AnimateIn stagger={1}>
-        <KaviTripMapSection tripEvents={tripEvents} />
-      </AnimateIn>
+      <KaviTripMapSection tripEvents={tripEvents} />
     </SiteShell>
   );
 }

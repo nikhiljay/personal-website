@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, type RefObject } from "react";
 import maplibregl from "maplibre-gl";
 import type {
   ExpressionSpecification,
@@ -824,15 +824,22 @@ export function TripMap({
   selectedStopId = null,
   onStopSelect,
   activeSavedSpotKinds = [],
+  onReady,
+  embedded = false,
+  shellRef: shellRefProp,
 }: {
   selectedSavedSpotId?: string | null;
   onSavedSpotSelect?: (id: string | null) => void;
   selectedStopId?: string | null;
   onStopSelect?: (id: string | null) => void;
   activeSavedSpotKinds?: SavedSpotKind[];
+  onReady?: () => void;
+  embedded?: boolean;
+  shellRef?: RefObject<HTMLDivElement | null>;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
+  const internalShellRef = useRef<HTMLDivElement>(null);
+  const shellRef = shellRefProp ?? internalShellRef;
   const mapRef = useRef<maplibregl.Map | null>(null);
   const themeRef = useRef<"light" | "dark">("light");
   const selectedSavedSpotIdRef = useRef(selectedSavedSpotId);
@@ -841,12 +848,15 @@ export function TripMap({
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const onSavedSpotSelectRef = useRef(onSavedSpotSelect);
   const onStopSelectRef = useRef(onStopSelect);
+  const onReadyRef = useRef(onReady);
+  const hasCalledReadyRef = useRef(false);
 
   selectedSavedSpotIdRef.current = selectedSavedSpotId;
   selectedStopIdRef.current = selectedStopId;
   activeSavedSpotKindsRef.current = activeSavedSpotKinds;
   onSavedSpotSelectRef.current = onSavedSpotSelect;
   onStopSelectRef.current = onStopSelect;
+  onReadyRef.current = onReady;
 
   const showPlacePopup = useCallback(
     (
@@ -874,7 +884,7 @@ export function TripMap({
   );
 
   const focusSavedSpot = useCallback(
-    (spotId: string | null) => {
+    (spotId: string | null, { scroll = false }: { scroll?: boolean } = {}) => {
       const map = mapRef.current;
       if (!map || !spotId) {
         return;
@@ -886,7 +896,9 @@ export function TripMap({
       }
 
       applySavedSpotSelection(map, spotId);
-      shellRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (scroll) {
+        shellRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       map.flyTo({
         center: [spot.lng, spot.lat],
         zoom: Math.max(map.getZoom(), 14),
@@ -900,7 +912,7 @@ export function TripMap({
   );
 
   const focusStop = useCallback(
-    (stopId: string | null) => {
+    (stopId: string | null, { scroll = false }: { scroll?: boolean } = {}) => {
       const map = mapRef.current;
       if (!map || !stopId) {
         return;
@@ -911,7 +923,9 @@ export function TripMap({
         return;
       }
 
-      shellRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (scroll) {
+        shellRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       map.flyTo({
         center: [place.lng, place.lat],
         zoom: Math.max(map.getZoom(), 14),
@@ -933,9 +947,9 @@ export function TripMap({
     applySavedSpotSelection(map, selectedSavedSpotId);
 
     if (selectedSavedSpotId) {
-      focusSavedSpot(selectedSavedSpotId);
+      focusSavedSpot(selectedSavedSpotId, { scroll: true });
     } else if (selectedStopId) {
-      focusStop(selectedStopId);
+      focusStop(selectedStopId, { scroll: true });
     } else {
       popupRef.current?.remove();
       popupRef.current = null;
@@ -1063,6 +1077,13 @@ export function TripMap({
       setupHighlightLayers(map, themeRef.current);
       bindInteractions();
 
+      map.getCanvas().setAttribute("tabindex", "-1");
+
+      if (!hasCalledReadyRef.current) {
+        hasCalledReadyRef.current = true;
+        onReadyRef.current?.();
+      }
+
       if (selectedSavedSpotIdRef.current) {
         focusSavedSpot(selectedSavedSpotIdRef.current);
       }
@@ -1162,8 +1183,10 @@ export function TripMap({
     };
   }, [focusSavedSpot, showPlacePopup]);
 
-  return (
-    <div ref={shellRef} className="trip-map-shell overflow-hidden">
+  return embedded ? (
+    <div ref={containerRef} className="size-full" />
+  ) : (
+    <div ref={internalShellRef} className="trip-map-shell overflow-hidden">
       <div ref={containerRef} className="h-[min(480px,68vh)] w-full" />
     </div>
   );
