@@ -6,14 +6,14 @@
 
 @font-face {
   font-family: Inter;
-  font-display: block;
+  font-display: swap;
   src: url("/fonts/inter-subset.woff2") format("woff2");
   font-weight: 100 900;
 }
 
 @font-face {
   font-family: Newsreader;
-  font-display: block;
+  font-display: swap;
   src: url("/fonts/newsreader-subset-0.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
@@ -21,7 +21,7 @@
 
 @font-face {
   font-family: Sohne;
-  font-display: block;
+  font-display: swap;
   src: url("/fonts/sohne-subset-0.woff2") format("woff2");
   font-weight: 400;
 }

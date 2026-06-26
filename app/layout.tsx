@@ -26,6 +26,8 @@ export const metadata: Metadata = {
   },
 };
 
+const isVercel = process.env.VERCEL === "1";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,8 +37,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <Analytics />
-        <SpeedInsights />
+        {isVercel ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
       </body>
     </html>
   );

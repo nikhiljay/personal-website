@@ -1092,7 +1092,7 @@ export function TripMap({
     };
 
     const init = async () => {
-      await ensureInterLoaded();
+      void ensureInterLoaded();
 
       const style = await fetchMapStyle(STYLES[themeRef.current]);
       if (cancelled) {

@@ -28,7 +28,7 @@ export function KaviTripMapSection({
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [activeKinds, setActiveKinds] = useState<SavedSpotKind[]>([]);
   const [showDistances, setShowDistances] = useState(false);
-  const currentLocation = useCurrentLocation();
+  const currentLocation = useCurrentLocation({ requireInteraction: true });
 
   useEffect(() => {
     const timer = window.setTimeout(() => setShowDistances(true), 900);
