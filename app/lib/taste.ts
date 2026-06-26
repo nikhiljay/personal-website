@@ -1,5 +1,6 @@
 export type TasteItem = {
   title: string;
+  location?: string;
   href?: string;
   links?: { label: string; href: string }[];
 };
@@ -91,39 +92,48 @@ export const tasteSections: TasteSection[] = [
     title: "Food",
     items: [
       {
-        title: "Kokkari Estiatorio (SF)",
+        title: "Kokkari Estiatorio",
+        location: "SF",
         href: "https://kokkari.com/",
       },
       {
-        title: "Purple Rice (SF)",
+        title: "Purple Rice",
+        location: "SF",
         href: "https://www.yelp.com/biz/purple-rice-san-francisco",
       },
       {
-        title: "Norcina (SF)",
+        title: "Norcina",
+        location: "SF",
         href: "https://www.norcinasf.com/",
       },
       {
-        title: "Che Fico (SF)",
+        title: "Che Fico",
+        location: "SF",
         href: "https://chefico.com/",
       },
       {
-        title: "Zareen's (Palo Alto)",
+        title: "Zareen's",
+        location: "Palo Alto",
         href: "https://www.zareensrestaurant.com/",
       },
       {
-        title: "Mitr Thai (NYC)",
+        title: "Mitr Thai",
+        location: "NYC",
         href: "https://mitrthainyc.com/",
       },
       {
-        title: "Adda (NYC)",
+        title: "Adda",
+        location: "NYC",
         href: "https://www.addanyc.com/",
       },
       {
-        title: "Wayan (NYC)",
+        title: "Wayan",
+        location: "NYC",
         href: "https://www.wayan-nyc.com/",
       },
       {
-        title: "L'industrie Pizzeria (NYC)",
+        title: "L'industrie Pizzeria",
+        location: "NYC",
         href: "https://www.lindustriebk.com/",
       },
     ],

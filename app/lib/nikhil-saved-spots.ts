@@ -20,7 +20,7 @@ export const savedSpots: SavedSpot[] = [
   { id: "birdland", name: "Birdland", address: "315 W 44th St", lat: 40.7590853, lng: -73.9896379, kind: "bar" },
   { id: "bleecker-street-pizza", name: "Bleecker Street Pizza", address: "69 7th Ave S", lat: 40.7317056, lng: -74.0037793, kind: "casual" },
   { id: "brooklyn-bridge", name: "Brooklyn Bridge", address: "Brooklyn Bridge", lat: 40.7062175, lng: -73.9970208, kind: "activity", visited: true },
-  { id: "by-antidote", name: "By Antidote", address: "30 E 20th St", lat: 40.7385926, lng: -73.988887, kind: "cafe" },
+  { id: "by-antidote", name: "By Antidote", address: "30 E 20th St", lat: 40.7385926, lng: -73.988887, kind: "nice" },
   { id: "7th-st-burger", name: "7th Street Burger", address: "91 E 7th St", lat: 40.7269803, lng: -73.9854205, kind: "casual", visited: true, photo: "/images/saved-spots/7th-st-burger.png" },
   { id: "c-and-b", name: "C&B", address: "178 E 7th St", lat: 40.7250538, lng: -73.9816964, kind: "cafe" },
   { id: "cava", name: "CAVA", address: "708 3rd Ave", lat: 40.7522516, lng: -73.9736217, kind: "casual", visited: true },

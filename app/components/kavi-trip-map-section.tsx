@@ -13,8 +13,8 @@ import {
 import { useCurrentLocation } from "../hooks/use-current-location";
 
 import { KaviTripSchedule } from "./kavi-trip-schedule";
+import { LazyTripMap } from "./lazy-trip-map";
 import { SavedSpotKindDot } from "./saved-spot-kind-dot";
-import { TripMap } from "./trip-map";
 
 const savedSpotKinds = Object.keys(savedSpotKindMeta) as SavedSpotKind[];
 
@@ -58,7 +58,7 @@ export function KaviTripMapSection({
   return (
     <>
       <div className="mb-10">
-        <TripMap
+        <LazyTripMap
           activeSavedSpotKinds={activeKinds}
           selectedSavedSpotId={selectedSpotId}
           onSavedSpotSelect={(spotId) => {

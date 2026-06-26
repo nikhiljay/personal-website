@@ -2,6 +2,13 @@ import { ExternalLink } from "./external-link";
 import type { TasteItem, TasteSection } from "../lib/taste";
 
 function TasteEntry({ item }: { item: TasteItem }) {
+  const location = item.location ? (
+    <>
+      {" "}
+      <span className="text-muted">[{item.location}]</span>
+    </>
+  ) : null;
+
   if (item.links) {
     return (
       <span>
@@ -16,10 +23,20 @@ function TasteEntry({ item }: { item: TasteItem }) {
   }
 
   if (item.href) {
-    return <ExternalLink href={item.href}>{item.title}</ExternalLink>;
+    return (
+      <>
+        <ExternalLink href={item.href}>{item.title}</ExternalLink>
+        {location}
+      </>
+    );
   }
 
-  return <span>{item.title}</span>;
+  return (
+    <>
+      <span>{item.title}</span>
+      {location}
+    </>
+  );
 }
 
 function TasteColumn({ section }: { section: TasteSection }) {
