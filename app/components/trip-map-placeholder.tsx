@@ -1,4 +1,3 @@
-import "./trip-map.css";
 import "./trip-map-placeholder.css";
 
 export function TripMapPlaceholder({ bare = false }: { bare?: boolean }) {

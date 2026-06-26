@@ -29,7 +29,6 @@ import {
 } from "../lib/saved-spot-kinds";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import "./trip-map.css";
 
 const STYLES: Record<"light" | "dark", string> = {
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
@@ -866,10 +865,16 @@ function syncCurrentLocationMarker(
   markerRef: RefObject<maplibregl.Marker | null>,
   location: Coordinates | null,
 ) {
-  markerRef.current?.remove();
-  markerRef.current = null;
-
   if (!location) {
+    markerRef.current?.remove();
+    markerRef.current = null;
+    return;
+  }
+
+  const nextPosition: [number, number] = [location.lng, location.lat];
+
+  if (markerRef.current) {
+    markerRef.current.setLngLat(nextPosition);
     return;
   }
 
@@ -877,7 +882,7 @@ function syncCurrentLocationMarker(
     element: createCurrentLocationMarkerElement(),
     anchor: "center",
   })
-    .setLngLat([location.lng, location.lat])
+    .setLngLat(nextPosition)
     .addTo(map);
 }
 

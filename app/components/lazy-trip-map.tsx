@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
+import "./trip-map.css";
 import { TripMapPlaceholder } from "./trip-map-placeholder";
 
 const TripMap = dynamic(
