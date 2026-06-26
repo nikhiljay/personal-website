@@ -17,7 +17,6 @@ export const metadata: Metadata = {
     url: "https://nikhil.ai",
     siteName: "Nikhil D'Souza",
     type: "website",
-    images: ["/images/screenshot.png"],
   },
   twitter: {
     card: "summary",
