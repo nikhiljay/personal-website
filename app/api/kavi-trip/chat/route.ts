@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const tripEvents = await loadTripEvents();
 
   const result = streamText({
-    model: gateway("openai/gpt-5.4"),
+    model: gateway("openai/gpt-4o-mini"),
     system: buildKaviTripSystemPrompt(tripEvents),
     messages: await convertToModelMessages(messages),
     maxOutputTokens: 500,
