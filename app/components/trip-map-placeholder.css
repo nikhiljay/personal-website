@@ -47,10 +47,6 @@
   animation: trip-map-glow-in 1.2s ease-out both;
 }
 
-.trip-map-placeholder--exit {
-  animation: trip-map-placeholder-out 0.45s ease-out forwards;
-}
-
 @keyframes trip-map-grid-in {
   from {
     opacity: 0;
@@ -73,20 +69,9 @@
   }
 }
 
-@keyframes trip-map-placeholder-out {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .trip-map-placeholder__grid,
-  .trip-map-placeholder__glow,
-  .trip-map-placeholder--exit {
+  .trip-map-placeholder__glow {
     animation: none;
   }
 }

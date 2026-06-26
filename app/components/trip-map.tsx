@@ -1079,14 +1079,16 @@ export function TripMap({
 
       map.getCanvas().setAttribute("tabindex", "-1");
 
-      if (!hasCalledReadyRef.current) {
-        hasCalledReadyRef.current = true;
-        onReadyRef.current?.();
-      }
-
       if (selectedSavedSpotIdRef.current) {
         focusSavedSpot(selectedSavedSpotIdRef.current);
       }
+
+      map.once("idle", () => {
+        if (!hasCalledReadyRef.current) {
+          hasCalledReadyRef.current = true;
+          onReadyRef.current?.();
+        }
+      });
     };
 
     const init = async () => {

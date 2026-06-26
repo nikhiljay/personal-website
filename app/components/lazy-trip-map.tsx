@@ -14,6 +14,8 @@ const TripMap = dynamic(
   },
 );
 
+const CROSSFADE_MS = 500;
+
 type LazyTripMapProps = ComponentProps<typeof TripMap>;
 
 export function LazyTripMap(props: LazyTripMapProps) {
@@ -29,7 +31,7 @@ export function LazyTripMap(props: LazyTripMapProps) {
 
     const timer = window.setTimeout(() => {
       setShowPlaceholder(false);
-    }, 450);
+    }, CROSSFADE_MS);
 
     return () => window.clearTimeout(timer);
   }, [mapReady]);
@@ -47,7 +49,7 @@ export function LazyTripMap(props: LazyTripMapProps) {
 
     const scheduleLoad = () => {
       if ("requestIdleCallback" in window) {
-        idleId = requestIdleCallback(startLoading, { timeout: 1500 });
+        idleId = requestIdleCallback(startLoading, { timeout: 500 });
         return;
       }
 
@@ -97,9 +99,12 @@ export function LazyTripMap(props: LazyTripMapProps) {
       {shouldLoad ? (
         <div
           className={cn(
-            "absolute inset-0 transition-opacity duration-500 ease-out",
+            "absolute inset-0 transition-opacity ease-in-out",
             mapReady ? "opacity-100" : "opacity-0",
           )}
+          style={{
+            transitionDuration: `${CROSSFADE_MS}ms`,
+          }}
         >
           <TripMap
             {...props}
@@ -111,8 +116,16 @@ export function LazyTripMap(props: LazyTripMapProps) {
       ) : null}
 
       {showPlaceholder ? (
-        <div className="absolute inset-0 z-10">
-          <TripMapPlaceholder exiting={mapReady} bare />
+        <div
+          className={cn(
+            "absolute inset-0 z-10 transition-opacity ease-in-out",
+            mapReady ? "pointer-events-none opacity-0" : "opacity-100",
+          )}
+          style={{
+            transitionDuration: `${CROSSFADE_MS}ms`,
+          }}
+        >
+          <TripMapPlaceholder bare />
         </div>
       ) : null}
     </div>
