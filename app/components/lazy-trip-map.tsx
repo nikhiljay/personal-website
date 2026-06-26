@@ -59,7 +59,7 @@ export function LazyTripMap(props: LazyTripMapProps) {
 
       {showPlaceholder ? (
         <div className="absolute inset-0 z-10">
-          <TripMapPlaceholder bare exiting={mapReady} />
+          <TripMapPlaceholder bare />
         </div>
       ) : null}
     </div>
