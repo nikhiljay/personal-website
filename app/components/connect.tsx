@@ -10,6 +10,10 @@ const socialLinks = [
     label: "GITHUB",
   },
   {
+    href: "https://nikhiljdsouza.substack.com",
+    label: "SUBSTACK",
+  },
+  {
     href: "https://twitter.com/nikhiljdsouza",
     label: "X",
   },
