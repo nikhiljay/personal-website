@@ -35,6 +35,18 @@ const STYLES: Record<"light" | "dark", string> = {
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
 };
 
+function proxiedCartoUrl(url: string) {
+  if (url.startsWith("https://basemaps.cartocdn.com/")) {
+    return url.replace("https://basemaps.cartocdn.com/", "/carto/basemaps/");
+  }
+
+  if (url.startsWith("https://tiles.basemaps.cartocdn.com/")) {
+    return url.replace("https://tiles.basemaps.cartocdn.com/", "/carto/tiles/");
+  }
+
+  return url;
+}
+
 const MAP_FIT_PADDING = {
   top: -10,
   bottom: 20,
@@ -156,7 +168,7 @@ async function fetchMapStyle(url: string) {
     return cached;
   }
 
-  const response = await fetch(url);
+  const response = await fetch(proxiedCartoUrl(url));
   const style = (await response.json()) as StyleSpecification;
   const { glyphs: _glyphs, ...styleWithoutGlyphs } = style;
 
@@ -1171,12 +1183,10 @@ export function TripMap({
         focusSavedSpot(selectedSavedSpotIdRef.current);
       }
 
-      map.once("idle", () => {
-        if (!hasCalledReadyRef.current) {
-          hasCalledReadyRef.current = true;
-          onReadyRef.current?.();
-        }
-      });
+      if (!hasCalledReadyRef.current) {
+        hasCalledReadyRef.current = true;
+        onReadyRef.current?.();
+      }
     };
 
     const init = async () => {
@@ -1202,6 +1212,7 @@ export function TripMap({
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
+        transformRequest: (requestUrl) => ({ url: proxiedCartoUrl(requestUrl) }),
       });
 
       mapRef.current = map;
@@ -1270,6 +1281,7 @@ export function TripMap({
 
     return () => {
       cancelled = true;
+      hasCalledReadyRef.current = false;
       setMapLoaded(false);
       media.removeEventListener("change", onThemeChange);
       resizeObserver.disconnect();

@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["maplibre-gl"],
   },
+  rewrites: async () => [
+    {
+      source: "/carto/basemaps/:path*",
+      destination: "https://basemaps.cartocdn.com/:path*",
+    },
+    {
+      source: "/carto/tiles/:path*",
+      destination: "https://tiles.basemaps.cartocdn.com/:path*",
+    },
+  ],
   headers: async () => [
     {
       source: "/fonts/:path*",
