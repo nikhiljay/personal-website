@@ -22,7 +22,7 @@ export default async function KaviNycTripPage() {
         <KaviTripWelcome />
       </AnimateIn>
 
-      <div className="mb-10 min-h-[min(480px,68vh)]">
+      <div className="min-h-[min(480px,68vh)]">
         <KaviTripMapSectionLoader tripEvents={tripEvents} />
       </div>
     </SiteShell>
