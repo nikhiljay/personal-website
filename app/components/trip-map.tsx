@@ -321,6 +321,62 @@ function fitMapBounds(map: maplibregl.Map) {
   });
 }
 
+const OVERLAY_LAYERS = [
+  NEIGHBORHOOD_LABELS_LAYER,
+  HIGHLIGHT_LABELS_LAYER,
+  HIGHLIGHT_SQUARE_LAYER,
+  HIGHLIGHT_LAYER,
+  HIGHLIGHT_RING_LAYER,
+  STOPS_LAYER,
+  SAVED_VISITED_LAYER,
+  SAVED_LAYER,
+] as const;
+
+const OVERLAY_SOURCES = [
+  NEIGHBORHOODS_SOURCE,
+  HIGHLIGHT_SOURCE,
+  STOPS_SOURCE,
+  SAVED_SOURCE,
+] as const;
+
+function removeMapOverlays(map: maplibregl.Map) {
+  for (const layerId of OVERLAY_LAYERS) {
+    if (map.getLayer(layerId)) {
+      map.removeLayer(layerId);
+    }
+  }
+
+  for (const sourceId of OVERLAY_SOURCES) {
+    if (map.getSource(sourceId)) {
+      map.removeSource(sourceId);
+    }
+  }
+
+  for (const legacyId of ["saved-visited-square", "saved-visited-square-v2"]) {
+    if (map.hasImage(legacyId)) {
+      map.removeImage(legacyId);
+    }
+  }
+
+  for (const kind of VISITED_MARKER_KINDS) {
+    for (const theme of ["light", "dark"] as const) {
+      const id = visitedMarkerImageId(kind, theme);
+      if (map.hasImage(id)) {
+        map.removeImage(id);
+      }
+    }
+  }
+
+  for (const place of squareHighlights()) {
+    for (const theme of ["light", "dark"] as const) {
+      const id = highlightSquareImageId(place.id, theme);
+      if (map.hasImage(id)) {
+        map.removeImage(id);
+      }
+    }
+  }
+}
+
 function hideBasemapLabels(map: maplibregl.Map) {
   for (const layer of map.getStyle()?.layers ?? []) {
     if (layer.type !== "symbol" || !layer.layout?.["text-field"]) {
@@ -338,7 +394,7 @@ function hideBasemapLabels(map: maplibregl.Map) {
 function setupNeighborhoodLayers(map: maplibregl.Map, theme: "light" | "dark") {
   const colors = labelColors(theme);
 
-  if (map.getSource(NEIGHBORHOODS_SOURCE)) {
+  if (map.getLayer(NEIGHBORHOOD_LABELS_LAYER)) {
     (map.getSource(NEIGHBORHOODS_SOURCE) as GeoJSONSource).setData(
       neighborhoodsGeoJson(),
     );
@@ -679,7 +735,7 @@ function setupSavedSpotLayers(
     theme,
   ) as ExpressionSpecification;
 
-  if (map.getSource(SAVED_SOURCE)) {
+  if (map.getLayer(SAVED_LAYER)) {
     (map.getSource(SAVED_SOURCE) as GeoJSONSource).setData(savedSpotsGeoJson());
     applySavedSpotKindFilter(map, activeKinds);
     map.setPaintProperty(SAVED_LAYER, "circle-color", kindColors);
@@ -728,7 +784,7 @@ function setupStopLayers(
   const colors = labelColors(theme);
   const data = stopsGeoJson();
 
-  if (map.getSource(STOPS_SOURCE)) {
+  if (map.getLayer(STOPS_LAYER)) {
     (map.getSource(STOPS_SOURCE) as GeoJSONSource).setData(data);
     map.setPaintProperty(STOPS_LAYER, "circle-color", colors.fill);
     map.setPaintProperty(STOPS_LAYER, "circle-radius", MARKER_DOT_RADIUS);
@@ -762,7 +818,7 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
   const colors = labelColors(theme);
   const data = highlightsGeoJson();
 
-  if (map.getSource(HIGHLIGHT_SOURCE)) {
+  if (map.getLayer(HIGHLIGHT_RING_LAYER)) {
     (map.getSource(HIGHLIGHT_SOURCE) as GeoJSONSource).setData(data);
     map.setFilter(HIGHLIGHT_LAYER, ["!=", ["get", "shape"], "square"]);
     map.setPaintProperty(HIGHLIGHT_RING_LAYER, "circle-radius", HIGHLIGHT_RING_RADIUS);
@@ -1072,6 +1128,7 @@ export function TripMap({
 
     let cancelled = false;
     let interactionsBound = false;
+    let themeUpdateId = 0;
 
     const showStopPopup = (
       coordinates: [number, number],
@@ -1158,22 +1215,31 @@ export function TripMap({
       }
     };
 
+    const applyMapOverlays = (map: maplibregl.Map, theme: "light" | "dark") => {
+      hideBasemapLabels(map);
+      setupNeighborhoodLayers(map, theme);
+      setupSavedSpotLayers(
+        map,
+        theme,
+        selectedSavedSpotIdRef.current,
+        activeSavedSpotKindsRef.current,
+      );
+      setupStopLayers(map, theme, activeSavedSpotKindsRef.current);
+      setupHighlightLayers(map, theme);
+      syncCurrentLocationMarker(
+        map,
+        currentLocationMarkerRef,
+        currentLocationRef.current,
+      );
+    };
+
     const onMapReady = () => {
       const map = mapRef.current;
       if (!map) {
         return;
       }
 
-      hideBasemapLabels(map);
-      setupNeighborhoodLayers(map, themeRef.current);
-      setupSavedSpotLayers(
-        map,
-        themeRef.current,
-        selectedSavedSpotIdRef.current,
-        activeSavedSpotKindsRef.current,
-      );
-      setupStopLayers(map, themeRef.current, activeSavedSpotKindsRef.current);
-      setupHighlightLayers(map, themeRef.current);
+      applyMapOverlays(map, themeRef.current);
       setMapLoaded(true);
       bindInteractions();
 
@@ -1236,41 +1302,27 @@ export function TripMap({
         return;
       }
 
-      themeRef.current = nextTheme;
+      const updateId = ++themeUpdateId;
       popupRef.current?.remove();
       popupRef.current = null;
 
       const style = await fetchMapStyle(STYLES[nextTheme]);
-      if (cancelled || !mapRef.current) {
+      if (cancelled || updateId !== themeUpdateId || !mapRef.current) {
         return;
       }
 
-      map.setStyle(style);
-      map.once("load", () => {
-        const activeMap = mapRef.current;
-        if (!activeMap) {
-          return;
-        }
-
-        void (() => {
-          hideBasemapLabels(activeMap);
-          setupNeighborhoodLayers(activeMap, nextTheme);
-          setupSavedSpotLayers(
-            activeMap,
-            nextTheme,
-            selectedSavedSpotIdRef.current,
-            activeSavedSpotKindsRef.current,
-          );
-          setupStopLayers(activeMap, nextTheme, activeSavedSpotKindsRef.current);
-          setupHighlightLayers(activeMap, nextTheme);
-          syncCurrentLocationMarker(
-            activeMap,
-            currentLocationMarkerRef,
-            currentLocationRef.current,
-          );
-          fitMapBounds(activeMap);
-        })();
+      map.setStyle(style, { diff: false });
+      await new Promise<void>((resolve) => {
+        map.once("style.load", () => resolve());
       });
+      if (cancelled || updateId !== themeUpdateId || !mapRef.current) {
+        return;
+      }
+
+      themeRef.current = nextTheme;
+      removeMapOverlays(map);
+      applyMapOverlays(map, nextTheme);
+      fitMapBounds(map);
     };
 
     const onThemeChange = (event: MediaQueryListEvent) => {

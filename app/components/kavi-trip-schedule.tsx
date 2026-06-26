@@ -33,7 +33,7 @@ const TITLE_ASIDES = [
   {
     pattern: /(solo adventure)/i,
     explanation:
-      "Why wait for company? Let go and enjoy the city by yourself! You're in the best city to explore.",
+      "Why wait for company? Enjoy the city by yourself - you're in the best city to explore!",
   },
 ] as const;
 
