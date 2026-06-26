@@ -16,7 +16,7 @@ const TripMap = dynamic(
 );
 
 const CROSSFADE_MS = 500;
-const MAP_MOUNT_FALLBACK_MS = 800;
+const MAP_MOUNT_FALLBACK_MS = 2_000;
 
 type LazyTripMapProps = ComponentProps<typeof TripMap>;
 
@@ -32,24 +32,30 @@ function scheduleMapMount(onMount: () => void) {
     onMount();
   };
 
-  let observer: PerformanceObserver | undefined;
-
-  if ("PerformanceObserver" in window) {
-    try {
-      observer = new PerformanceObserver(() => {
-        observer?.disconnect();
-        mount();
-      });
-      observer.observe({ type: "largest-contentful-paint", buffered: true });
-    } catch {
-      // LCP type unsupported — fall through to timeout.
-    }
-  }
-
   const fallback = window.setTimeout(mount, MAP_MOUNT_FALLBACK_MS);
 
+  const mountAfterPaint = () => {
+    const startMap = () => {
+      window.clearTimeout(fallback);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(mount);
+      });
+    };
+
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(startMap, { timeout: 500 });
+    } else {
+      startMap();
+    }
+  };
+
+  if (typeof document !== "undefined" && "fonts" in document) {
+    void document.fonts.ready.then(mountAfterPaint).catch(mountAfterPaint);
+  } else {
+    mountAfterPaint();
+  }
+
   return () => {
-    observer?.disconnect();
     window.clearTimeout(fallback);
   };
 }
