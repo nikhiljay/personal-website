@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { AnimateIn } from "../components/animate-in";
+import { LazyKaviAskAi } from "../components/lazy-kavi-ask-ai";
 import { KaviTripMapSectionLoader } from "../components/kavi-trip-map-section-loader";
 import { KaviTripWelcome } from "../components/kavi-trip-welcome";
 import { SiteShell } from "../components/site-shell";
@@ -25,6 +26,8 @@ export default async function KaviNycTripPage() {
       <div className="min-h-[min(480px,68vh)]">
         <KaviTripMapSectionLoader tripEvents={tripEvents} />
       </div>
+
+      <LazyKaviAskAi />
     </SiteShell>
   );
 }
