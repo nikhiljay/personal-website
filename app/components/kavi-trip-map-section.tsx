@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 
 import type { TripEvent } from "../lib/kavi-nyc-trip";
@@ -13,9 +14,14 @@ import {
 import { useCurrentLocation } from "../hooks/use-current-location";
 
 import { AnimateIn } from "./animate-in";
-import { KaviTripSchedule } from "./kavi-trip-schedule";
 import { LazyTripMap } from "./lazy-trip-map";
 import { SavedSpotKindDot } from "./saved-spot-kind-dot";
+
+const KaviTripSchedule = dynamic(
+  () =>
+    import("./kavi-trip-schedule").then((mod) => mod.KaviTripSchedule),
+  { ssr: false },
+);
 
 const savedSpotKinds = Object.keys(savedSpotKindMeta) as SavedSpotKind[];
 

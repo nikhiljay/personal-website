@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import { SerifEm } from "./serif-em";
 import { ExpandableAside } from "./expandable-aside";
+import { SerifEm } from "./serif-em";
 
 export function KaviTripWelcome() {
   const [expanded, setExpanded] = useState(false);
