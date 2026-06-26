@@ -921,7 +921,7 @@ function createCurrentLocationMarkerElement() {
 
   const label = document.createElement("span");
   label.className = "trip-map-current-location-label";
-  label.textContent = "Kavi";
+  label.textContent = "You";
 
   ring.append(dot);
   marker.append(ring, label);
