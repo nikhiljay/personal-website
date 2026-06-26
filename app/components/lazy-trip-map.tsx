@@ -8,15 +8,15 @@ import { cn } from "@/lib/utils";
 import { TripMapPlaceholder } from "./trip-map-placeholder";
 
 const TripMap = dynamic(
-  () =>
-    import(/* webpackPrefetch: true */ "./trip-map").then((mod) => mod.TripMap),
+  () => import("./trip-map").then((mod) => mod.TripMap),
   {
     ssr: false,
   },
 );
 
 const CROSSFADE_MS = 500;
-const MAP_MOUNT_FALLBACK_MS = 2_000;
+const MAP_MOUNT_FALLBACK_MS = 3_000;
+const LCP_WAIT_MS = 2_500;
 
 type LazyTripMapProps = ComponentProps<typeof TripMap>;
 
@@ -32,31 +32,86 @@ function scheduleMapMount(onMount: () => void) {
     onMount();
   };
 
-  const fallback = window.setTimeout(mount, MAP_MOUNT_FALLBACK_MS);
-
-  const mountAfterPaint = () => {
-    const startMap = () => {
-      window.clearTimeout(fallback);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(mount);
-      });
-    };
+  const mountWhenIdle = () => {
+    void import("./trip-map");
 
     if ("requestIdleCallback" in window) {
-      requestIdleCallback(startMap, { timeout: 500 });
-    } else {
-      startMap();
+      requestIdleCallback(
+        () => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(mount);
+          });
+        },
+        { timeout: 1_000 },
+      );
+      return;
     }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(mount);
+    });
   };
 
+  let fontsDone = false;
+  let lcpDone = false;
+
+  const tryMount = () => {
+    if (!fontsDone || !lcpDone) {
+      return;
+    }
+
+    window.clearTimeout(fallback);
+    window.clearTimeout(lcpFallback);
+    mountWhenIdle();
+  };
+
+  const fallback = window.setTimeout(mount, MAP_MOUNT_FALLBACK_MS);
+  const lcpFallback = window.setTimeout(() => {
+    lcpDone = true;
+    tryMount();
+  }, LCP_WAIT_MS);
+
   if (typeof document !== "undefined" && "fonts" in document) {
-    void document.fonts.ready.then(mountAfterPaint).catch(mountAfterPaint);
+    void document.fonts.ready
+      .then(() => {
+        fontsDone = true;
+        tryMount();
+      })
+      .catch(() => {
+        fontsDone = true;
+        tryMount();
+      });
   } else {
-    mountAfterPaint();
+    fontsDone = true;
+  }
+
+  let observer: PerformanceObserver | undefined;
+
+  if ("PerformanceObserver" in window) {
+    try {
+      observer = new PerformanceObserver((list) => {
+        if (list.getEntries().length === 0) {
+          return;
+        }
+
+        lcpDone = true;
+        observer?.disconnect();
+        tryMount();
+      });
+      observer.observe({ type: "largest-contentful-paint", buffered: true });
+    } catch {
+      lcpDone = true;
+      tryMount();
+    }
+  } else {
+    lcpDone = true;
+    tryMount();
   }
 
   return () => {
     window.clearTimeout(fallback);
+    window.clearTimeout(lcpFallback);
+    observer?.disconnect();
   };
 }
 

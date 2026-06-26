@@ -1,3 +1,5 @@
+import "./kavi.css";
+
 export default function KaviNycTripLayout({
   children,
 }: {

@@ -1,0 +1,6 @@
+@font-face {
+  font-family: Sohne;
+  font-display: optional;
+  src: url("/fonts/sohne-subset-0.woff2") format("woff2");
+  font-weight: 400;
+}

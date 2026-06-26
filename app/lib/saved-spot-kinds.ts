@@ -1,4 +1,4 @@
-import type { ExpressionSpecification } from "maplibre-gl";
+type MapExpression = unknown;
 
 export type SavedSpotKind = "cafe" | "casual" | "nice" | "bar" | "activity";
 
@@ -35,7 +35,7 @@ export const savedSpotKindMeta: Record<
 
 export function savedSpotKindColorExpression(
   theme: "light" | "dark",
-): ExpressionSpecification {
+): MapExpression {
   const colors = savedSpotKindColors[theme];
 
   return [

@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  experimental: {
+    optimizePackageImports: ["maplibre-gl"],
+  },
   headers: async () => [
     {
       source: "/fonts/:path*",

@@ -659,7 +659,9 @@ function setupSavedSpotLayers(
   activeKinds: SavedSpotKind[],
 ) {
   const colors = labelColors(theme);
-  const kindColors = savedSpotKindColorExpression(theme);
+  const kindColors = savedSpotKindColorExpression(
+    theme,
+  ) as ExpressionSpecification;
 
   if (map.getSource(SAVED_SOURCE)) {
     (map.getSource(SAVED_SOURCE) as GeoJSONSource).setData(savedSpotsGeoJson());

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { AnimateIn } from "../components/animate-in";
-import { KaviTripMapSection } from "../components/kavi-trip-map-section";
+import { KaviTripMapSectionLoader } from "../components/kavi-trip-map-section-loader";
 import { KaviTripWelcome } from "../components/kavi-trip-welcome";
 import { SiteShell } from "../components/site-shell";
 import { getTripEventsFromCalendar } from "../lib/kavi-trip-calendar";
@@ -22,7 +22,9 @@ export default async function KaviNycTripPage() {
         <KaviTripWelcome />
       </AnimateIn>
 
-      <KaviTripMapSection tripEvents={tripEvents} />
+      <div className="mb-10 min-h-[min(480px,68vh)]">
+        <KaviTripMapSectionLoader tripEvents={tripEvents} />
+      </div>
     </SiteShell>
   );
 }
