@@ -24,10 +24,6 @@ function readSimulatedLocation() {
     return SIMULATED_NYC_LOCATION;
   }
 
-  if (process.env.NODE_ENV === "development") {
-    return SIMULATED_NYC_LOCATION;
-  }
-
   return null;
 }
 
