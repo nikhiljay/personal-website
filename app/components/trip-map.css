@@ -4,6 +4,49 @@
   background: light-dark(#fafafa, #222222);
 }
 
+/* Matches map circle markers: 5px fill radius + 2px centered stroke ≈ 12px outer. */
+.trip-map-current-location {
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+
+.trip-map-current-location-dot {
+  display: block;
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #007aff;
+  animation: trip-map-location-breathe 6s ease-in-out infinite;
+}
+
+@keyframes trip-map-location-breathe {
+  0%,
+  100% {
+    border-width: 2.5px;
+  }
+
+  50% {
+    border-width: 1px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .trip-map-current-location-dot {
+    background: #0a84ff;
+    border-color: #ffffff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-map-current-location-dot {
+    animation: none;
+    border-width: 2px;
+  }
+}
+
 .trip-map-popup .maplibregl-popup-content {
   padding: 10px 12px;
   border-radius: 0;

@@ -3,6 +3,12 @@ export type Coordinates = {
   lng: number;
 };
 
+/** Midtown — used with ?simulateLocation while testing outside NYC. */
+export const SIMULATED_NYC_LOCATION: Coordinates = {
+  lat: 40.7589,
+  lng: -73.9851,
+};
+
 /** Approximate NYC city bounds (all boroughs). */
 const NYC_BOUNDS = {
   minLat: 40.477,

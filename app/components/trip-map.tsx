@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import maplibregl from "maplibre-gl";
 import type {
   ExpressionSpecification,
@@ -19,6 +19,7 @@ import {
   mapHighlights,
   tripStops,
 } from "../lib/kavi-nyc-trip";
+import type { Coordinates } from "../lib/geo";
 import { savedSpots, type SavedSpot } from "../lib/nikhil-saved-spots";
 import { citymapperDirectionsUrl } from "../lib/citymapper";
 import {
@@ -820,12 +821,45 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
   });
 }
 
+function createCurrentLocationMarkerElement() {
+  const marker = document.createElement("div");
+  marker.className = "trip-map-current-location";
+  marker.setAttribute("aria-hidden", "true");
+
+  const dot = document.createElement("span");
+  dot.className = "trip-map-current-location-dot";
+
+  marker.append(dot);
+  return marker;
+}
+
+function syncCurrentLocationMarker(
+  map: maplibregl.Map,
+  markerRef: RefObject<maplibregl.Marker | null>,
+  location: Coordinates | null,
+) {
+  markerRef.current?.remove();
+  markerRef.current = null;
+
+  if (!location) {
+    return;
+  }
+
+  markerRef.current = new maplibregl.Marker({
+    element: createCurrentLocationMarkerElement(),
+    anchor: "center",
+  })
+    .setLngLat([location.lng, location.lat])
+    .addTo(map);
+}
+
 export function TripMap({
   selectedSavedSpotId = null,
   onSavedSpotSelect,
   selectedStopId = null,
   onStopSelect,
   activeSavedSpotKinds = [],
+  currentLocation = null,
   onReady,
   embedded = false,
   shellRef: shellRefProp,
@@ -835,6 +869,7 @@ export function TripMap({
   selectedStopId?: string | null;
   onStopSelect?: (id: string | null) => void;
   activeSavedSpotKinds?: SavedSpotKind[];
+  currentLocation?: Coordinates | null;
   onReady?: () => void;
   embedded?: boolean;
   shellRef?: RefObject<HTMLDivElement | null>;
@@ -847,15 +882,19 @@ export function TripMap({
   const selectedSavedSpotIdRef = useRef(selectedSavedSpotId);
   const selectedStopIdRef = useRef(selectedStopId);
   const activeSavedSpotKindsRef = useRef(activeSavedSpotKinds);
+  const currentLocationRef = useRef(currentLocation);
+  const currentLocationMarkerRef = useRef<maplibregl.Marker | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const onSavedSpotSelectRef = useRef(onSavedSpotSelect);
   const onStopSelectRef = useRef(onStopSelect);
   const onReadyRef = useRef(onReady);
   const hasCalledReadyRef = useRef(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   selectedSavedSpotIdRef.current = selectedSavedSpotId;
   selectedStopIdRef.current = selectedStopId;
   activeSavedSpotKindsRef.current = activeSavedSpotKinds;
+  currentLocationRef.current = currentLocation;
   onSavedSpotSelectRef.current = onSavedSpotSelect;
   onStopSelectRef.current = onStopSelect;
   onReadyRef.current = onReady;
@@ -968,6 +1007,19 @@ export function TripMap({
   }, [activeSavedSpotKinds]);
 
   useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) {
+      return;
+    }
+
+    syncCurrentLocationMarker(
+      map,
+      currentLocationMarkerRef,
+      currentLocation,
+    );
+  }, [currentLocation, mapLoaded]);
+
+  useEffect(() => {
     const container = containerRef.current;
     if (!container) {
       return;
@@ -1077,6 +1129,7 @@ export function TripMap({
       );
       setupStopLayers(map, themeRef.current, activeSavedSpotKindsRef.current);
       setupHighlightLayers(map, themeRef.current);
+      setMapLoaded(true);
       bindInteractions();
 
       map.getCanvas().setAttribute("tabindex", "-1");
@@ -1166,6 +1219,11 @@ export function TripMap({
           );
           setupStopLayers(activeMap, nextTheme, activeSavedSpotKindsRef.current);
           setupHighlightLayers(activeMap, nextTheme);
+          syncCurrentLocationMarker(
+            activeMap,
+            currentLocationMarkerRef,
+            currentLocationRef.current,
+          );
           fitMapBounds(activeMap);
         })();
       });
@@ -1179,8 +1237,11 @@ export function TripMap({
 
     return () => {
       cancelled = true;
+      setMapLoaded(false);
       media.removeEventListener("change", onThemeChange);
       resizeObserver.disconnect();
+      currentLocationMarkerRef.current?.remove();
+      currentLocationMarkerRef.current = null;
       popupRef.current?.remove();
       mapRef.current?.remove();
       mapRef.current = null;

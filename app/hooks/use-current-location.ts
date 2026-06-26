@@ -2,19 +2,55 @@
 
 import { useEffect, useState } from "react";
 
-import type { Coordinates } from "../lib/geo";
+import { SIMULATED_NYC_LOCATION, type Coordinates } from "../lib/geo";
 
 type UseCurrentLocationOptions = {
   requireInteraction?: boolean;
 };
 
-export function useCurrentLocation(options: UseCurrentLocationOptions = {}) {
+type CurrentLocationState = {
+  location: Coordinates | null;
+  isSimulated: boolean;
+};
+
+function readSimulatedLocation() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.has("simulateLocation")) {
+    return SIMULATED_NYC_LOCATION;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return SIMULATED_NYC_LOCATION;
+  }
+
+  return null;
+}
+
+export function useCurrentLocation(
+  options: UseCurrentLocationOptions = {},
+): CurrentLocationState {
   const { requireInteraction = false } = options;
+  const [simulatedLocation, setSimulatedLocation] =
+    useState<Coordinates | null>(null);
   const [enabled, setEnabled] = useState(!requireInteraction);
   const [location, setLocation] = useState<Coordinates | null>(null);
 
   useEffect(() => {
-    if (!requireInteraction) {
+    const simulated = readSimulatedLocation();
+    if (simulated) {
+      setSimulatedLocation(simulated);
+      setLocation(simulated);
+      setEnabled(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (simulatedLocation || !requireInteraction) {
       return;
     }
 
@@ -27,9 +63,13 @@ export function useCurrentLocation(options: UseCurrentLocationOptions = {}) {
       window.removeEventListener("pointerdown", enable);
       window.removeEventListener("keydown", enable);
     };
-  }, [requireInteraction]);
+  }, [requireInteraction, simulatedLocation]);
 
   useEffect(() => {
+    if (simulatedLocation) {
+      return;
+    }
+
     if (!enabled || !navigator.geolocation) {
       return;
     }
@@ -54,7 +94,10 @@ export function useCurrentLocation(options: UseCurrentLocationOptions = {}) {
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [enabled]);
+  }, [enabled, simulatedLocation]);
 
-  return location;
+  return {
+    location,
+    isSimulated: Boolean(simulatedLocation),
+  };
 }

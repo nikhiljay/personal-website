@@ -34,7 +34,14 @@ export function KaviTripMapSection({
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
   const [activeKinds, setActiveKinds] = useState<SavedSpotKind[]>([]);
   const [showDistances, setShowDistances] = useState(false);
-  const currentLocation = useCurrentLocation({ requireInteraction: true });
+  const { location: currentLocation, isSimulated } = useCurrentLocation({
+    requireInteraction: true,
+  });
+  const mapCurrentLocation =
+    currentLocation &&
+    (isSimulated || isInNyc(currentLocation))
+      ? currentLocation
+      : null;
 
   useEffect(() => {
     const timer = window.setTimeout(() => setShowDistances(true), 900);
@@ -73,6 +80,7 @@ export function KaviTripMapSection({
       <AnimateIn>
         <LazyTripMap
           activeSavedSpotKinds={activeKinds}
+          currentLocation={mapCurrentLocation}
           selectedSavedSpotId={selectedSpotId}
           onSavedSpotSelect={(spotId) => {
             setSelectedStopId(null);
