@@ -15,7 +15,7 @@ export const tasteSections: TasteSection[] = [
     items: [
       {
         title: "Tissot PRX",
-        href: "https://www.tissotwatches.com/en-us/prx",
+        href: "https://www.tissotwatches.com/en-us/T1374071105100.html",
       },
       {
         title: "Garmin Forerunner 970",
