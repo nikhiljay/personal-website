@@ -7,8 +7,8 @@ import { SiteShell } from "../components/site-shell";
 import { getTripEventsFromCalendar } from "../lib/kavi-trip-calendar";
 
 export const metadata: Metadata = {
-  title: "AHLA NYC Trip",
-  description: "Map and schedule for Kavi's AHLA trip in New York City.",
+  title: "Kavi in New York",
+  description: "Map and schedule for Kavi's trip to New York City.",
 };
 
 export const revalidate = 900;

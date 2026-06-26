@@ -6,7 +6,7 @@ import {
   getScheduleMarkerColor,
   getStopById,
   type TripEvent,
-} from "../lib/ahla-nyc-trip";
+} from "../lib/kavi-nyc-trip";
 
 import { MapMarkerDot } from "./map-marker-dot";
 import { ExpandableAside } from "./expandable-aside";

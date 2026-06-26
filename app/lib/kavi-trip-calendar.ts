@@ -1,4 +1,4 @@
-import { type TripEvent, tripStops } from "./ahla-nyc-trip";
+import { type TripEvent, tripStops } from "./kavi-nyc-trip";
 
 const TRIP_TIMEZONE = "America/New_York";
 const SF_TIMEZONE = "America/Los_Angeles";

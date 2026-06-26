@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import type { TripEvent } from "../lib/ahla-nyc-trip";
+import type { TripEvent } from "../lib/kavi-nyc-trip";
 import { distanceInMiles, formatDistanceMiles, isInNyc } from "../lib/geo";
 import { savedSpots } from "../lib/nikhil-saved-spots";
 import {

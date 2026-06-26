@@ -18,7 +18,7 @@ import {
   mapHighlightIds,
   mapHighlights,
   tripStops,
-} from "../lib/ahla-nyc-trip";
+} from "../lib/kavi-nyc-trip";
 import { savedSpots, type SavedSpot } from "../lib/nikhil-saved-spots";
 import { citymapperDirectionsUrl } from "../lib/citymapper";
 import {
@@ -33,6 +33,13 @@ import "./trip-map.css";
 const STYLES: Record<"light" | "dark", string> = {
   light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
   dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+};
+
+const MAP_FIT_PADDING = {
+  top: -10,
+  bottom: 20,
+  left: 10,
+  right: 10,
 };
 
 const LABEL_FONT = ["Inter", "system-ui", "sans-serif"];
@@ -292,7 +299,7 @@ function labelColors(theme: "light" | "dark") {
 
 function fitMapBounds(map: maplibregl.Map) {
   map.fitBounds(mapBounds, {
-    padding: 40,
+    padding: MAP_FIT_PADDING,
     animate: false,
     bearing: mapBearing,
   });
@@ -1074,7 +1081,7 @@ export function TripMap({
         style,
         bounds: mapBounds,
         fitBoundsOptions: {
-          padding: 40,
+          padding: MAP_FIT_PADDING,
           animate: false,
           bearing: mapBearing,
         },
