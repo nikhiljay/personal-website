@@ -59,6 +59,7 @@ export function KaviTripMapSection({
     <>
       <div className="mb-10">
         <TripMap
+          activeSavedSpotKinds={activeKinds}
           selectedSavedSpotId={selectedSpotId}
           onSavedSpotSelect={(spotId) => {
             setSelectedStopId(null);
@@ -72,7 +73,7 @@ export function KaviTripMapSection({
         />
       </div>
 
-      <section className="flex flex-col gap-3 px-6 md:px-0">
+      <section className="flex flex-col gap-3">
         <h2 className="section-label">Nikhil&apos;s saved spots</h2>
         <ul className="m-0 flex flex-wrap gap-x-4 gap-y-1 p-0 text-[12px] leading-5">
           {savedSpotKinds.map((kind) => {
@@ -143,16 +144,14 @@ export function KaviTripMapSection({
       </section>
 
       {tripEvents.length > 0 ? (
-        <div className="px-6 md:px-0">
-          <KaviTripSchedule
+        <KaviTripSchedule
           events={tripEvents}
           selectedStopId={selectedStopId}
           onStopSelect={(stopId) => {
             setSelectedSpotId(null);
             setSelectedStopId(stopId);
           }}
-          />
-        </div>
+        />
       ) : null}
     </>
   );

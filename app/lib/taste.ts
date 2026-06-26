@@ -14,6 +14,10 @@ export const tasteSections: TasteSection[] = [
     title: "Stack",
     items: [
       {
+        title: "Tissot PRX",
+        href: "https://www.tissotwatches.com/en-us/prx",
+      },
+      {
         title: "Garmin Forerunner 970",
         href: "https://www.garmin.com/en-US/c/sports-fitness/running-smartwatches/",
       },
@@ -69,15 +73,59 @@ export const tasteSections: TasteSection[] = [
         title: "Mistborn",
         href: "https://www.amazon.com/Mistborn-Final-Empire-Brandon-Sanderson/dp/0765311789",
       },
+      {
+        title: "Atomic Habits",
+        href: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
+      },
+      {
+        title: "The Dictionary of Obscure Sorrows",
+        href: "https://www.amazon.com/Dictionary-Obscure-Sorrows-John-Koenig/dp/1501153655",
+      },
+      {
+        title: "Tomorrow, and Tomorrow, and Tomorrow",
+        href: "https://www.amazon.com/Tomorrow-Tomorrow-Gabrielle-Zevin/dp/0593321200",
+      },
     ],
   },
   {
     title: "Food",
     items: [
-      { title: "Nari" },
-      { title: "Delfina" },
-      { title: "Tartine Manufactory" },
-      { title: "Rintaro" },
+      {
+        title: "Kokkari Estiatorio (SF)",
+        href: "https://kokkari.com/",
+      },
+      {
+        title: "Purple Rice (SF)",
+        href: "https://www.yelp.com/biz/purple-rice-san-francisco",
+      },
+      {
+        title: "Norcina (SF)",
+        href: "https://www.norcinasf.com/",
+      },
+      {
+        title: "Che Fico (SF)",
+        href: "https://chefico.com/",
+      },
+      {
+        title: "Zareen's (Palo Alto)",
+        href: "https://www.zareensrestaurant.com/",
+      },
+      {
+        title: "Mitr Thai (NYC)",
+        href: "https://mitrthainyc.com/",
+      },
+      {
+        title: "Adda (NYC)",
+        href: "https://www.addanyc.com/",
+      },
+      {
+        title: "Wayan (NYC)",
+        href: "https://www.wayan-nyc.com/",
+      },
+      {
+        title: "L'industrie Pizzeria (NYC)",
+        href: "https://www.lindustriebk.com/",
+      },
     ],
   },
 ];

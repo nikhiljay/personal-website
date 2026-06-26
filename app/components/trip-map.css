@@ -4,14 +4,6 @@
   background: light-dark(#fafafa, #222222);
 }
 
-@media (max-width: 767px) {
-  .trip-map-shell {
-    border-radius: 0;
-    border-left-width: 0;
-    border-right-width: 0;
-  }
-}
-
 .trip-map-popup .maplibregl-popup-content {
   padding: 10px 12px;
   border-radius: 0;
@@ -72,6 +64,14 @@
   flex-shrink: 0;
   line-height: 0;
   opacity: 0.92;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.trip-map-popup-citymapper:focus,
+.trip-map-popup-citymapper:focus-visible,
+.trip-map-popup-citymapper:active {
+  outline: none;
 }
 
 .trip-map-popup-citymapper:hover {

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import type {
   ExpressionSpecification,
+  FilterSpecification,
   GeoJSONSource,
   MapLayerMouseEvent,
   StyleSpecification,
@@ -529,6 +530,57 @@ function ensureHighlightSquareLayer(map: maplibregl.Map, theme: "light" | "dark"
   );
 }
 
+function savedSpotLayerFilter(
+  visited: boolean,
+  activeKinds: SavedSpotKind[],
+): FilterSpecification {
+  const visitedFilter: FilterSpecification = visited
+    ? ["==", ["get", "visited"], true]
+    : ["!=", ["get", "visited"], true];
+
+  if (activeKinds.length === 0) {
+    return visitedFilter;
+  }
+
+  return [
+    "all",
+    visitedFilter,
+    ["in", ["get", "kind"], ["literal", activeKinds]],
+  ];
+}
+
+function applySavedSpotKindFilter(
+  map: maplibregl.Map,
+  activeKinds: SavedSpotKind[],
+) {
+  if (!map.getLayer(SAVED_LAYER)) {
+    return;
+  }
+
+  map.setFilter(SAVED_LAYER, savedSpotLayerFilter(false, activeKinds));
+
+  if (map.getLayer(SAVED_VISITED_LAYER)) {
+    map.setFilter(SAVED_VISITED_LAYER, savedSpotLayerFilter(true, activeKinds));
+  }
+
+  applyTripStopsVisibility(map, activeKinds);
+}
+
+function applyTripStopsVisibility(
+  map: maplibregl.Map,
+  activeKinds: SavedSpotKind[],
+) {
+  if (!map.getLayer(STOPS_LAYER)) {
+    return;
+  }
+
+  map.setLayoutProperty(
+    STOPS_LAYER,
+    "visibility",
+    activeKinds.length === 0 ? "visible" : "none",
+  );
+}
+
 function applySavedSpotSelection(
   map: maplibregl.Map,
   selectedId: string | null,
@@ -597,13 +649,14 @@ function setupSavedSpotLayers(
   map: maplibregl.Map,
   theme: "light" | "dark",
   selectedId: string | null,
+  activeKinds: SavedSpotKind[],
 ) {
   const colors = labelColors(theme);
   const kindColors = savedSpotKindColorExpression(theme);
 
   if (map.getSource(SAVED_SOURCE)) {
     (map.getSource(SAVED_SOURCE) as GeoJSONSource).setData(savedSpotsGeoJson());
-    map.setFilter(SAVED_LAYER, ["!=", ["get", "visited"], true]);
+    applySavedSpotKindFilter(map, activeKinds);
     map.setPaintProperty(SAVED_LAYER, "circle-color", kindColors);
     map.setPaintProperty(SAVED_LAYER, "circle-stroke-color", colors.stroke);
     ensureSavedVisitedLayer(map, theme);
@@ -622,7 +675,7 @@ function setupSavedSpotLayers(
     id: SAVED_VISITED_LAYER,
     type: "symbol",
     source: SAVED_SOURCE,
-    filter: ["==", ["get", "visited"], true],
+    filter: savedSpotLayerFilter(true, activeKinds),
     layout: visitedSquareLayerLayout(theme),
   });
 
@@ -630,7 +683,7 @@ function setupSavedSpotLayers(
     id: SAVED_LAYER,
     type: "circle",
     source: SAVED_SOURCE,
-    filter: ["!=", ["get", "visited"], true],
+    filter: savedSpotLayerFilter(false, activeKinds),
     paint: {
       "circle-radius": MARKER_DOT_RADIUS,
       "circle-color": kindColors,
@@ -642,7 +695,11 @@ function setupSavedSpotLayers(
   applySavedSpotSelection(map, selectedId);
 }
 
-function setupStopLayers(map: maplibregl.Map, theme: "light" | "dark") {
+function setupStopLayers(
+  map: maplibregl.Map,
+  theme: "light" | "dark",
+  activeKinds: SavedSpotKind[],
+) {
   const colors = labelColors(theme);
   const data = stopsGeoJson();
 
@@ -652,6 +709,7 @@ function setupStopLayers(map: maplibregl.Map, theme: "light" | "dark") {
     map.setPaintProperty(STOPS_LAYER, "circle-radius", MARKER_DOT_RADIUS);
     map.setPaintProperty(STOPS_LAYER, "circle-stroke-width", MARKER_STROKE_WIDTH);
     map.setPaintProperty(STOPS_LAYER, "circle-stroke-color", colors.stroke);
+    applyTripStopsVisibility(map, activeKinds);
     return;
   }
 
@@ -671,6 +729,8 @@ function setupStopLayers(map: maplibregl.Map, theme: "light" | "dark") {
       "circle-stroke-color": colors.stroke,
     },
   });
+
+  applyTripStopsVisibility(map, activeKinds);
 }
 
 function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
@@ -756,11 +816,13 @@ export function TripMap({
   onSavedSpotSelect,
   selectedStopId = null,
   onStopSelect,
+  activeSavedSpotKinds = [],
 }: {
   selectedSavedSpotId?: string | null;
   onSavedSpotSelect?: (id: string | null) => void;
   selectedStopId?: string | null;
   onStopSelect?: (id: string | null) => void;
+  activeSavedSpotKinds?: SavedSpotKind[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -768,12 +830,14 @@ export function TripMap({
   const themeRef = useRef<"light" | "dark">("light");
   const selectedSavedSpotIdRef = useRef(selectedSavedSpotId);
   const selectedStopIdRef = useRef(selectedStopId);
+  const activeSavedSpotKindsRef = useRef(activeSavedSpotKinds);
   const popupRef = useRef<maplibregl.Popup | null>(null);
   const onSavedSpotSelectRef = useRef(onSavedSpotSelect);
   const onStopSelectRef = useRef(onStopSelect);
 
   selectedSavedSpotIdRef.current = selectedSavedSpotId;
   selectedStopIdRef.current = selectedStopId;
+  activeSavedSpotKindsRef.current = activeSavedSpotKinds;
   onSavedSpotSelectRef.current = onSavedSpotSelect;
   onStopSelectRef.current = onStopSelect;
 
@@ -870,6 +934,15 @@ export function TripMap({
       popupRef.current = null;
     }
   }, [selectedSavedSpotId, selectedStopId, focusSavedSpot, focusStop]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) {
+      return;
+    }
+
+    applySavedSpotKindFilter(map, activeSavedSpotKinds);
+  }, [activeSavedSpotKinds]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -977,8 +1050,9 @@ export function TripMap({
         map,
         themeRef.current,
         selectedSavedSpotIdRef.current,
+        activeSavedSpotKindsRef.current,
       );
-      setupStopLayers(map, themeRef.current);
+      setupStopLayers(map, themeRef.current, activeSavedSpotKindsRef.current);
       setupHighlightLayers(map, themeRef.current);
       bindInteractions();
 
@@ -1056,8 +1130,9 @@ export function TripMap({
             activeMap,
             nextTheme,
             selectedSavedSpotIdRef.current,
+            activeSavedSpotKindsRef.current,
           );
-          setupStopLayers(activeMap, nextTheme);
+          setupStopLayers(activeMap, nextTheme, activeSavedSpotKindsRef.current);
           setupHighlightLayers(activeMap, nextTheme);
           fitMapBounds(activeMap);
         })();

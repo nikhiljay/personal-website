@@ -27,7 +27,7 @@ export default function HomePage() {
         <AnimateIn as="p" stagger={2}>
           I&apos;m passionate about
           continuous growth, using data to tell compelling stories, and solving
-          tough engineering problems in healthcare. Based in San Francisco, CA.
+          tough engineering problems. Based in San Francisco, CA.
         </AnimateIn>
         <AnimateIn as="p" stagger={3}>
           <SerifEm>Chasing novel experiences</SerifEm>. In my free time, you&apos;ll find me{" "}
