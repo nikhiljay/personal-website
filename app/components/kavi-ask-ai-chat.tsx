@@ -212,7 +212,7 @@ export function KaviAskAiChat({
               <InputGroup
                 className={cn(
                   textSize,
-                  "h-12 rounded-full border-0 bg-neutral-100 p-1.5 shadow-none dark:bg-neutral-800/80",
+                  "h-12 rounded-full border-0 bg-muted p-1.5 shadow-none",
                   "has-[[data-slot=input-group-control]:focus-visible]:border-transparent has-[[data-slot=input-group-control]:focus-visible]:ring-0",
                 )}
               >
@@ -221,7 +221,7 @@ export function KaviAskAiChat({
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask about spots, schedule, neighborhoods…"
                   className={cn(
-                    "h-full min-w-0 px-3 py-0",
+                    "h-full min-w-0 px-3 py-0 text-foreground placeholder:text-muted-foreground",
                     inputTextSize,
                   )}
                   enterKeyHint="send"
@@ -252,7 +252,7 @@ export function KaviAskAiChat({
                     variant="default"
                     size="icon-sm"
                     disabled={!input.trim() || isBusy}
-                    className="size-9 rounded-full border-0 bg-neutral-900 text-white shadow-none hover:bg-neutral-800 focus-visible:ring-0 disabled:bg-neutral-300 disabled:text-neutral-500 disabled:opacity-100 data-[hidden=true]:hidden"
+                    className="size-9 rounded-full border-0 bg-[light-dark(#171717,#f5f5f5)] text-[light-dark(#ffffff,#171717)] shadow-none hover:bg-[light-dark(#262626,#e5e5e5)] focus-visible:ring-0 disabled:bg-[light-dark(#d4d4d4,#404040)] disabled:text-[light-dark(#737373,#737373)] disabled:opacity-100 data-[hidden=true]:hidden"
                     data-hidden={isBusy}
                   >
                     <ArrowUpIcon className="size-[18px] stroke-[2.5]" />
@@ -263,11 +263,11 @@ export function KaviAskAiChat({
                     type="button"
                     variant="ghost"
                     data-hidden={!isBusy}
-                    className="size-9 rounded-full border-0 bg-neutral-900 p-0 text-white shadow-none hover:bg-neutral-800 focus-visible:ring-0 data-[hidden=true]:hidden"
+                    className="size-9 rounded-full border-0 bg-[light-dark(#171717,#f5f5f5)] p-0 text-[light-dark(#ffffff,#171717)] shadow-none hover:bg-[light-dark(#262626,#e5e5e5)] focus-visible:ring-0 data-[hidden=true]:hidden"
                     onClick={() => stop()}
                   >
                     <span
-                      className="size-3 shrink-0 rounded-[3px] bg-white"
+                      className="size-3 shrink-0 rounded-[3px] bg-[light-dark(#ffffff,#171717)]"
                       aria-hidden
                     />
                     <span className="sr-only">Stop</span>

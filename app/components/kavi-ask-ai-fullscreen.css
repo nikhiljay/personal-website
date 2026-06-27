@@ -1,0 +1,24 @@
+.kavi-ask-ai-fullscreen {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.kavi-ask-ai-fullscreen.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kavi-ask-ai-fullscreen {
+    transition: none;
+  }
+
+  .kavi-ask-ai-fullscreen:not(.is-open) {
+    visibility: hidden;
+  }
+
+  .kavi-ask-ai-fullscreen.is-open {
+    opacity: 1;
+  }
+}

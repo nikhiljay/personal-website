@@ -2,11 +2,7 @@
 
 import { useLayoutEffect } from "react";
 
-/**
- * Pins the fullscreen shell to the visual viewport and locks the document.
- * Top + height track the visible area so the header stays put and the chat
- * shrinks as the keyboard opens — no padding-bottom ref timing issues.
- */
+/** Tracks visual viewport size/offset for the fullscreen shell (GPU transform). */
 export function useVisualViewportKeyboard(active: boolean) {
   useLayoutEffect(() => {
     if (!active) {
