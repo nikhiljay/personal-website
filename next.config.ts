@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["10.0.0.179", "10.0.0.179:3000"],
   images: {
     formats: ["image/avif", "image/webp"],
   },
