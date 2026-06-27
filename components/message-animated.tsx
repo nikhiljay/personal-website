@@ -2,6 +2,9 @@
 
 import type { UIMessage } from "ai";
 
+import { PlaceRatingCard } from "@/app/components/place-rating-card";
+import type { PlaceRatingsToolOutput } from "@/app/lib/kavi-trip-ai-tools";
+import { sanitizeAssistantText } from "@/app/lib/sanitize-assistant-text";
 import { MessageMarkdown } from "@/components/message-markdown";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Message, MessageContent } from "@/components/ui/message";
@@ -28,9 +31,30 @@ export function MessageAnimated({
       scrollAnchor={scrollAnchor ?? isUser}
     >
       <Message align={isUser ? "end" : "start"}>
-        <MessageContent>
+        <MessageContent className={isUser ? undefined : "[&>*]:w-full [&>*]:min-w-0"}>
           {message.parts.map((part, index) => {
+            if (part.type === "tool-getPlaceRatings") {
+              const input = part.input as
+                | { name?: string; address?: string; spotId?: string }
+                | undefined;
+              const output = part.output as PlaceRatingsToolOutput | undefined;
+
+              return (
+                <PlaceRatingCard
+                  key={`${message.id}-${part.toolCallId}`}
+                  state={part.state}
+                  input={input}
+                  output={output}
+                  className="w-full min-w-0 self-stretch"
+                />
+              );
+            }
+
             if (part.type !== "text") {
+              return null;
+            }
+
+            if (!part.text.trim()) {
               return null;
             }
 
@@ -43,7 +67,9 @@ export function MessageAnimated({
                   {isUser ? (
                     <span className="whitespace-pre-wrap">{part.text}</span>
                   ) : (
-                    <MessageMarkdown>{part.text}</MessageMarkdown>
+                    <MessageMarkdown>
+                      {sanitizeAssistantText(part.text)}
+                    </MessageMarkdown>
                   )}
                 </BubbleContent>
               </Bubble>

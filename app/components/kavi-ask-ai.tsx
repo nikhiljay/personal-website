@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -16,20 +17,26 @@ export function KaviAskAi() {
 
   return (
     <TooltipProvider>
-      <KaviAskAiFab
-        ref={fabRef}
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-      />
-      {isDesktop ? (
-        <KaviAskAiPopover
-          open={open}
-          onOpenChange={setOpen}
-          fabRef={fabRef}
-        />
-      ) : (
-        <KaviAskAiDrawer open={open} onOpenChange={setOpen} />
+      {createPortal(
+        <>
+          <KaviAskAiFab
+            ref={fabRef}
+            onClick={() => setOpen((current) => !current)}
+            aria-expanded={open}
+          />
+          {isDesktop ? (
+            <KaviAskAiPopover
+              open={open}
+              onOpenChange={setOpen}
+              fabRef={fabRef}
+            />
+          ) : null}
+        </>,
+        document.body,
       )}
+      {!isDesktop ? (
+        <KaviAskAiDrawer open={open} onOpenChange={setOpen} />
+      ) : null}
     </TooltipProvider>
   );
 }

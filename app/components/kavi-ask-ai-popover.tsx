@@ -57,7 +57,7 @@ export function KaviAskAiPopover({
     <div
       ref={panelRef}
       className={cn(
-        "fixed right-6 bottom-[calc(1.5rem+2.75rem+0.75rem)] z-40",
+        "fixed right-4 bottom-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+2.75rem+0.75rem)] z-40",
         "h-140 w-[min(100vw-3rem,24rem)]",
       )}
     >

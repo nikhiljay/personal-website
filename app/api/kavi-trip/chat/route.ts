@@ -1,7 +1,13 @@
 import { gateway } from "@ai-sdk/gateway";
-import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import {
+  convertToModelMessages,
+  stepCountIs,
+  streamText,
+  type UIMessage,
+} from "ai";
 
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
+import { kaviTripAiTools } from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
 
 export const maxDuration = 30;
@@ -22,7 +28,9 @@ export async function POST(req: Request) {
     model: gateway("openai/gpt-4o-mini"),
     system: buildKaviTripSystemPrompt(tripEvents),
     messages: await convertToModelMessages(messages),
-    maxOutputTokens: 500,
+    tools: kaviTripAiTools,
+    stopWhen: stepCountIs(5),
+    maxOutputTokens: 600,
   });
 
   return result.toUIMessageStreamResponse();

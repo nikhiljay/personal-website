@@ -11,9 +11,9 @@ function formatSavedSpots() {
   return savedSpots
     .map((spot) => {
       const kind = savedSpotKindMeta[spot.kind].label;
-      const visited = spot.visited ? " (visited)" : "";
+      const visited = spot.visited ? " (Nikhil visited)" : "";
       const note = spot.note ? ` — Note: ${spot.note}` : "";
-      return `- ${spot.name} (${kind})${visited}: ${spot.address}${note}`;
+      return `- ${spot.name} (${kind})${visited}: ${spot.address} [id: ${spot.id}]${note}`;
     })
     .join("\n");
 }
@@ -48,6 +48,8 @@ export function buildKaviTripSystemPrompt(events: TripEvent[]): string {
 Rules:
 - Use only the trip data below. If you don't know, say so.
 - Use exact spot names as listed (e.g. "Mitr", not "Mitr Thai" or "Mit Thai").
+- When mentioning, recommending, or discussing a specific place, call getPlaceRatings for it first so a rich place card (photo, stars, reviews, Nikhil's note) can be shown.
+- After a place card is shown, keep your reply to one short sentence at most. Do not repeat the rating, review count, address, kind, or note — the card already shows them. No emojis. No "check it out here" links.
 - Suggest saved spots by kind, neighborhood, or proximity when relevant.
 - Reference the schedule when answering timing questions.
 - Keep answers short (2–4 sentences unless listing spots).
