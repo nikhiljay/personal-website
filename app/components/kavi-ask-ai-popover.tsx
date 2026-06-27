@@ -4,18 +4,20 @@ import { useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { KaviAskAiChat } from "./kavi-ask-ai-chat";
+import "./kavi-ask-ai-popover.css";
 
 type KaviAskAiPopoverProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   fabRef: React.RefObject<HTMLButtonElement | null>;
+  children: React.ReactNode;
 };
 
 export function KaviAskAiPopover({
   open,
   onOpenChange,
   fabRef,
+  children,
 }: KaviAskAiPopoverProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -49,19 +51,17 @@ export function KaviAskAiPopover({
     };
   }, [fabRef, onOpenChange, open]);
 
-  if (!open) {
-    return null;
-  }
-
   return (
     <div
       ref={panelRef}
       className={cn(
-        "fixed right-4 bottom-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+2.75rem+0.75rem)] z-40",
+        "kavi-ask-ai-popover fixed right-4 bottom-[calc(1.5rem+2.75rem+0.75rem)] z-40",
         "h-140 w-[min(100vw-3rem,24rem)]",
+        open ? "is-open pointer-events-auto" : "pointer-events-none",
       )}
+      aria-hidden={!open}
     >
-      <KaviAskAiChat className="h-full" />
+      {children}
     </div>
   );
 }

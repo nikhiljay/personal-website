@@ -17,6 +17,10 @@ export type PlaceRatingsToolOutput =
       note: string | null;
       visited: boolean;
       spotId: string | null;
+      openNow: boolean | null;
+      todayHours: string | null;
+      lat: number | null;
+      lng: number | null;
     };
 
 export const kaviTripAiTools = {
@@ -53,6 +57,10 @@ export const kaviTripAiTools = {
         note: result.note,
         visited: result.visited,
         spotId: result.spotId,
+        openNow: result.openNow,
+        todayHours: result.todayHours,
+        lat: result.lat,
+        lng: result.lng,
       };
     },
   }),

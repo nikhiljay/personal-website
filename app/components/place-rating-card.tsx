@@ -3,6 +3,7 @@
 import { StarIcon } from "lucide-react";
 
 import type { PlaceRatingsToolOutput } from "@/app/lib/kavi-trip-ai-tools";
+import { citymapperDirectionsUrl } from "@/app/lib/citymapper";
 import { cn } from "@/lib/utils";
 
 function formatReviewCount(count: number) {
@@ -50,9 +51,42 @@ function PlaceRatingCardContent({
 }: {
   place: PlaceRatingsToolOutput & { found: true };
 }) {
+  const hoursLabel =
+    place.todayHours?.toLowerCase() === "closed" ? null : place.todayHours;
+
+  const citymapperUrl =
+    place.lat != null &&
+    place.lng != null &&
+    place.address
+      ? citymapperDirectionsUrl({
+          lat: place.lat,
+          lng: place.lng,
+          name: place.name,
+          address: place.address,
+        })
+      : null;
+
   return (
     <div className="w-full min-w-0">
-      <div className="flex gap-3 p-3">
+      <div className="relative flex gap-3 p-3">
+        {citymapperUrl ? (
+          <a
+            href={citymapperUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${place.name} in Citymapper`}
+            className="absolute right-3 top-3 inline-flex shrink-0 opacity-90 outline-none hover:opacity-100 focus:outline-none"
+          >
+            <img
+              src="/images/citymapper-icon.png"
+              alt=""
+              width={18}
+              height={18}
+              className="rounded-[4px]"
+            />
+          </a>
+        ) : null}
+
         <div className="relative size-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-muted">
           {place.photoUrl ? (
             <img
@@ -67,7 +101,12 @@ function PlaceRatingCardContent({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div
+          className={cn(
+            "flex min-w-0 flex-1 flex-col gap-2",
+            citymapperUrl && "pr-7",
+          )}
+        >
           <div className="min-w-0">
             <p className="truncate text-sm font-medium leading-tight">
               {place.name}
@@ -93,6 +132,29 @@ function PlaceRatingCardContent({
               ) : null}
             </div>
           )}
+
+          {place.openNow != null || hoursLabel ? (
+            <p className="text-xs">
+              {place.openNow != null ? (
+                <span
+                  className={cn(
+                    "font-medium",
+                    place.openNow
+                      ? "text-green-600 dark:text-green-500"
+                      : "text-red-600 dark:text-red-500",
+                  )}
+                >
+                  {place.openNow ? "Open" : "Closed"}
+                </span>
+              ) : null}
+              {hoursLabel ? (
+                <span className="text-muted-foreground">
+                  {place.openNow != null ? " · " : ""}
+                  {hoursLabel}
+                </span>
+              ) : null}
+            </p>
+          ) : null}
 
           {place.rating != null || place.userRatingCount != null ? (
             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
@@ -120,21 +182,8 @@ function PlaceRatingCardContent({
 
       {place.note ? (
         <p className="border-t border-border px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-          {place.note}
+          <span className="font-medium text-foreground">Nikhil:</span> {place.note}
         </p>
-      ) : null}
-
-      {place.googleMapsUri ? (
-        <div className="border-t border-border px-3 py-2">
-          <a
-            href={place.googleMapsUri}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-          >
-            Open in Google Maps
-          </a>
-        </div>
       ) : null}
     </div>
   );
@@ -157,7 +206,7 @@ export function PlaceRatingCard({
     return (
       <div
         className={cn(
-          "w-full min-w-0 self-stretch overflow-hidden rounded-xl border border-border bg-background shadow-sm",
+          "w-full min-w-0 self-stretch overflow-hidden rounded-xl border border-border bg-background",
           className,
         )}
       >

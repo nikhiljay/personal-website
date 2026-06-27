@@ -1,6 +1,8 @@
 import { savedSpots, type SavedSpot } from "./nikhil-saved-spots";
 import { savedSpotKindMeta } from "./saved-spot-kinds";
 
+const NYC_TIMEZONE = "America/New_York";
+
 export type PlaceCardData = {
   name: string;
   address: string | null;
@@ -12,6 +14,15 @@ export type PlaceCardData = {
   note: string | null;
   visited: boolean;
   spotId: string | null;
+  openNow: boolean | null;
+  todayHours: string | null;
+  lat: number | null;
+  lng: number | null;
+};
+
+type GoogleOpeningHours = {
+  openNow?: boolean;
+  weekdayDescriptions?: string[];
 };
 
 type GooglePlacesSearchResponse = {
@@ -22,10 +33,13 @@ type GooglePlacesSearchResponse = {
     userRatingCount?: number;
     googleMapsUri?: string;
     photos?: Array<{ name?: string }>;
+    location?: { latitude?: number; longitude?: number };
+    currentOpeningHours?: GoogleOpeningHours;
+    regularOpeningHours?: GoogleOpeningHours;
   }>;
 };
 
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const CACHE_TTL_MS = 60 * 60 * 1000;
 const cache = new Map<string, { value: PlaceCardData; expiresAt: number }>();
 
 function cacheKey(name: string, address?: string) {
@@ -64,6 +78,99 @@ function googlePhotoProxyUrl(photoName: string) {
   return `/api/places/photo?name=${encodeURIComponent(photoName)}`;
 }
 
+function parseTimeToken(time: string) {
+  const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) {
+    return null;
+  }
+
+  return {
+    hour: Number(match[1]),
+    minutes: match[2],
+    period: match[3].toLowerCase(),
+  };
+}
+
+function formatTimeValue(
+  hour: number,
+  minutes: string,
+  includePeriod: boolean,
+  period?: string,
+) {
+  const timeStr = minutes === "00" ? `${hour}` : `${hour}:${minutes}`;
+  if (includePeriod && period) {
+    return `${timeStr}${period}`;
+  }
+  return timeStr;
+}
+
+function formatTimeRange(startStr: string, endStr: string) {
+  const start = parseTimeToken(startStr);
+  const end = parseTimeToken(endStr);
+
+  if (!start || !end) {
+    return `${startStr.trim()}–${endStr.trim()}`;
+  }
+
+  if (start.period === end.period) {
+    const startPart = formatTimeValue(start.hour, start.minutes, false);
+    const endPart = formatTimeValue(end.hour, end.minutes, false);
+    return `${startPart}–${endPart}${start.period}`;
+  }
+
+  const startPart = formatTimeValue(
+    start.hour,
+    start.minutes,
+    true,
+    start.period,
+  );
+  const endPart = formatTimeValue(end.hour, end.minutes, true, end.period);
+  return `${startPart}–${endPart}`;
+}
+
+function formatTodayHoursDisplay(hours: string) {
+  if (hours.toLowerCase() === "closed") {
+    return "Closed";
+  }
+
+  const normalized = hours.replace(/\u202f/g, " ").replace(/\u2009/g, " ");
+
+  return normalized
+    .split(",")
+    .map((segment) => {
+      const parts = segment.trim().split(/\s*[–-]\s*/);
+      if (parts.length >= 2) {
+        return formatTimeRange(parts[0], parts[1]);
+      }
+      return segment.trim();
+    })
+    .join(", ");
+}
+
+function parseTodayHours(openingHours?: GoogleOpeningHours) {
+  if (!openingHours) {
+    return { openNow: null, todayHours: null };
+  }
+
+  const dayName = new Intl.DateTimeFormat("en-US", {
+    timeZone: NYC_TIMEZONE,
+    weekday: "long",
+  }).format(new Date());
+
+  const description = openingHours.weekdayDescriptions?.find((entry) =>
+    entry.startsWith(`${dayName}:`),
+  );
+
+  const rawHours = description
+    ? description.replace(/^[^:]+:\s*/, "").replace(/\u202f/g, " ").trim()
+    : null;
+
+  return {
+    openNow: openingHours.openNow ?? null,
+    todayHours: rawHours ? formatTodayHoursDisplay(rawHours) : null,
+  };
+}
+
 function buildPlaceCardData(
   savedSpot: SavedSpot | undefined,
   place: NonNullable<GooglePlacesSearchResponse["places"]>[number],
@@ -74,6 +181,10 @@ function buildPlaceCardData(
   const photoUrl =
     savedSpot?.photo ??
     (googlePhotoName ? googlePhotoProxyUrl(googlePhotoName) : null);
+
+  const hours = parseTodayHours(
+    place.currentOpeningHours ?? place.regularOpeningHours,
+  );
 
   return {
     name: savedSpot?.name ?? place.displayName?.text ?? fallbackName,
@@ -87,6 +198,10 @@ function buildPlaceCardData(
     note: savedSpot?.note ?? null,
     visited: savedSpot?.visited ?? false,
     spotId: savedSpot?.id ?? null,
+    openNow: hours.openNow,
+    todayHours: hours.todayHours,
+    lat: savedSpot?.lat ?? place.location?.latitude ?? null,
+    lng: savedSpot?.lng ?? place.location?.longitude ?? null,
   };
 }
 
@@ -132,7 +247,7 @@ export async function getPlaceCardData(input: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": apiKey,
       "X-Goog-FieldMask":
-        "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos",
+        "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours",
     },
     body: JSON.stringify(body),
   });

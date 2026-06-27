@@ -1,13 +1,11 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import type { useChat } from "@ai-sdk/react";
 import {
   ArrowUpIcon,
   MessageCircleDashedIcon,
   StopCircleIcon,
 } from "lucide-react";
-import { useState } from "react";
 
 import { MessageAnimated } from "@/components/message-animated";
 import {
@@ -47,22 +45,29 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
-const chatTransport = new DefaultChatTransport({ api: "/api/kavi-trip/chat" });
-
 type KaviAskAiChatProps = {
   className?: string;
   variant?: "card" | "drawer";
+  input: string;
+  setInput: (value: string) => void;
+  messages: ReturnType<typeof useChat>["messages"];
+  sendMessage: ReturnType<typeof useChat>["sendMessage"];
+  status: ReturnType<typeof useChat>["status"];
+  error: ReturnType<typeof useChat>["error"];
+  stop: ReturnType<typeof useChat>["stop"];
 };
 
 export function KaviAskAiChat({
   className,
   variant = "card",
+  input,
+  setInput,
+  messages,
+  sendMessage,
+  status,
+  error,
+  stop,
 }: KaviAskAiChatProps) {
-  const [input, setInput] = useState("");
-  const { messages, sendMessage, status, error, stop } = useChat({
-    transport: chatTransport,
-  });
-
   const isBusy = status === "submitted" || status === "streaming";
 
   const handleSubmit = async (text: string) => {
