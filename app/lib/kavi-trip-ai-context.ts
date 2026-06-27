@@ -47,6 +47,7 @@ export function buildKaviTripSystemPrompt(events: TripEvent[]): string {
 
 Rules:
 - Use only the trip data below. If you don't know, say so.
+- Use exact spot names as listed (e.g. "Mitr", not "Mitr Thai" or "Mit Thai").
 - Suggest saved spots by kind, neighborhood, or proximity when relevant.
 - Reference the schedule when answering timing questions.
 - Keep answers short (2–4 sentences unless listing spots).
