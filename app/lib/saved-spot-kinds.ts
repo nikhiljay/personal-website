@@ -26,12 +26,19 @@ export const savedSpotKindMeta: Record<
   SavedSpotKind,
   { label: string; color: string }
 > = {
-  cafe: { label: "Café", color: "light-dark(#B06A35, #C4926A)" },
-  casual: { label: "Casual", color: "light-dark(#3D8B47, #8FAF8F)" },
-  nice: { label: "Sit-Down", color: "light-dark(#7550A0, #A898B8)" },
-  bar: { label: "Bar", color: "light-dark(#C99200, #D4AA50)" },
-  activity: { label: "Activity", color: "light-dark(#2E7DAF, #7AACC4)" },
+  cafe: { label: "Café", color: savedSpotKindColors.light.cafe },
+  casual: { label: "Casual", color: savedSpotKindColors.light.casual },
+  nice: { label: "Sit-Down", color: savedSpotKindColors.light.nice },
+  bar: { label: "Bar", color: savedSpotKindColors.light.bar },
+  activity: { label: "Activity", color: savedSpotKindColors.light.activity },
 };
+
+export function getSavedSpotKindColor(
+  kind: SavedSpotKind,
+  theme: "light" | "dark",
+) {
+  return savedSpotKindColors[theme][kind];
+}
 
 export function savedSpotKindColorExpression(
   theme: "light" | "dark",

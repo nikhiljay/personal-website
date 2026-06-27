@@ -7,6 +7,7 @@ import {
   getStopById,
   type TripEvent,
 } from "../lib/kavi-nyc-trip";
+import { usePreferredColorScheme } from "../hooks/use-preferred-color-scheme";
 
 import { MapMarkerDot } from "./map-marker-dot";
 import { ExpandableAside } from "./expandable-aside";
@@ -128,6 +129,7 @@ export function KaviTripSchedule({
   selectedStopId: string | null;
   onStopSelect: (stopId: string | null) => void;
 }) {
+  const theme = usePreferredColorScheme();
   const dayGroups = groupEventsByDate(events);
 
   return (
@@ -162,7 +164,7 @@ export function KaviTripSchedule({
                           }`}
                         >
                           <MapMarkerDot
-                            color={getScheduleMarkerColor(stop.id)}
+                            color={getScheduleMarkerColor(stop.id, theme)}
                             label={stop.name}
                           />
                           <span>{stop.name}</span>

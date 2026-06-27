@@ -1,4 +1,4 @@
-import { savedSpotKindMeta } from "./saved-spot-kinds";
+import { getSavedSpotKindColor } from "./saved-spot-kinds";
 import { savedSpots } from "./nikhil-saved-spots";
 
 export type TripStop = {
@@ -168,7 +168,10 @@ export function getPlaceByStopId(id: string) {
   );
 }
 
-export function getScheduleMarkerColor(stopId: string) {
+export function getScheduleMarkerColor(
+  stopId: string,
+  theme: "light" | "dark" = "light",
+) {
   const highlight = mapHighlights.find((place) => place.id === stopId);
   if (highlight) {
     return highlight.fill;
@@ -176,8 +179,8 @@ export function getScheduleMarkerColor(stopId: string) {
 
   const savedSpot = savedSpots.find((spot) => spot.id === stopId);
   if (savedSpot) {
-    return savedSpotKindMeta[savedSpot.kind].color;
+    return getSavedSpotKindColor(savedSpot.kind, theme);
   }
 
-  return "light-dark(#111111, #f2f2f2)";
+  return theme === "dark" ? "#f2f2f2" : "#111111";
 }

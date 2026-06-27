@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import type { Coordinates } from "@/app/lib/geo";
+import { usePreferredColorScheme } from "@/app/hooks/use-preferred-color-scheme";
 import { MessageAnimated } from "@/components/message-animated";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +31,6 @@ import {
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import {
@@ -64,6 +64,23 @@ type KaviAskAiChatProps = {
   getCurrentLocation: () => Coordinates | null;
 };
 
+function getSendButtonColors(
+  scheme: "light" | "dark",
+  disabled: boolean,
+) {
+  if (disabled) {
+    return {
+      backgroundColor: scheme === "dark" ? "#404040" : "#d4d4d4",
+      color: "#737373",
+    };
+  }
+
+  return {
+    backgroundColor: scheme === "dark" ? "#f5f5f5" : "#171717",
+    color: scheme === "dark" ? "#171717" : "#ffffff",
+  };
+}
+
 export function KaviAskAiChat({
   className,
   variant = "card",
@@ -79,6 +96,10 @@ export function KaviAskAiChat({
   getCurrentLocation,
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
+  const colorScheme = usePreferredColorScheme();
+  const isSubmitDisabled = !input.trim() || isBusy;
+  const sendButtonColors = getSendButtonColors(colorScheme, isSubmitDisabled);
+  const stopIconColor = colorScheme === "dark" ? "#171717" : "#ffffff";
 
   const handleSubmit = async (text: string) => {
     const trimmed = text.trim();
@@ -247,31 +268,34 @@ export function KaviAskAiChat({
                     textSize,
                   )}
                 >
-                  <InputGroupButton
+                  <button
                     type="submit"
-                    variant="default"
-                    size="icon-sm"
-                    disabled={!input.trim() || isBusy}
-                    className="size-9 rounded-full border-0 bg-[light-dark(#171717,#f5f5f5)] text-[light-dark(#ffffff,#171717)] shadow-none hover:bg-[light-dark(#262626,#e5e5e5)] focus-visible:ring-0 disabled:bg-[light-dark(#d4d4d4,#404040)] disabled:text-[light-dark(#737373,#737373)] disabled:opacity-100 data-[hidden=true]:hidden"
-                    data-hidden={isBusy}
+                    disabled={isSubmitDisabled}
+                    style={sendButtonColors}
+                    className={cn(
+                      "flex size-9 shrink-0 items-center justify-center rounded-full border-0 p-0 shadow-none outline-none appearance-none [-webkit-appearance:none] disabled:opacity-100",
+                      isBusy && "hidden",
+                    )}
                   >
                     <ArrowUpIcon className="size-[18px] stroke-[2.5]" />
                     <span className="sr-only">Send</span>
-                  </InputGroupButton>
-                  <InputGroupButton
-                    size="icon-sm"
+                  </button>
+                  <button
                     type="button"
-                    variant="ghost"
-                    data-hidden={!isBusy}
-                    className="size-9 rounded-full border-0 bg-[light-dark(#171717,#f5f5f5)] p-0 text-[light-dark(#ffffff,#171717)] shadow-none hover:bg-[light-dark(#262626,#e5e5e5)] focus-visible:ring-0 data-[hidden=true]:hidden"
+                    style={getSendButtonColors(colorScheme, false)}
+                    className={cn(
+                      "flex size-9 shrink-0 items-center justify-center rounded-full border-0 p-0 shadow-none outline-none appearance-none [-webkit-appearance:none]",
+                      !isBusy && "hidden",
+                    )}
                     onClick={() => stop()}
                   >
                     <span
-                      className="size-3 shrink-0 rounded-[3px] bg-[light-dark(#ffffff,#171717)]"
+                      className="size-3 shrink-0 rounded-[3px]"
+                      style={{ backgroundColor: stopIconColor }}
                       aria-hidden
                     />
                     <span className="sr-only">Stop</span>
-                  </InputGroupButton>
+                  </button>
                 </InputGroupAddon>
               </InputGroup>
             </form>
