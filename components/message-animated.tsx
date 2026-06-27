@@ -13,6 +13,7 @@ import { MessageScrollerItem } from "@/components/ui/message-scroller";
 type MessageAnimatedProps = {
   message: UIMessage;
   scrollAnchor?: boolean;
+  textSize?: string;
   userVariant?: React.ComponentProps<typeof Bubble>["variant"];
   assistantVariant?: React.ComponentProps<typeof Bubble>["variant"];
 };
@@ -20,6 +21,7 @@ type MessageAnimatedProps = {
 export function MessageAnimated({
   message,
   scrollAnchor,
+  textSize = "text-sm/relaxed",
   userVariant = "muted",
   assistantVariant = "ghost",
 }: MessageAnimatedProps) {
@@ -30,7 +32,7 @@ export function MessageAnimated({
       messageId={message.id}
       scrollAnchor={scrollAnchor ?? isUser}
     >
-      <Message align={isUser ? "end" : "start"}>
+      <Message align={isUser ? "end" : "start"} className={textSize}>
         <MessageContent className={isUser ? undefined : "[&>*]:w-full [&>*]:min-w-0"}>
           {message.parts.map((part, index) => {
             if (part.type === "tool-getPlaceRatings") {
@@ -45,6 +47,7 @@ export function MessageAnimated({
                   state={part.state}
                   input={input}
                   output={output}
+                  textSize={textSize}
                   className="w-full min-w-0 self-stretch"
                 />
               );
@@ -63,7 +66,7 @@ export function MessageAnimated({
                 key={`${message.id}-${index}`}
                 variant={isUser ? userVariant : assistantVariant}
               >
-                <BubbleContent>
+                <BubbleContent className={textSize}>
                   {isUser ? (
                     <span className="whitespace-pre-wrap">{part.text}</span>
                   ) : (

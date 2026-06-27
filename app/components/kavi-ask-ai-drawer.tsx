@@ -15,7 +15,7 @@ export function KaviAskAiDrawer({
 }: KaviAskAiDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex max-h-[92dvh] flex-col p-2 pb-[max(1rem,env(safe-area-inset-bottom,0px))] before:hidden [&>div:first-of-type]:hidden">
+      <DrawerContent className="flex h-[76dvh] max-h-[76dvh] flex-col p-2 pb-[max(1rem,env(safe-area-inset-bottom,0px))] before:hidden data-[vaul-drawer-direction=bottom]:mt-20 data-[vaul-drawer-direction=bottom]:h-[76dvh] data-[vaul-drawer-direction=bottom]:max-h-[76dvh] [&>div:first-of-type]:hidden">
         {children}
       </DrawerContent>
     </Drawer>

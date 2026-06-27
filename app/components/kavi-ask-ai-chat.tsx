@@ -81,6 +81,8 @@ export function KaviAskAiChat({
   };
 
   const isDrawer = variant === "drawer";
+  const textSize = "text-sm/relaxed";
+  const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
 
   return (
     <MessageScrollerProvider autoScroll>
@@ -88,6 +90,7 @@ export function KaviAskAiChat({
         <Card
           className={cn(
             "mx-auto h-full w-full gap-0",
+            textSize,
             isDrawer
               ? "max-w-none rounded-xl py-0 ring-0 [--card-spacing:--spacing(5)]"
               : "max-w-sm",
@@ -103,7 +106,9 @@ export function KaviAskAiChat({
             className={cn("gap-1 border-b", isDrawer && "pt-3")}
           >
             <CardTitle>Ask AI</CardTitle>
-            <CardDescription>How can I help you today?</CardDescription>
+            <CardDescription className={textSize}>
+              How can I help you today?
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
@@ -114,7 +119,7 @@ export function KaviAskAiChat({
                     <MessageCircleDashedIcon />
                   </EmptyMedia>
                   <EmptyTitle>Hey Kavi!</EmptyTitle>
-                  <EmptyDescription>
+                  <EmptyDescription className={textSize}>
                     Ask about your schedule, saved spots, or neighborhoods. Send
                     a message to start.
                   </EmptyDescription>
@@ -132,11 +137,12 @@ export function KaviAskAiChat({
                         key={message.id}
                         message={message}
                         scrollAnchor={message.role === "user"}
+                        textSize={textSize}
                       />
                     ))}
                     {status === "submitted" ? (
                       <MessageScrollerItem messageId="thinking">
-                        <Marker role="status">
+                        <Marker role="status" className={textSize}>
                           <MarkerIcon>
                             <Spinner />
                           </MarkerIcon>
@@ -152,7 +158,12 @@ export function KaviAskAiChat({
           </CardContent>
 
           {error ? (
-            <p className="px-(--card-spacing) pb-2 text-xs text-destructive">
+            <p
+              className={cn(
+                "px-(--card-spacing) pb-2 text-destructive",
+                textSize,
+              )}
+            >
               {error.message}
             </p>
           ) : null}
@@ -165,12 +176,12 @@ export function KaviAskAiChat({
               }}
               className="w-full"
             >
-              <InputGroup>
+              <InputGroup className={textSize}>
                 <InputGroupTextarea
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask about spots, schedule, neighborhoods…"
-                  className="min-h-14 px-3 py-2.5 text-xs/relaxed"
+                  className={cn("min-h-14 px-3 py-2.5", inputTextSize)}
                   rows={2}
                   disabled={isBusy}
                   onKeyDown={(event) => {
@@ -180,7 +191,7 @@ export function KaviAskAiChat({
                     }
                   }}
                 />
-                <InputGroupAddon align="block-end" className="pt-1">
+                <InputGroupAddon align="block-end" className={cn("pt-1", textSize)}>
                   <InputGroupButton
                     type="submit"
                     variant="default"

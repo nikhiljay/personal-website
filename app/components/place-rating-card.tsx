@@ -48,9 +48,12 @@ function PlaceRatingCardSkeleton({
 
 function PlaceRatingCardContent({
   place,
+  textSize = "text-sm/relaxed",
 }: {
   place: PlaceRatingsToolOutput & { found: true };
+  textSize?: string;
 }) {
+  const detailTextSize = "text-sm";
   const hoursLabel =
     place.todayHours?.toLowerCase() === "closed" ? null : place.todayHours;
 
@@ -112,7 +115,12 @@ function PlaceRatingCardContent({
               {place.name}
             </p>
             {place.address ? (
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              <p
+                className={cn(
+                  "mt-0.5 truncate text-muted-foreground",
+                  detailTextSize,
+                )}
+              >
                 {place.address}
               </p>
             ) : null}
@@ -134,7 +142,7 @@ function PlaceRatingCardContent({
           )}
 
           {place.openNow != null || hoursLabel ? (
-            <p className="text-xs">
+            <p className={detailTextSize}>
               {place.openNow != null ? (
                 <span
                   className={cn(
@@ -157,7 +165,12 @@ function PlaceRatingCardContent({
           ) : null}
 
           {place.rating != null || place.userRatingCount != null ? (
-            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
+            <div
+              className={cn(
+                "flex flex-wrap items-center gap-x-1.5 gap-y-1",
+                detailTextSize,
+              )}
+            >
               {place.rating != null ? (
                 <>
                   <StarIcon
@@ -181,7 +194,12 @@ function PlaceRatingCardContent({
       </div>
 
       {place.note ? (
-        <p className="border-t border-border px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+        <p
+          className={cn(
+            "border-t border-border px-3 py-2.5 leading-relaxed text-muted-foreground",
+            textSize,
+          )}
+        >
           <span className="font-medium text-foreground">Nikhil:</span> {place.note}
         </p>
       ) : null}
@@ -193,6 +211,7 @@ type PlaceRatingCardProps = {
   state: string;
   input?: { name?: string };
   output?: PlaceRatingsToolOutput;
+  textSize?: string;
   className?: string;
 };
 
@@ -200,8 +219,10 @@ export function PlaceRatingCard({
   state,
   input,
   output,
+  textSize = "text-sm/relaxed",
   className,
 }: PlaceRatingCardProps) {
+  const detailTextSize = "text-sm";
   if (state === "output-available" && output?.found) {
     return (
       <div
@@ -210,7 +231,7 @@ export function PlaceRatingCard({
           className,
         )}
       >
-        <PlaceRatingCardContent place={output} />
+        <PlaceRatingCardContent place={output} textSize={textSize} />
       </div>
     );
   }
@@ -219,7 +240,8 @@ export function PlaceRatingCard({
     return (
       <div
         className={cn(
-          "w-full min-w-0 self-stretch rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground",
+          "w-full min-w-0 self-stretch rounded-xl border border-border bg-muted/30 px-3 py-2 text-muted-foreground",
+          detailTextSize,
           className,
         )}
       >
@@ -232,7 +254,8 @@ export function PlaceRatingCard({
     return (
       <div
         className={cn(
-          "w-full min-w-0 self-stretch rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground",
+          "w-full min-w-0 self-stretch rounded-xl border border-border bg-muted/30 px-3 py-2 text-muted-foreground",
+          detailTextSize,
           className,
         )}
       >

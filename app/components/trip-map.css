@@ -2,6 +2,7 @@
   border: 1px solid light-dark(#e8e8e8, #333333);
   border-radius: 6px;
   background: light-dark(#fafafa, #222222);
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 /* Slightly larger than map markers so current location reads clearly. */
