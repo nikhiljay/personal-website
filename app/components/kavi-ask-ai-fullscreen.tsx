@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/utils";
@@ -22,31 +22,59 @@ export function KaviAskAiFullscreen({
   children,
 }: KaviAskAiFullscreenProps) {
   const scrollContainerRef = useRef<Element | null>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useVisualViewportKeyboard(open);
   useBodyScrollLock(open, scrollContainerRef, { fixBody: false, touchLock: true });
 
+  useLayoutEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const header = headerRef.current;
+    const html = document.documentElement;
+    if (!header) {
+      return;
+    }
+
+    const syncHeaderHeight = () => {
+      html.style.setProperty(
+        "--ask-ai-header-height",
+        `${header.offsetHeight}px`,
+      );
+    };
+
+    syncHeaderHeight();
+
+    const observer = new ResizeObserver(syncHeaderHeight);
+    observer.observe(header);
+
+    return () => {
+      observer.disconnect();
+      html.style.removeProperty("--ask-ai-header-height");
+    };
+  }, [open]);
+
   return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ask-ai-title"
       className={cn(
-        "kavi-ask-ai-fullscreen fixed inset-0 z-50",
+        "kavi-ask-ai-fullscreen fixed inset-0 z-50 bg-popover text-popover-foreground",
         open && "is-open",
       )}
       aria-hidden={!open}
     >
-      <div aria-hidden className="absolute inset-0 bg-popover" />
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="ask-ai-title"
-        className="absolute inset-x-0 top-0 flex h-[var(--vv-height,100dvh)] touch-none flex-col overflow-hidden overscroll-none bg-popover text-popover-foreground will-change-[transform,height] [transform:translate3d(0,var(--vv-top,0px),0)]"
+        ref={headerRef}
+        className="kavi-ask-ai-fullscreen-header absolute inset-x-0 top-[length:var(--vv-top,0px)] z-[60] border-b border-border bg-popover"
       >
-        <div className="isolate shrink-0 border-b border-border bg-popover">
-          <KaviAskAiFullscreenHeader onClose={onClose} />
-        </div>
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-popover">
-          {children(scrollContainerRef)}
-        </div>
+        <KaviAskAiFullscreenHeader onClose={onClose} />
+      </div>
+      <div className="kavi-ask-ai-fullscreen-body absolute inset-x-0 top-[calc(var(--vv-top,0px)+var(--ask-ai-header-height,0px))] bottom-[length:var(--keyboard-inset,0px)] flex touch-none flex-col overflow-hidden overscroll-none">
+        {children(scrollContainerRef)}
       </div>
     </div>,
     document.body,

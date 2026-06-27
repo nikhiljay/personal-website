@@ -9,8 +9,27 @@
   pointer-events: auto;
 }
 
+/*
+ * iOS fires visualViewport resize/scroll sparsely during the keyboard
+ * animation, so --vv-top / --keyboard-inset update in a few big steps. A
+ * short transition on the driven offsets lets the header and body glide to
+ * each step instead of snapping after the keyboard settles. Header and body
+ * share the same timing so they stay locked together while --vv-top moves.
+ */
+.kavi-ask-ai-fullscreen-header {
+  transition: top 0.25s ease-out;
+}
+
+.kavi-ask-ai-fullscreen-body {
+  transition:
+    top 0.25s ease-out,
+    bottom 0.25s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .kavi-ask-ai-fullscreen {
+  .kavi-ask-ai-fullscreen,
+  .kavi-ask-ai-fullscreen-header,
+  .kavi-ask-ai-fullscreen-body {
     transition: none;
   }
 

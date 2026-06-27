@@ -2,7 +2,7 @@
 
 import { useLayoutEffect } from "react";
 
-/** Tracks visual viewport size/offset for the fullscreen shell (GPU transform). */
+/** Syncs --vv-top and --keyboard-inset to the visual viewport on every change. */
 export function useVisualViewportKeyboard(active: boolean) {
   useLayoutEffect(() => {
     if (!active) {
@@ -14,49 +14,50 @@ export function useVisualViewportKeyboard(active: boolean) {
       position: html.style.position,
       width: html.style.width,
       height: html.style.height,
+      overscrollBehavior: html.style.overscrollBehavior,
     };
 
     html.style.position = "fixed";
     html.style.width = "100%";
     html.style.height = "100%";
+    html.style.overscrollBehavior = "none";
 
-    let syncFrame = 0;
-    let viewport = window.visualViewport;
-
+    // Write synchronously on each event so --vv-top tracks the visual
+    // viewport top tightly (the header reads it directly). offsetTop and
+    // height are read from the same vv snapshot, so they are always
+    // consistent; smoothing between sparse iOS events is done in CSS via a
+    // transition on the (now absolutely-positioned) header/body.
     const sync = () => {
-      syncFrame = 0;
-      const vv = viewport ?? window.visualViewport;
+      const vv = window.visualViewport;
       if (!vv) {
         return;
       }
 
-      html.style.setProperty("--vv-top", `${Math.round(vv.offsetTop)}px`);
-      html.style.setProperty("--vv-height", `${Math.round(vv.height)}px`);
-    };
+      const offsetTop = Math.max(0, Math.round(vv.offsetTop));
+      const keyboardInset = Math.max(
+        0,
+        Math.round(window.innerHeight - vv.offsetTop - vv.height),
+      );
 
-    const schedule = () => {
-      if (syncFrame !== 0) {
-        return;
-      }
-
-      syncFrame = requestAnimationFrame(sync);
+      html.style.setProperty("--vv-top", `${offsetTop}px`);
+      html.style.setProperty("--keyboard-inset", `${keyboardInset}px`);
     };
 
     sync();
 
-    viewport = window.visualViewport;
-    viewport?.addEventListener("resize", schedule);
-    viewport?.addEventListener("scroll", schedule);
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", sync);
+    viewport?.addEventListener("scroll", sync);
 
     return () => {
-      cancelAnimationFrame(syncFrame);
-      viewport?.removeEventListener("resize", schedule);
-      viewport?.removeEventListener("scroll", schedule);
+      viewport?.removeEventListener("resize", sync);
+      viewport?.removeEventListener("scroll", sync);
       html.style.removeProperty("--vv-top");
-      html.style.removeProperty("--vv-height");
+      html.style.removeProperty("--keyboard-inset");
       html.style.position = previousHtml.position;
       html.style.width = previousHtml.width;
       html.style.height = previousHtml.height;
+      html.style.overscrollBehavior = previousHtml.overscrollBehavior;
     };
   }, [active]);
 }
