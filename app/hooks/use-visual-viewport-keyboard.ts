@@ -14,22 +14,11 @@ export function useVisualViewportKeyboard(active: boolean) {
       position: html.style.position,
       width: html.style.width,
       height: html.style.height,
-      overflow: html.style.overflow,
     };
-
-    const body = document.body;
-    const previousBody = {
-      overflow: body.style.overflow,
-      touchAction: body.style.touchAction,
-    };
-
-    body.style.overflow = "hidden";
-    body.style.touchAction = "none";
 
     html.style.position = "fixed";
     html.style.width = "100%";
     html.style.height = "100%";
-    html.style.overflow = "hidden";
 
     let syncFrame = 0;
     let viewport = window.visualViewport;
@@ -68,9 +57,6 @@ export function useVisualViewportKeyboard(active: boolean) {
       html.style.position = previousHtml.position;
       html.style.width = previousHtml.width;
       html.style.height = previousHtml.height;
-      html.style.overflow = previousHtml.overflow;
-      body.style.overflow = previousBody.overflow;
-      body.style.touchAction = previousBody.touchAction;
     };
   }, [active]);
 }
