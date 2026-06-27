@@ -23,7 +23,7 @@ export const KaviAskAiFab = forwardRef<HTMLButtonElement, KaviAskAiFabProps>(
     ref,
   ) {
     const isDesktop = useMediaQuery("(min-width: 768px)");
-    useFabViewportOffset();
+    useFabViewportOffset(!ariaExpanded);
 
     return (
       <button

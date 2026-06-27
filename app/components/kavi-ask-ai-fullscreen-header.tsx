@@ -1,0 +1,40 @@
+"use client";
+
+import { memo } from "react";
+import { XIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  CardAction,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+type KaviAskAiFullscreenHeaderProps = {
+  onClose: () => void;
+};
+
+export const KaviAskAiFullscreenHeader = memo(function KaviAskAiFullscreenHeader({
+  onClose,
+}: KaviAskAiFullscreenHeaderProps) {
+  return (
+    <CardHeader className="gap-1.5 border-b bg-popover pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] [--card-spacing:--spacing(5)]">
+      <CardTitle id="ask-ai-title">Ask AI</CardTitle>
+      <CardDescription className="text-sm/relaxed">
+        How can I help you today?
+      </CardDescription>
+      <CardAction>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Close Ask AI"
+          onClick={onClose}
+        >
+          <XIcon />
+        </Button>
+      </CardAction>
+    </CardHeader>
+  );
+});

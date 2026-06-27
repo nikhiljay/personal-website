@@ -5,12 +5,10 @@ import type { useChat } from "@ai-sdk/react";
 import {
   ArrowUpIcon,
   MessageCircleDashedIcon,
-  StopCircleIcon,
   XIcon,
 } from "lucide-react";
 
 import type { Coordinates } from "@/app/lib/geo";
-import { useKeyboardOpen } from "@/app/hooks/use-keyboard-open";
 import { MessageAnimated } from "@/components/message-animated";
 import { Button } from "@/components/ui/button";
 import {
@@ -97,9 +95,30 @@ export function KaviAskAiChat({
   };
 
   const isFullscreen = variant === "fullscreen";
-  const keyboardOpen = useKeyboardOpen(isFullscreen);
   const textSize = "text-sm/relaxed";
   const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
+
+  const header = (
+    <CardHeader className="shrink-0 gap-1 border-b bg-popover">
+      <CardTitle>Ask AI</CardTitle>
+      <CardDescription className={textSize}>
+        How can I help you today?
+      </CardDescription>
+      {onClose ? (
+        <CardAction>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Close Ask AI"
+            onClick={onClose}
+          >
+            <XIcon />
+          </Button>
+        </CardAction>
+      ) : null}
+    </CardHeader>
+  );
 
   return (
     <MessageScrollerProvider autoScroll>
@@ -109,46 +128,15 @@ export function KaviAskAiChat({
             "mx-auto h-full w-full gap-0",
             textSize,
             isFullscreen
-              ? "max-w-none rounded-none border-0 bg-transparent py-0 shadow-none ring-0 [--card-spacing:--spacing(5)]"
+              ? "flex min-h-0 max-w-none flex-col rounded-none border-0 bg-popover py-0 shadow-none ring-0 [--card-spacing:--spacing(5)]"
               : "max-w-sm",
           )}
         >
-          <CardHeader
-            className={cn(
-              "shrink-0 gap-1 border-b",
-              isFullscreen &&
-                "pt-[max(0.75rem,env(safe-area-inset-top,0px))]",
-            )}
-          >
-            <CardTitle>Ask AI</CardTitle>
-            <CardDescription className={textSize}>
-              How can I help you today?
-            </CardDescription>
-            {onClose ? (
-              <CardAction>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label="Close Ask AI"
-                  onClick={onClose}
-                >
-                  <XIcon />
-                </Button>
-              </CardAction>
-            ) : null}
-          </CardHeader>
+          {!isFullscreen ? header : null}
 
-          <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
+          <CardContent className="min-h-0 flex-1 overflow-hidden overscroll-none p-0">
             {messages.length === 0 ? (
-              <Empty
-                className={cn(
-                  "h-full border-0 transition-[padding] duration-200",
-                  isFullscreen && keyboardOpen
-                    ? "justify-start pt-[min(22dvh,9rem)]"
-                    : "justify-center",
-                )}
-              >
+              <Empty className="h-full touch-none justify-center overflow-hidden border-0">
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
                     <MessageCircleDashedIcon />
@@ -210,9 +198,8 @@ export function KaviAskAiChat({
 
           <CardFooter
             className={cn(
-              "shrink-0 flex-col gap-2",
-              isFullscreen &&
-                "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
+              "shrink-0 flex-col gap-2 bg-popover",
+              isFullscreen && "pb-3",
             )}
           >
             <form
@@ -233,6 +220,13 @@ export function KaviAskAiChat({
                   autoComplete="off"
                   autoCorrect="on"
                   disabled={isBusy}
+                  onTouchEnd={(event) => {
+                    if (!isFullscreen) {
+                      return;
+                    }
+
+                    event.currentTarget.focus({ preventScroll: true });
+                  }}
                   onKeyDown={(event) => {
                     if (
                       event.key !== "Enter" ||
@@ -262,11 +256,15 @@ export function KaviAskAiChat({
                   <InputGroupButton
                     size="icon-sm"
                     type="button"
+                    variant="ghost"
                     data-hidden={!isBusy}
-                    className="ml-auto data-[hidden=true]:hidden"
+                    className="ml-auto rounded-full bg-neutral-900 p-0 hover:bg-neutral-800 data-[hidden=true]:hidden"
                     onClick={() => stop()}
                   >
-                    <StopCircleIcon />
+                    <span
+                      className="size-3 shrink-0 rounded-[3px] bg-neutral-200"
+                      aria-hidden
+                    />
                     <span className="sr-only">Stop</span>
                   </InputGroupButton>
                 </InputGroupAddon>

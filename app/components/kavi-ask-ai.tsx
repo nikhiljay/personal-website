@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,6 +37,7 @@ export function KaviAskAi() {
   const chatLocationRef = useRef<Coordinates | null>(null);
   chatLocationRef.current = resolveChatLocation(location, isSimulated);
   const chat = useChat({ transport: chatTransport });
+  const closeChat = useCallback(() => setOpen(false), []);
 
   const chatProps = {
     input,
@@ -72,13 +73,12 @@ export function KaviAskAi() {
         document.body,
       )}
       {!isDesktop ? (
-        <KaviAskAiFullscreen open={open}>
+        <KaviAskAiFullscreen open={open} onClose={closeChat}>
           {(scrollContainerRef) => (
             <KaviAskAiChat
               variant="fullscreen"
               className="min-h-0 flex-1"
               scrollContainerRef={scrollContainerRef}
-              onClose={() => setOpen(false)}
               {...chatProps}
             />
           )}

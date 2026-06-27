@@ -4,11 +4,11 @@ import { useEffect } from "react";
 
 import { useMediaQuery } from "./use-media-query";
 
-export function useFabViewportOffset() {
+export function useFabViewportOffset(active = true) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
-    if (isDesktop) {
+    if (isDesktop || !active) {
       document.documentElement.style.removeProperty("--fab-viewport-offset");
       return;
     }
@@ -39,5 +39,5 @@ export function useFabViewportOffset() {
       window.removeEventListener("orientationchange", update);
       document.documentElement.style.removeProperty("--fab-viewport-offset");
     };
-  }, [isDesktop]);
+  }, [active, isDesktop]);
 }

@@ -2,9 +2,17 @@
 
 import { useEffect, type RefObject } from "react";
 
+type BodyScrollLockOptions = {
+  /** iOS keyboard fights `position: fixed` on body — skip for fullscreen overlays. */
+  fixBody?: boolean;
+  /** Touch/wheel listeners are expensive during iOS keyboard animation. */
+  touchLock?: boolean;
+};
+
 export function useBodyScrollLock(
   active: boolean,
   allowScrollWithinRef: RefObject<Element | null>,
+  { fixBody = true, touchLock = true }: BodyScrollLockOptions = {},
 ) {
   useEffect(() => {
     if (!active) {
@@ -25,9 +33,12 @@ export function useBodyScrollLock(
     html.setAttribute("data-drawer-open", "");
     html.style.overflow = "hidden";
     body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.width = "100%";
+
+    if (fixBody) {
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.width = "100%";
+    }
 
     const shouldAllowScroll = (target: EventTarget | null) => {
       if (!(target instanceof Node)) {
@@ -56,18 +67,22 @@ export function useBodyScrollLock(
       event.preventDefault();
     };
 
-    document.addEventListener("touchstart", onTouchStart, { passive: true });
-    document.addEventListener("touchmove", preventBackgroundScroll, {
-      passive: false,
-    });
-    document.addEventListener("wheel", preventBackgroundScroll, {
-      passive: false,
-    });
+    if (touchLock) {
+      document.addEventListener("touchstart", onTouchStart, { passive: true });
+      document.addEventListener("touchmove", preventBackgroundScroll, {
+        passive: false,
+      });
+      document.addEventListener("wheel", preventBackgroundScroll, {
+        passive: false,
+      });
+    }
 
     return () => {
-      document.removeEventListener("touchstart", onTouchStart);
-      document.removeEventListener("touchmove", preventBackgroundScroll);
-      document.removeEventListener("wheel", preventBackgroundScroll);
+      if (touchLock) {
+        document.removeEventListener("touchstart", onTouchStart);
+        document.removeEventListener("touchmove", preventBackgroundScroll);
+        document.removeEventListener("wheel", preventBackgroundScroll);
+      }
 
       if (!hadDrawerOpenAttribute) {
         html.removeAttribute("data-drawer-open");
@@ -78,7 +93,9 @@ export function useBodyScrollLock(
       body.style.position = previousBodyPosition;
       body.style.top = previousBodyTop;
       body.style.width = previousBodyWidth;
-      window.scrollTo(0, scrollY);
+      if (fixBody) {
+        window.scrollTo(0, scrollY);
+      }
     };
-  }, [active, allowScrollWithinRef]);
+  }, [active, allowScrollWithinRef, fixBody, touchLock]);
 }
