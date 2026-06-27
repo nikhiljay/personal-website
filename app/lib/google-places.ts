@@ -1,7 +1,16 @@
 import { savedSpots, type SavedSpot } from "./nikhil-saved-spots";
 import { savedSpotKindMeta } from "./saved-spot-kinds";
+import type { Coordinates } from "./geo";
+import {
+  formatWalkingDistance,
+  formatWalkingDuration,
+  getWalkingDistances,
+  type WalkingDistance,
+} from "./google-distance";
 
 const NYC_TIMEZONE = "America/New_York";
+/** ~15 min walk at typical NYC pace */
+export const NEARBY_SEARCH_RADIUS_METERS = 1500;
 
 export type PlaceCardData = {
   name: string;
@@ -72,6 +81,44 @@ export function findSavedSpot(name: string, address?: string) {
 
 export function findSavedSpotById(spotId: string) {
   return savedSpots.find((spot) => spot.id === spotId);
+}
+
+export function matchesSavedSpot(input: {
+  name: string;
+  address?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+}) {
+  const byName = findSavedSpot(input.name, input.address ?? undefined);
+  if (byName) {
+    return byName;
+  }
+
+  if (input.lat == null || input.lng == null) {
+    return undefined;
+  }
+
+  for (const spot of savedSpots) {
+    const latDelta = Math.abs(spot.lat - input.lat);
+    const lngDelta = Math.abs(spot.lng - input.lng);
+    if (latDelta < 0.0005 && lngDelta < 0.0005) {
+      return spot;
+    }
+  }
+
+  return undefined;
+}
+
+export function isKnownSavedSpot(place: PlaceCardData) {
+  return (
+    place.spotId != null ||
+    matchesSavedSpot({
+      name: place.name,
+      address: place.address,
+      lat: place.lat,
+      lng: place.lng,
+    }) != null
+  );
 }
 
 function googlePhotoProxyUrl(photoName: string) {
@@ -281,10 +328,12 @@ export async function getPlaceCardDataForSpot(input: {
   spotId?: string;
   name: string;
   address?: string;
+  googleOnly?: boolean;
 }): Promise<PlaceCardData | { error: string }> {
-  const savedSpot =
-    (input.spotId ? findSavedSpotById(input.spotId) : undefined) ??
-    findSavedSpot(input.name, input.address);
+  const savedSpot = input.googleOnly
+    ? undefined
+    : (input.spotId ? findSavedSpotById(input.spotId) : undefined) ??
+      findSavedSpot(input.name, input.address);
 
   return getPlaceCardData({
     name: savedSpot?.name ?? input.name,
@@ -293,4 +342,104 @@ export async function getPlaceCardDataForSpot(input: {
     lng: savedSpot?.lng,
     savedSpot,
   });
+}
+
+function placeCardFromGoogleResult(
+  place: NonNullable<GooglePlacesSearchResponse["places"]>[number],
+): PlaceCardData {
+  return buildPlaceCardData(undefined, place, place.displayName?.text ?? "Unknown");
+}
+
+export async function searchNearbyGooglePlaces(input: {
+  origin: Coordinates;
+  includedTypes?: string[];
+  maxResultCount?: number;
+}): Promise<PlaceCardData[]> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  if (!apiKey) {
+    return [];
+  }
+
+  const response = await fetch(
+    "https://places.googleapis.com/v1/places:searchNearby",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask":
+          "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours",
+      },
+      body: JSON.stringify({
+        locationRestriction: {
+          circle: {
+            center: {
+              latitude: input.origin.lat,
+              longitude: input.origin.lng,
+            },
+            radius: NEARBY_SEARCH_RADIUS_METERS,
+          },
+        },
+        includedTypes: input.includedTypes ?? ["restaurant"],
+        maxResultCount: input.maxResultCount ?? 10,
+        rankPreference: "DISTANCE",
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = (await response.json()) as GooglePlacesSearchResponse;
+  return (data.places ?? [])
+    .filter(
+      (place) =>
+        place.location?.latitude != null && place.location?.longitude != null,
+    )
+    .map(placeCardFromGoogleResult);
+}
+
+export async function rankPlacesByWalkingDistance(
+  origin: Coordinates,
+  places: PlaceCardData[],
+  maxWalkSeconds: number,
+  limit: number,
+): Promise<
+  Array<{
+    place: PlaceCardData;
+    walking: WalkingDistance;
+    walkingDistanceLabel: string;
+    walkingDurationLabel: string;
+  }>
+> {
+  if (places.length === 0) {
+    return [];
+  }
+
+  const walkingDistances = await getWalkingDistances(
+    origin,
+    places.map((place) => ({
+      lat: place.lat ?? 0,
+      lng: place.lng ?? 0,
+    })),
+  );
+
+  return places
+    .map((place, index) => {
+      const walking = walkingDistances[index];
+      if (!walking || walking.durationSeconds > maxWalkSeconds) {
+        return null;
+      }
+
+      return {
+        place,
+        walking,
+        walkingDistanceLabel: formatWalkingDistance(walking.distanceMeters),
+        walkingDurationLabel: formatWalkingDuration(walking.durationSeconds),
+      };
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry != null)
+    .sort((left, right) => left.walking.distanceMeters - right.walking.distanceMeters)
+    .slice(0, limit);
 }

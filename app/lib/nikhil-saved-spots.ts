@@ -64,7 +64,7 @@ export const savedSpots: SavedSpot[] = [
   { id: "marea", name: "Marea", address: "240 Central Park S", lat: 40.7673344, lng: -73.9811711, kind: "nice" },
   { id: "magnolia-bakery", name: "Magnolia Bakery", address: "1794 Broadway", lat: 40.7672083, lng: -73.9814833, kind: "cafe", visited: true },
   { id: "manjul", name: "Manjul", address: "31 Howard St", lat: 40.71954, lng: -74.00079, kind: "cafe", visited: true, photo: "/images/saved-spots/manjul.png" },
-  { id: "mitr-thai", name: "Mitr", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice", visited: true, note: "This is where I went with Pranav and it was excellent. Highly recommend getting a drink here too", photo: "/images/saved-spots/mitr-thai.png" },
+  { id: "mitr-thai", name: "Mitr Thai", address: "37 W 46th St", lat: 40.7568723, lng: -73.9804251, kind: "nice", visited: true, note: "This is where I went with Pranav and it was excellent. Highly recommend getting a drink here too", photo: "/images/saved-spots/mitr-thai.png" },
   { id: "nolita-pizza", name: "Nolita Pizza", address: "68 Kenmare St", lat: 40.7209123, lng: -73.9961959, kind: "casual" },
   { id: "nom-wah", name: "Nom Wah", address: "10 Kenmare St", lat: 40.7203696, lng: -73.9945824, kind: "casual" },
   { id: "prince-st-pizza", name: "Prince St. Pizza", address: "27 Prince St", lat: 40.7230823, lng: -73.9945374, kind: "casual", visited: true, photo: "/images/saved-spots/prince-st-pizza.png" },

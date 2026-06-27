@@ -168,6 +168,69 @@ export function getPlaceByStopId(id: string) {
   );
 }
 
+export type TripReferencePoint = {
+  name: string;
+  lat: number;
+  lng: number;
+};
+
+type TripReferenceCandidate = {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+};
+
+const tripReferenceCandidates: TripReferenceCandidate[] = [
+  ...tripStops,
+  ...mapHighlights,
+  ...manhattanNeighborhoods,
+  ...savedSpots,
+];
+
+export function resolveTripReferencePoint(
+  query: string,
+): TripReferencePoint | null {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return null;
+  }
+
+  const byId = tripReferenceCandidates.find(
+    (place) => place.id.toLowerCase() === normalized,
+  );
+  if (byId) {
+    return { name: byId.name, lat: byId.lat, lng: byId.lng };
+  }
+
+  const byExactName = tripReferenceCandidates.find(
+    (place) => place.name.toLowerCase() === normalized,
+  );
+  if (byExactName) {
+    return { name: byExactName.name, lat: byExactName.lat, lng: byExactName.lng };
+  }
+
+  const partialMatches = tripReferenceCandidates.filter(
+    (place) =>
+      place.name.toLowerCase().includes(normalized) ||
+      normalized.includes(place.name.toLowerCase()),
+  );
+
+  if (partialMatches.length === 0) {
+    return null;
+  }
+
+  const bestMatch = partialMatches.sort(
+    (left, right) => left.name.length - right.name.length,
+  )[0];
+
+  return {
+    name: bestMatch.name,
+    lat: bestMatch.lat,
+    lng: bestMatch.lng,
+  };
+}
+
 export function getScheduleMarkerColor(
   stopId: string,
   theme: "light" | "dark" = "light",

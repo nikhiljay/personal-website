@@ -10,6 +10,7 @@ import {
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
 import {
   createKaviTripAiTools,
+  type NearbySpotsToolOutput,
   type PlaceRatingsToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
@@ -45,7 +46,7 @@ function parseCurrentLocation(
   return isInNyc(location) ? location : null;
 }
 
-const stopAfterPlaceLookup: StopCondition<
+const stopAfterRichPlaceResponse: StopCondition<
   ReturnType<typeof createKaviTripAiTools>
 > = ({ steps }) => {
   const lastStep = steps.at(-1);
@@ -54,6 +55,11 @@ const stopAfterPlaceLookup: StopCondition<
   }
 
   return lastStep.staticToolResults.some((result) => {
+    if (result.toolName === "findNearbySpots") {
+      const output = result.output as NearbySpotsToolOutput | undefined;
+      return output?.found === true && output.places.length > 0;
+    }
+
     if (result.toolName !== "getPlaceRatings") {
       return false;
     }
@@ -93,7 +99,7 @@ export async function POST(req: Request) {
     ),
     messages: await convertToModelMessages(messages),
     tools,
-    stopWhen: [stopAfterPlaceLookup, stepCountIs(5)],
+    stopWhen: [stopAfterRichPlaceResponse, stepCountIs(5)],
     maxOutputTokens: 600,
   });
 

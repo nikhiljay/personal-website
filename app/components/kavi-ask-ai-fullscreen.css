@@ -12,17 +12,24 @@
 /*
  * iOS fires visualViewport resize/scroll sparsely during the keyboard
  * animation, so --vv-top / --keyboard-inset update in a few big steps. A
- * short transition on the driven offsets lets the header and body glide to
- * each step instead of snapping after the keyboard settles. Header and body
- * share the same timing so they stay locked together while --vv-top moves.
+ * transition on the driven offsets bridges those steps instead of snapping.
+ *
+ * The TOP (header + body top) follows iOS's focus pan, which we don't control,
+ * so its transition is kept SHORT — long enough to smooth the steps, short
+ * enough that it doesn't visibly lag the pan (the "choppy delay"). Header and
+ * body top share this timing so they stay locked together.
+ *
+ * The body BOTTOM tracks the keyboard top and its target is set the instant
+ * the input is focused (see the hook), so a longer transition there reads as a
+ * clean glide in sync with the keyboard rather than a lag.
  */
 .kavi-ask-ai-fullscreen-header {
-  transition: top 0.25s ease-out;
+  transition: top 0.15s ease-out;
 }
 
 .kavi-ask-ai-fullscreen-body {
   transition:
-    top 0.25s ease-out,
+    top 0.15s ease-out,
     bottom 0.25s ease-out;
 }
 
