@@ -3,8 +3,9 @@
 import { useLayoutEffect } from "react";
 
 /**
- * Tracks keyboard inset for the dialog and keeps the page from scrolling
- * (so the header stays pinned without per-frame transforms).
+ * Pins the fullscreen shell to the visual viewport and locks the document.
+ * Top + height track the visible area so the header stays put and the chat
+ * shrinks as the keyboard opens — no padding-bottom ref timing issues.
  */
 export function useVisualViewportKeyboard(active: boolean) {
   useLayoutEffect(() => {
@@ -44,19 +45,8 @@ export function useVisualViewportKeyboard(active: boolean) {
         return;
       }
 
-      const keyboardInset = Math.max(
-        0,
-        window.innerHeight - vv.height - vv.offsetTop,
-      );
-
-      document.documentElement.style.setProperty(
-        "--keyboard-inset",
-        `${keyboardInset}px`,
-      );
-
-      if (window.scrollY !== 0) {
-        window.scrollTo(0, 0);
-      }
+      html.style.setProperty("--vv-top", `${Math.round(vv.offsetTop)}px`);
+      html.style.setProperty("--vv-height", `${Math.round(vv.height)}px`);
     };
 
     const schedule = () => {
@@ -77,7 +67,8 @@ export function useVisualViewportKeyboard(active: boolean) {
       cancelAnimationFrame(syncFrame);
       viewport?.removeEventListener("resize", schedule);
       viewport?.removeEventListener("scroll", schedule);
-      document.documentElement.style.removeProperty("--keyboard-inset");
+      html.style.removeProperty("--vv-top");
+      html.style.removeProperty("--vv-height");
       html.style.position = previousHtml.position;
       html.style.width = previousHtml.width;
       html.style.height = previousHtml.height;

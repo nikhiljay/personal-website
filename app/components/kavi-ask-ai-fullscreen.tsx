@@ -32,7 +32,7 @@ export function KaviAskAiFullscreen({
       role="dialog"
       aria-modal="true"
       aria-labelledby="ask-ai-title"
-      className="fixed inset-0 z-50 flex touch-none flex-col overflow-hidden overscroll-none bg-popover pb-[var(--keyboard-inset,0px)] text-popover-foreground"
+      className="fixed inset-x-0 z-50 flex touch-none flex-col overflow-hidden overscroll-none bg-popover text-popover-foreground top-[var(--vv-top,0px)] h-[var(--vv-height,100dvh)]"
     >
       <div className="shrink-0 border-b bg-popover">
         <KaviAskAiFullscreenHeader onClose={onClose} />

@@ -128,8 +128,8 @@ export function KaviAskAiChat({
             "mx-auto h-full w-full gap-0",
             textSize,
             isFullscreen
-              ? "flex min-h-0 max-w-none flex-col rounded-none border-0 bg-popover py-0 shadow-none ring-0 [--card-spacing:--spacing(5)]"
-              : "max-w-sm",
+              ? "!grid min-h-0 grid-rows-[minmax(0,1fr)_auto] max-w-none rounded-none border-0 bg-popover py-0 shadow-none ring-0 [--card-spacing:--spacing(5)]"
+              : "max-w-sm flex flex-col",
           )}
         >
           {!isFullscreen ? header : null}
@@ -199,7 +199,7 @@ export function KaviAskAiChat({
           <CardFooter
             className={cn(
               "shrink-0 flex-col gap-2 bg-popover",
-              isFullscreen && "pb-3",
+              isFullscreen && "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
             )}
           >
             <form
@@ -212,7 +212,7 @@ export function KaviAskAiChat({
               <InputGroup
                 className={cn(
                   textSize,
-                  "h-12 rounded-full border-0 bg-neutral-100 shadow-none dark:bg-neutral-800/80",
+                  "h-12 rounded-full border-0 bg-neutral-100 p-1.5 shadow-none dark:bg-neutral-800/80",
                   "has-[[data-slot=input-group-control]:focus-visible]:border-transparent has-[[data-slot=input-group-control]:focus-visible]:ring-0",
                 )}
               >
@@ -221,20 +221,13 @@ export function KaviAskAiChat({
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask about spots, schedule, neighborhoods…"
                   className={cn(
-                    "h-full min-w-0 px-4 py-0",
+                    "h-full min-w-0 px-3 py-0",
                     inputTextSize,
                   )}
                   enterKeyHint="send"
                   autoComplete="off"
                   autoCorrect="on"
                   disabled={isBusy}
-                  onTouchEnd={(event) => {
-                    if (!isFullscreen) {
-                      return;
-                    }
-
-                    event.currentTarget.focus({ preventScroll: true });
-                  }}
                   onKeyDown={(event) => {
                     if (
                       event.key !== "Enter" ||
@@ -249,7 +242,10 @@ export function KaviAskAiChat({
                 />
                 <InputGroupAddon
                   align="inline-end"
-                  className={cn("shrink-0 py-0 pr-3", textSize)}
+                  className={cn(
+                    "shrink-0 p-0 has-[>button]:mr-0",
+                    textSize,
+                  )}
                 >
                   <InputGroupButton
                     type="submit"
