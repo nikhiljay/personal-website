@@ -31,7 +31,7 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupTextarea,
+  InputGroupInput,
 } from "@/components/ui/input-group";
 import {
   Marker,
@@ -209,13 +209,21 @@ export function KaviAskAiChat({
               }}
               className="w-full"
             >
-              <InputGroup className={textSize}>
-                <InputGroupTextarea
+              <InputGroup
+                className={cn(
+                  textSize,
+                  "h-12 rounded-full border-0 bg-neutral-100 shadow-none dark:bg-neutral-800/80",
+                  "has-[[data-slot=input-group-control]:focus-visible]:border-transparent has-[[data-slot=input-group-control]:focus-visible]:ring-0",
+                )}
+              >
+                <InputGroupInput
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask about spots, schedule, neighborhoods…"
-                  className={cn("min-h-14 px-3 py-2.5", inputTextSize)}
-                  rows={2}
+                  className={cn(
+                    "h-full min-w-0 px-4 py-0",
+                    inputTextSize,
+                  )}
                   enterKeyHint="send"
                   autoComplete="off"
                   autoCorrect="on"
@@ -235,22 +243,23 @@ export function KaviAskAiChat({
                       return;
                     }
 
-                    if (!event.shiftKey) {
-                      event.preventDefault();
-                      void handleSubmit(input);
-                    }
+                    event.preventDefault();
+                    void handleSubmit(input);
                   }}
                 />
-                <InputGroupAddon align="block-end" className={cn("pt-1", textSize)}>
+                <InputGroupAddon
+                  align="inline-end"
+                  className={cn("shrink-0 py-0 pr-3", textSize)}
+                >
                   <InputGroupButton
                     type="submit"
                     variant="default"
                     size="icon-sm"
                     disabled={!input.trim() || isBusy}
-                    className="ml-auto data-[hidden=true]:hidden"
+                    className="size-9 rounded-full border-0 bg-neutral-900 text-white shadow-none hover:bg-neutral-800 focus-visible:ring-0 disabled:bg-neutral-300 disabled:text-neutral-500 disabled:opacity-100 data-[hidden=true]:hidden"
                     data-hidden={isBusy}
                   >
-                    <ArrowUpIcon />
+                    <ArrowUpIcon className="size-[18px] stroke-[2.5]" />
                     <span className="sr-only">Send</span>
                   </InputGroupButton>
                   <InputGroupButton
@@ -258,11 +267,11 @@ export function KaviAskAiChat({
                     type="button"
                     variant="ghost"
                     data-hidden={!isBusy}
-                    className="ml-auto rounded-full bg-neutral-900 p-0 hover:bg-neutral-800 data-[hidden=true]:hidden"
+                    className="size-9 rounded-full border-0 bg-neutral-900 p-0 text-white shadow-none hover:bg-neutral-800 focus-visible:ring-0 data-[hidden=true]:hidden"
                     onClick={() => stop()}
                   >
                     <span
-                      className="size-3 shrink-0 rounded-[3px] bg-neutral-200"
+                      className="size-3 shrink-0 rounded-[3px] bg-white"
                       aria-hidden
                     />
                     <span className="sr-only">Stop</span>

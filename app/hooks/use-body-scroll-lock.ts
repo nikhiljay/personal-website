@@ -25,6 +25,7 @@ export function useBodyScrollLock(
 
     const previousHtmlOverflow = html.style.overflow;
     const previousBodyOverflow = body.style.overflow;
+    const previousBodyTouchAction = body.style.touchAction;
     const previousBodyPosition = body.style.position;
     const previousBodyTop = body.style.top;
     const previousBodyWidth = body.style.width;
@@ -33,6 +34,9 @@ export function useBodyScrollLock(
     html.setAttribute("data-drawer-open", "");
     html.style.overflow = "hidden";
     body.style.overflow = "hidden";
+    if (touchLock) {
+      body.style.touchAction = "none";
+    }
 
     if (fixBody) {
       body.style.position = "fixed";
@@ -90,6 +94,7 @@ export function useBodyScrollLock(
 
       html.style.overflow = previousHtmlOverflow;
       body.style.overflow = previousBodyOverflow;
+      body.style.touchAction = previousBodyTouchAction;
       body.style.position = previousBodyPosition;
       body.style.top = previousBodyTop;
       body.style.width = previousBodyWidth;

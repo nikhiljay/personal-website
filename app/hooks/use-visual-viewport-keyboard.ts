@@ -4,7 +4,7 @@ import { useLayoutEffect } from "react";
 
 /**
  * Tracks keyboard inset for the dialog and keeps the page from scrolling
- * (so a body-portaled header can stay at top: 0 without per-frame transforms).
+ * (so the header stays pinned without per-frame transforms).
  */
 export function useVisualViewportKeyboard(active: boolean) {
   useLayoutEffect(() => {

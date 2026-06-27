@@ -18,7 +18,6 @@ export function KaviAskAiFullscreen({
   onClose,
   children,
 }: KaviAskAiFullscreenProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<Element | null>(null);
 
   useVisualViewportKeyboard(open);
@@ -30,7 +29,6 @@ export function KaviAskAiFullscreen({
 
   return createPortal(
     <div
-      ref={containerRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="ask-ai-title"
