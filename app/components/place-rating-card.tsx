@@ -31,18 +31,39 @@ function PlaceRatingCardSkeleton({
       )}
     >
       <div className="flex gap-3 p-3">
-        <div className="size-[4.5rem] shrink-0 animate-pulse rounded-lg bg-muted" />
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+        <div className="w-24 shrink-0 self-stretch min-h-24 animate-pulse rounded-lg bg-muted" />
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
           {name ? (
-            <p className="truncate text-sm font-medium">{name}</p>
+            <p className="truncate text-sm font-semibold">{name}</p>
           ) : (
             <div className="h-4 w-28 animate-pulse rounded bg-muted" />
           )}
-          <div className="h-3 w-36 animate-pulse rounded bg-muted" />
-          <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-3 w-40 animate-pulse rounded bg-muted" />
+          <div className="h-5 w-32 animate-pulse rounded-full bg-muted" />
         </div>
       </div>
     </div>
+  );
+}
+
+function PlaceTag({
+  children,
+  variant = "muted",
+}: {
+  children: React.ReactNode;
+  variant?: "muted" | "visited";
+}) {
+  return (
+    <span
+      className={cn(
+        "rounded-full px-2 py-0.5 text-xs font-medium",
+        variant === "visited"
+          ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+          : "bg-muted text-muted-foreground",
+      )}
+    >
+      {children}
+    </span>
   );
 }
 
@@ -53,7 +74,6 @@ function PlaceRatingCardContent({
   place: PlaceRatingsToolOutput & { found: true };
   textSize?: string;
 }) {
-  const detailTextSize = "text-sm";
   const hoursLabel =
     place.todayHours?.toLowerCase() === "closed" ? null : place.todayHours;
 
@@ -69,6 +89,10 @@ function PlaceRatingCardContent({
         })
       : null;
 
+  const hasTags = place.kind || place.visited;
+  const hasStatus = place.openNow != null || hoursLabel;
+  const hasRating = place.rating != null || place.userRatingCount != null;
+
   return (
     <div className="w-full min-w-0">
       <div className="relative flex gap-3 p-3">
@@ -78,7 +102,7 @@ function PlaceRatingCardContent({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Open ${place.name} in Citymapper`}
-            className="absolute right-3 top-3 inline-flex shrink-0 opacity-90 outline-none hover:opacity-100 focus:outline-none"
+            className="absolute right-3 top-3 z-10 inline-flex shrink-0 opacity-90 outline-none hover:opacity-100 focus:outline-none"
           >
             <img
               src="/images/citymapper-icon.png"
@@ -90,15 +114,15 @@ function PlaceRatingCardContent({
           </a>
         ) : null}
 
-        <div className="relative size-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-muted">
+        <div className="relative w-24 shrink-0 self-stretch overflow-hidden rounded-lg bg-muted">
           {place.photoUrl ? (
             <img
               src={place.photoUrl}
               alt=""
-              className="size-full object-cover"
+              className="absolute inset-0 size-full object-cover"
             />
           ) : (
-            <div className="flex size-full items-center justify-center px-1 text-center text-[10px] leading-tight text-muted-foreground">
+            <div className="flex size-full min-h-24 items-center justify-center px-1 text-center text-[10px] leading-tight text-muted-foreground">
               No photo
             </div>
           )}
@@ -106,78 +130,31 @@ function PlaceRatingCardContent({
 
         <div
           className={cn(
-            "flex min-w-0 flex-1 flex-col gap-2",
+            "flex min-w-0 flex-1 flex-col justify-center gap-1",
             citymapperUrl && "pr-7",
           )}
         >
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium leading-tight">
-              {place.name}
-            </p>
+          <p className="truncate text-sm leading-tight">
+            <span className="font-semibold">{place.name}</span>
             {place.address ? (
-              <p
-                className={cn(
-                  "mt-0.5 truncate text-muted-foreground",
-                  detailTextSize,
-                )}
-              >
-                {place.address}
-              </p>
+              <>
+                <span className="font-normal text-muted-foreground">
+                  {" "}
+                  — {place.address}
+                </span>
+              </>
             ) : null}
-          </div>
+          </p>
 
-          {(place.kind || place.visited) && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {place.kind ? (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium">
-                  {place.kind}
-                </span>
-              ) : null}
-              {place.visited ? (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium">
-                  Nikhil visited
-                </span>
-              ) : null}
-            </div>
-          )}
-
-          {place.openNow != null || hoursLabel ? (
-            <p className={detailTextSize}>
-              {place.openNow != null ? (
-                <span
-                  className={cn(
-                    "font-medium",
-                    place.openNow
-                      ? "text-green-600 dark:text-green-500"
-                      : "text-red-600 dark:text-red-500",
-                  )}
-                >
-                  {place.openNow ? "Open" : "Closed"}
-                </span>
-              ) : null}
-              {hoursLabel ? (
-                <span className="text-muted-foreground">
-                  {place.openNow != null ? " · " : ""}
-                  {hoursLabel}
-                </span>
-              ) : null}
-            </p>
-          ) : null}
-
-          {place.rating != null || place.userRatingCount != null ? (
-            <div
-              className={cn(
-                "flex flex-wrap items-center gap-x-1.5 gap-y-1",
-                detailTextSize,
-              )}
-            >
+          {hasRating ? (
+            <div className="flex items-center gap-1 text-xs tabular-nums">
               {place.rating != null ? (
                 <>
                   <StarIcon
-                    className="size-3.5 shrink-0 fill-[#f5a623] text-[#f5a623]"
+                    className="size-3 shrink-0 fill-[#f5a623] text-[#f5a623]"
                     aria-hidden="true"
                   />
-                  <span className="font-medium tabular-nums">
+                  <span className="font-semibold">
                     {place.rating.toFixed(1)}
                   </span>
                 </>
@@ -190,13 +167,53 @@ function PlaceRatingCardContent({
               ) : null}
             </div>
           ) : null}
+
+          {hasStatus ? (
+            <p className="truncate text-xs text-muted-foreground">
+              {place.openNow != null ? (
+                <span
+                  className={cn(
+                    "font-medium",
+                    place.openNow
+                      ? "text-emerald-600 dark:text-emerald-500"
+                      : "text-red-600 dark:text-red-500",
+                  )}
+                >
+                  {place.openNow ? "Open" : "Closed"}
+                </span>
+              ) : null}
+              {hoursLabel ? (
+                <span>
+                  {place.openNow != null ? " · " : ""}
+                  {hoursLabel}
+                </span>
+              ) : null}
+            </p>
+          ) : null}
+
+          {place.walkingDistanceLabel || place.walkingDurationLabel ? (
+            <p className="truncate text-xs text-muted-foreground">
+              {[place.walkingDistanceLabel, place.walkingDurationLabel]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ) : null}
+
+          {hasTags ? (
+            <div className="flex flex-wrap items-center gap-1 pt-0.5">
+              {place.kind ? <PlaceTag>{place.kind}</PlaceTag> : null}
+              {place.visited ? (
+                <PlaceTag variant="visited">Nikhil visited</PlaceTag>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
 
       {place.note ? (
         <p
           className={cn(
-            "border-t border-border px-3 py-2.5 leading-relaxed text-muted-foreground",
+            "border-t border-border bg-muted/20 px-3 py-2.5 leading-relaxed text-muted-foreground",
             textSize,
           )}
         >

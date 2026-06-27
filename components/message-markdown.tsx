@@ -21,12 +21,12 @@ export function MessageMarkdown({ children, className }: MessageMarkdownProps) {
           <strong className="font-semibold">{content}</strong>
         ),
         ol: ({ children: content }) => (
-          <ol className="mb-2 list-decimal space-y-1 pl-4 last:mb-0">
+          <ol className="mb-2 list-none space-y-1 last:mb-0 [counter-reset:markdown-ol] [&>li]:relative [&>li]:pl-5 [&>li]:before:absolute [&>li]:before:left-0 [&>li]:before:tabular-nums [&>li]:before:content-[counter(markdown-ol)'.'] [&>li]:[counter-increment:markdown-ol]">
             {content}
           </ol>
         ),
         ul: ({ children: content }) => (
-          <ul className="mb-2 list-disc space-y-1 pl-4 last:mb-0">
+          <ul className="mb-2 list-none space-y-1 last:mb-0 [&>li]:relative [&>li]:pl-4 [&>li]:before:absolute [&>li]:before:left-0 [&>li]:before:content-['•']">
             {content}
           </ul>
         ),

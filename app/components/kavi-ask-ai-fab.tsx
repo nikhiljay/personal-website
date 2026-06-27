@@ -5,16 +5,25 @@ import { forwardRef } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { useFixedBottomOffset } from "../hooks/use-fixed-bottom-offset";
+import { useFabViewportOffset } from "../hooks/use-fab-viewport-offset";
+import { useMediaQuery } from "../hooks/use-media-query";
+
+const MOBILE_FAB_BOTTOM =
+  "calc(env(safe-area-inset-bottom, 0px) + 0.5rem + var(--fab-viewport-offset, 0px))";
 
 type KaviAskAiFabProps = {
   onClick: () => void;
   "aria-expanded"?: boolean;
+  className?: string;
 };
 
 export const KaviAskAiFab = forwardRef<HTMLButtonElement, KaviAskAiFabProps>(
-  function KaviAskAiFab({ onClick, "aria-expanded": ariaExpanded }, ref) {
-    const { isDesktop, mobileBottom } = useFixedBottomOffset();
+  function KaviAskAiFab(
+    { onClick, "aria-expanded": ariaExpanded, className },
+    ref,
+  ) {
+    const isDesktop = useMediaQuery("(min-width: 768px)");
+    useFabViewportOffset();
 
     return (
       <button
@@ -23,9 +32,9 @@ export const KaviAskAiFab = forwardRef<HTMLButtonElement, KaviAskAiFabProps>(
         onClick={onClick}
         aria-expanded={ariaExpanded}
         aria-haspopup="dialog"
-        style={isDesktop ? undefined : { bottom: mobileBottom }}
+        style={isDesktop ? undefined : { bottom: MOBILE_FAB_BOTTOM }}
         className={cn(
-          "fixed right-4 z-40 flex size-11 cursor-pointer items-center justify-center rounded-full border outline-none",
+          "kavi-ask-ai-fab fixed right-4 z-40 flex size-11 cursor-pointer items-center justify-center rounded-full border outline-none",
           "transition-[transform,background-color,border-color,box-shadow,opacity] duration-200 ease-out",
           "focus-visible:ring-2 focus-visible:ring-fg/20",
           "border-[light-dark(#e8e8e8,#333333)] bg-bg text-fg",
@@ -37,6 +46,7 @@ export const KaviAskAiFab = forwardRef<HTMLButtonElement, KaviAskAiFabProps>(
           "aria-expanded:hover:scale-105",
           "motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
           isDesktop && "bottom-6",
+          className,
         )}
         aria-label="Ask AI about your NYC trip"
       >

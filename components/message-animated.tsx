@@ -9,6 +9,7 @@ import { MessageMarkdown } from "@/components/message-markdown";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Message, MessageContent } from "@/components/ui/message";
 import { MessageScrollerItem } from "@/components/ui/message-scroller";
+import { cn } from "@/lib/utils";
 
 type MessageAnimatedProps = {
   message: UIMessage;
@@ -66,7 +67,7 @@ export function MessageAnimated({
                 key={`${message.id}-${index}`}
                 variant={isUser ? userVariant : assistantVariant}
               >
-                <BubbleContent className={textSize}>
+                <BubbleContent className={cn(textSize, !isUser && "overflow-visible")}>
                   {isUser ? (
                     <span className="whitespace-pre-wrap">{part.text}</span>
                   ) : (

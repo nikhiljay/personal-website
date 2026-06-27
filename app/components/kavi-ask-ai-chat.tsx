@@ -1,15 +1,21 @@
 "use client";
 
+import type { RefObject } from "react";
 import type { useChat } from "@ai-sdk/react";
 import {
   ArrowUpIcon,
   MessageCircleDashedIcon,
   StopCircleIcon,
+  XIcon,
 } from "lucide-react";
 
+import type { Coordinates } from "@/app/lib/geo";
+import { useKeyboardOpen } from "@/app/hooks/use-keyboard-open";
 import { MessageAnimated } from "@/components/message-animated";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -47,7 +53,9 @@ import { cn } from "@/lib/utils";
 
 type KaviAskAiChatProps = {
   className?: string;
-  variant?: "card" | "drawer";
+  variant?: "card" | "fullscreen";
+  onClose?: () => void;
+  scrollContainerRef?: RefObject<Element | null>;
   input: string;
   setInput: (value: string) => void;
   messages: ReturnType<typeof useChat>["messages"];
@@ -55,11 +63,14 @@ type KaviAskAiChatProps = {
   status: ReturnType<typeof useChat>["status"];
   error: ReturnType<typeof useChat>["error"];
   stop: ReturnType<typeof useChat>["stop"];
+  getCurrentLocation: () => Coordinates | null;
 };
 
 export function KaviAskAiChat({
   className,
   variant = "card",
+  onClose,
+  scrollContainerRef,
   input,
   setInput,
   messages,
@@ -67,6 +78,7 @@ export function KaviAskAiChat({
   status,
   error,
   stop,
+  getCurrentLocation,
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
 
@@ -77,10 +89,15 @@ export function KaviAskAiChat({
     }
 
     setInput("");
-    await sendMessage({ text: trimmed });
+    const currentLocation = getCurrentLocation();
+    await sendMessage(
+      { text: trimmed },
+      currentLocation ? { body: { currentLocation } } : undefined,
+    );
   };
 
-  const isDrawer = variant === "drawer";
+  const isFullscreen = variant === "fullscreen";
+  const keyboardOpen = useKeyboardOpen(isFullscreen);
   const textSize = "text-sm/relaxed";
   const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
 
@@ -91,29 +108,47 @@ export function KaviAskAiChat({
           className={cn(
             "mx-auto h-full w-full gap-0",
             textSize,
-            isDrawer
-              ? "max-w-none rounded-xl py-0 ring-0 [--card-spacing:--spacing(5)]"
+            isFullscreen
+              ? "max-w-none rounded-none border-0 bg-transparent py-0 shadow-none ring-0 [--card-spacing:--spacing(5)]"
               : "max-w-sm",
           )}
         >
-          {isDrawer ? (
-            <div
-              aria-hidden
-              className="mx-auto mt-4 h-1.5 w-[100px] shrink-0 rounded-full bg-muted"
-            />
-          ) : null}
           <CardHeader
-            className={cn("gap-1 border-b", isDrawer && "pt-3")}
+            className={cn(
+              "shrink-0 gap-1 border-b",
+              isFullscreen &&
+                "pt-[max(0.75rem,env(safe-area-inset-top,0px))]",
+            )}
           >
             <CardTitle>Ask AI</CardTitle>
             <CardDescription className={textSize}>
               How can I help you today?
             </CardDescription>
+            {onClose ? (
+              <CardAction>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Close Ask AI"
+                  onClick={onClose}
+                >
+                  <XIcon />
+                </Button>
+              </CardAction>
+            ) : null}
           </CardHeader>
 
           <CardContent className="min-h-0 flex-1 overflow-hidden p-0">
             {messages.length === 0 ? (
-              <Empty className="h-full border-0">
+              <Empty
+                className={cn(
+                  "h-full border-0 transition-[padding] duration-200",
+                  isFullscreen && keyboardOpen
+                    ? "justify-start pt-[min(22dvh,9rem)]"
+                    : "justify-center",
+                )}
+              >
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
                     <MessageCircleDashedIcon />
@@ -126,8 +161,13 @@ export function KaviAskAiChat({
                 </EmptyHeader>
               </Empty>
             ) : (
-              <MessageScroller className="h-full">
-                <MessageScrollerViewport>
+              <MessageScroller className="h-full touch-auto">
+                <MessageScrollerViewport
+                  ref={
+                    scrollContainerRef as React.RefObject<HTMLDivElement | null>
+                  }
+                  className={isFullscreen ? "touch-auto" : undefined}
+                >
                   <MessageScrollerContent
                     aria-busy={isBusy}
                     className="p-(--card-spacing)"
@@ -168,7 +208,13 @@ export function KaviAskAiChat({
             </p>
           ) : null}
 
-          <CardFooter className={cn("flex-col gap-2", isDrawer && "pb-6")}>
+          <CardFooter
+            className={cn(
+              "shrink-0 flex-col gap-2",
+              isFullscreen &&
+                "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
+            )}
+          >
             <form
               onSubmit={(event) => {
                 event.preventDefault();
@@ -183,16 +229,19 @@ export function KaviAskAiChat({
                   placeholder="Ask about spots, schedule, neighborhoods…"
                   className={cn("min-h-14 px-3 py-2.5", inputTextSize)}
                   rows={2}
+                  enterKeyHint="send"
+                  autoComplete="off"
+                  autoCorrect="on"
                   disabled={isBusy}
-                  onFocus={() => {
-                    if (isDrawer) {
-                      requestAnimationFrame(() => {
-                        window.scrollTo(0, 0);
-                      });
-                    }
-                  }}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
+                    if (
+                      event.key !== "Enter" ||
+                      event.nativeEvent.isComposing
+                    ) {
+                      return;
+                    }
+
+                    if (!event.shiftKey) {
                       event.preventDefault();
                       void handleSubmit(input);
                     }

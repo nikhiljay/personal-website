@@ -8,9 +8,12 @@ import {
 } from "ai";
 
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
-import { kaviTripAiTools } from "@/app/lib/kavi-trip-ai-tools";
-import type { PlaceRatingsToolOutput } from "@/app/lib/kavi-trip-ai-tools";
+import {
+  createKaviTripAiTools,
+  type PlaceRatingsToolOutput,
+} from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
+import { isInNyc, type Coordinates } from "@/app/lib/geo";
 
 export const maxDuration = 30;
 
@@ -24,9 +27,27 @@ async function loadTripEvents() {
 
 // Place cards are the response — skip a second LLM turn (saves a Gateway call and
 // avoids free-tier rate limits that surfaced as "An error occurred.").
-const stopAfterPlaceLookup: StopCondition<typeof kaviTripAiTools> = ({
-  steps,
-}) => {
+function parseCurrentLocation(
+  value: unknown,
+): Coordinates | null {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    !("lat" in value) ||
+    !("lng" in value) ||
+    typeof value.lat !== "number" ||
+    typeof value.lng !== "number"
+  ) {
+    return null;
+  }
+
+  const location = { lat: value.lat, lng: value.lng };
+  return isInNyc(location) ? location : null;
+}
+
+const stopAfterPlaceLookup: StopCondition<
+  ReturnType<typeof createKaviTripAiTools>
+> = ({ steps }) => {
   const lastStep = steps.at(-1);
   if (!lastStep) {
     return false;
@@ -57,14 +78,21 @@ function formatStreamError(error: unknown) {
 }
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const {
+    messages,
+    currentLocation,
+  }: { messages: UIMessage[]; currentLocation?: unknown } = await req.json();
   const tripEvents = await loadTripEvents();
+  const tools = createKaviTripAiTools(parseCurrentLocation(currentLocation));
 
   const result = streamText({
     model: gateway("openai/gpt-4o-mini"),
-    system: buildKaviTripSystemPrompt(tripEvents),
+    system: buildKaviTripSystemPrompt(
+      tripEvents,
+      parseCurrentLocation(currentLocation),
+    ),
     messages: await convertToModelMessages(messages),
-    tools: kaviTripAiTools,
+    tools,
     stopWhen: [stopAfterPlaceLookup, stepCountIs(5)],
     maxOutputTokens: 600,
   });

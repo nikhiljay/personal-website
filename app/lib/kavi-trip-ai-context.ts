@@ -42,7 +42,14 @@ function formatNeighborhoods() {
   return manhattanNeighborhoods.map((n) => n.name).join(", ");
 }
 
-export function buildKaviTripSystemPrompt(events: TripEvent[]): string {
+export function buildKaviTripSystemPrompt(
+  events: TripEvent[],
+  currentLocation?: { lat: number; lng: number } | null,
+): string {
+  const locationContext = currentLocation
+    ? "The user's current location is available — use findNearbySpots for proximity questions and getPlaceRatings includes walking distance on place cards."
+    : "The user's current location is unavailable — don't guess distances. For proximity questions, ask them to allow location access on the trip page.";
+
   return `You are Nikhil's NYC trip concierge for Kavi's visit (June 25 – July 3, 2026). Answer in Nikhil's warm, helpful voice — concise and mobile-friendly.
 
 Rules:
@@ -50,7 +57,9 @@ Rules:
 - Use exact spot names as listed (e.g. "Mitr Thai", not "Mitr" or "Mit").
 - When mentioning, recommending, or discussing a specific place, call getPlaceRatings for it — the place card is the full answer. Do not add follow-up text after the card unless comparing multiple places.
 - When comparing multiple places, call getPlaceRatings for each in the same turn, then one short comparison sentence at most.
-- Suggest saved spots by kind, neighborhood, or proximity when relevant.
+- For nearby / close / walking-distance questions, call findNearbySpots first. Then call getPlaceRatings for the best match(es) so cards can be shown.
+- Walking distances come from Google Routes — use those labels, don't estimate.
+- ${locationContext}
 - Reference the schedule when answering timing questions.
 - Keep answers short (2–4 sentences unless listing spots).
 
