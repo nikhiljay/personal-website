@@ -71,14 +71,17 @@ const HIGHLIGHT_LABEL_LETTER_SPACING = 0.01;
 const CURRENT_LOCATION_LABEL_LETTER_SPACING = -0.02;
 const HIGHLIGHT_LABEL_HALO_WIDTH = 1.5;
 const HIGHLIGHT_LABEL_OFFSET: [number, number] = [0, 0.65];
+const POINT_LABEL_MIN_ZOOM = 15;
 
 const NEIGHBORHOODS_SOURCE = "neighborhoods";
 const NEIGHBORHOOD_LABELS_LAYER = "neighborhood-labels";
 const SAVED_SOURCE = "saved-spots";
 const SAVED_VISITED_LAYER = "saved-spots-visited";
 const SAVED_LAYER = "saved-spots-dot";
+const SAVED_LABELS_LAYER = "saved-spots-labels";
 const STOPS_SOURCE = "trip-stops";
 const STOPS_LAYER = "trip-stops-dot";
+const STOPS_LABELS_LAYER = "trip-stops-labels";
 const HIGHLIGHT_SOURCE = "map-highlights";
 const HIGHLIGHT_RING_LAYER = "map-highlights-ring";
 const HIGHLIGHT_LAYER = "map-highlights-dot";
@@ -94,6 +97,8 @@ const MARKER_LAYER_STACK = [
   HIGHLIGHT_LAYER,
   HIGHLIGHT_SQUARE_LAYER,
   HIGHLIGHT_LABELS_LAYER,
+  SAVED_LABELS_LAYER,
+  STOPS_LABELS_LAYER,
 ] as const;
 
 const MARKER_LAYERS = [
@@ -223,6 +228,22 @@ function basemapConfig(theme: PreferredColorScheme) {
   };
 }
 
+function syncPointOfInterestLabels(map: mapboxgl.Map) {
+  if (!map.isStyleLoaded()) {
+    return;
+  }
+
+  try {
+    map.setConfigProperty(
+      "basemap",
+      "showPointOfInterestLabels",
+      map.getZoom() >= POINT_LABEL_MIN_ZOOM,
+    );
+  } catch {
+    // Standard-style config is unavailable until the basemap is ready.
+  }
+}
+
 function configureBasemap(map: mapboxgl.Map, theme: PreferredColorScheme) {
   if (!map.isStyleLoaded()) {
     return;
@@ -233,11 +254,11 @@ function configureBasemap(map: mapboxgl.Map, theme: PreferredColorScheme) {
   try {
     map.setConfigProperty("basemap", "lightPreset", config.lightPreset);
     map.setConfigProperty("basemap", "theme", config.theme);
-    map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
     map.setConfigProperty("basemap", "showPlaceLabels", false);
     map.setConfigProperty("basemap", "showRoadLabels", false);
     map.setConfigProperty("basemap", "showTransitLabels", false);
     map.setConfigProperty("basemap", "show3dObjects", true);
+    syncPointOfInterestLabels(map);
   } catch {
     // Standard-style config is unavailable until the basemap is ready.
   }
@@ -412,7 +433,9 @@ const OVERLAY_LAYERS = [
   HIGHLIGHT_SQUARE_LAYER,
   HIGHLIGHT_LAYER,
   HIGHLIGHT_RING_LAYER,
+  STOPS_LABELS_LAYER,
   STOPS_LAYER,
+  SAVED_LABELS_LAYER,
   SAVED_VISITED_LAYER,
   SAVED_LAYER,
 ] as const;
@@ -704,6 +727,97 @@ function savedSpotLayerFilter(
   ];
 }
 
+function savedSpotLabelFilter(
+  activeKinds: SavedSpotKind[],
+): FilterSpecification {
+  if (activeKinds.length === 0) {
+    return ["has", "id"];
+  }
+
+  return ["in", ["get", "kind"], ["literal", activeKinds]];
+}
+
+function pointLabelLayout() {
+  return {
+    "text-field": ["get", "name"],
+    "text-font": LABEL_FONT,
+    "text-size": HIGHLIGHT_LABEL_SIZE,
+    "text-offset": HIGHLIGHT_LABEL_OFFSET,
+    "text-anchor": "top" as const,
+    "text-max-width": 10,
+    "text-letter-spacing": HIGHLIGHT_LABEL_LETTER_SPACING,
+    "text-allow-overlap": true,
+    "text-ignore-placement": true,
+  };
+}
+
+function ensureSavedSpotLabelsLayer(
+  map: mapboxgl.Map,
+  theme: "light" | "dark",
+  activeKinds: SavedSpotKind[],
+) {
+  const colors = labelColors(theme);
+  const kindColors = savedSpotKindColorExpression(
+    theme,
+  ) as ExpressionSpecification;
+
+  if (map.getLayer(SAVED_LABELS_LAYER)) {
+    map.setFilter(SAVED_LABELS_LAYER, savedSpotLabelFilter(activeKinds));
+    map.setPaintProperty(SAVED_LABELS_LAYER, "text-color", kindColors);
+    map.setPaintProperty(SAVED_LABELS_LAYER, "text-halo-color", colors.halo);
+    applyTextEmissive(map, SAVED_LABELS_LAYER);
+    return;
+  }
+
+  if (!map.getSource(SAVED_SOURCE)) {
+    return;
+  }
+
+  map.addLayer({
+    id: SAVED_LABELS_LAYER,
+    type: "symbol",
+    source: SAVED_SOURCE,
+    minzoom: POINT_LABEL_MIN_ZOOM,
+    filter: savedSpotLabelFilter(activeKinds),
+    layout: pointLabelLayout(),
+    paint: {
+      "text-color": kindColors,
+      "text-halo-color": colors.halo,
+      "text-halo-width": HIGHLIGHT_LABEL_HALO_WIDTH,
+      "text-emissive-strength": TEXT_EMISSIVE_STRENGTH,
+    },
+  });
+}
+
+function ensureStopLabelsLayer(map: mapboxgl.Map, theme: "light" | "dark") {
+  const colors = labelColors(theme);
+
+  if (map.getLayer(STOPS_LABELS_LAYER)) {
+    map.setPaintProperty(STOPS_LABELS_LAYER, "text-color", colors.fill);
+    map.setPaintProperty(STOPS_LABELS_LAYER, "text-halo-color", colors.halo);
+    applyTextEmissive(map, STOPS_LABELS_LAYER);
+    return;
+  }
+
+  if (!map.getSource(STOPS_SOURCE)) {
+    return;
+  }
+
+  map.addLayer({
+    id: STOPS_LABELS_LAYER,
+    type: "symbol",
+    source: STOPS_SOURCE,
+    minzoom: POINT_LABEL_MIN_ZOOM,
+    layout: pointLabelLayout(),
+    paint: {
+      "text-color": colors.fill,
+      "text-halo-color": colors.halo,
+      "text-halo-width": HIGHLIGHT_LABEL_HALO_WIDTH,
+      "text-emissive-strength": TEXT_EMISSIVE_STRENGTH,
+    },
+  });
+}
+
 function applySavedSpotKindFilter(
   map: mapboxgl.Map,
   activeKinds: SavedSpotKind[],
@@ -716,6 +830,10 @@ function applySavedSpotKindFilter(
 
   if (map.getLayer(SAVED_VISITED_LAYER)) {
     map.setFilter(SAVED_VISITED_LAYER, savedSpotLayerFilter(true, activeKinds));
+  }
+
+  if (map.getLayer(SAVED_LABELS_LAYER)) {
+    map.setFilter(SAVED_LABELS_LAYER, savedSpotLabelFilter(activeKinds));
   }
 
   applyTripStopsVisibility(map, activeKinds);
@@ -734,6 +852,14 @@ function applyTripStopsVisibility(
     "visibility",
     activeKinds.length === 0 ? "visible" : "none",
   );
+
+  if (map.getLayer(STOPS_LABELS_LAYER)) {
+    map.setLayoutProperty(
+      STOPS_LABELS_LAYER,
+      "visibility",
+      activeKinds.length === 0 ? "visible" : "none",
+    );
+  }
 }
 
 function applySavedSpotSelection(
@@ -821,6 +947,7 @@ function setupSavedSpotLayers(
     applyMarkerCirclePaint(map, SAVED_LAYER);
     ensureSavedVisitedLayer(map, theme);
     applySavedSpotSelection(map, selectedId);
+    ensureSavedSpotLabelsLayer(map, theme, activeKinds);
     return;
   }
 
@@ -855,6 +982,7 @@ function setupSavedSpotLayers(
   });
 
   applySavedSpotSelection(map, selectedId);
+  ensureSavedSpotLabelsLayer(map, theme, activeKinds);
 }
 
 function setupStopLayers(
@@ -873,6 +1001,7 @@ function setupStopLayers(
     map.setPaintProperty(STOPS_LAYER, "circle-stroke-color", colors.stroke);
     applyMarkerCirclePaint(map, STOPS_LAYER);
     applyTripStopsVisibility(map, activeKinds);
+    ensureStopLabelsLayer(map, theme);
     return;
   }
 
@@ -895,6 +1024,7 @@ function setupStopLayers(
   });
 
   applyTripStopsVisibility(map, activeKinds);
+  ensureStopLabelsLayer(map, theme);
 }
 
 function setupHighlightLayers(map: mapboxgl.Map, theme: "light" | "dark") {
@@ -1254,6 +1384,13 @@ export function TripMap({
     let cancelled = false;
     let interactionsBound = false;
 
+    const onZoomChange = () => {
+      const map = mapRef.current;
+      if (map) {
+        syncPointOfInterestLabels(map);
+      }
+    };
+
     const showStopPopup = (
       coordinates: [number, number],
       properties: { name: string; address: string; note?: string; photo?: string },
@@ -1414,6 +1551,8 @@ export function TripMap({
 
       mapRef.current = map;
 
+      map.on("zoom", onZoomChange);
+
       map.on("load", () => {
         if (map.isStyleLoaded()) {
           onMapReady();
@@ -1441,6 +1580,7 @@ export function TripMap({
       hasCalledReadyRef.current = false;
       setMapLoaded(false);
       resizeObserver.disconnect();
+      mapRef.current?.off("zoom", onZoomChange);
       currentLocationMarkerRef.current?.remove();
       currentLocationMarkerRef.current = null;
       popupRef.current?.remove();
