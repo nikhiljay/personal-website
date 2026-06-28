@@ -10,7 +10,9 @@ import {
 
 import type { UserLocationContext } from "@/app/lib/user-location";
 import { usePreferredColorScheme } from "@/app/hooks/use-preferred-color-scheme";
+import { useThoughtTurnTiming } from "@/app/hooks/use-thought-turn-timing";
 import { MessageAnimated } from "@/components/message-animated";
+import { ThinkingIndicator } from "@/components/reasoning-block";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,11 +36,6 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import {
-  Marker,
-  MarkerContent,
-  MarkerIcon,
-} from "@/components/ui/marker";
-import {
   MessageScroller,
   MessageScrollerButton,
   MessageScrollerContent,
@@ -46,7 +43,6 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
-import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 type KaviAskAiChatProps = {
@@ -96,6 +92,20 @@ export function KaviAskAiChat({
   getLocationContext,
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
+  const thoughtTurn = useThoughtTurnTiming(status);
+  const lastMessage = messages.at(-1);
+  const latestAssistantMessageId =
+    lastMessage?.role === "assistant" ? lastMessage.id : null;
+  const hasStreamingAssistant =
+    lastMessage?.role === "assistant" &&
+    lastMessage.parts.some(
+      (part) =>
+        part.type === "reasoning" ||
+        part.type === "text" ||
+        part.type.startsWith("tool-"),
+    );
+  const showFallbackThinking =
+    thoughtTurn.isActive && !hasStreamingAssistant;
   const colorScheme = usePreferredColorScheme();
   const isSubmitDisabled = !input.trim() || isBusy;
   const sendButtonColors = getSendButtonColors(colorScheme, isSubmitDisabled);
@@ -186,18 +196,16 @@ export function KaviAskAiChat({
                         message={message}
                         scrollAnchor={message.role === "user"}
                         textSize={textSize}
+                        turnTiming={
+                          message.id === latestAssistantMessageId
+                            ? thoughtTurn
+                            : undefined
+                        }
                       />
                     ))}
-                    {status === "submitted" ? (
+                    {showFallbackThinking ? (
                       <MessageScrollerItem messageId="thinking">
-                        <Marker role="status" className={cn(textSize, "leading-none")}>
-                          <MarkerIcon>
-                            <Spinner className="size-3.5" />
-                          </MarkerIcon>
-                          <MarkerContent className="leading-none">
-                            Thinking…
-                          </MarkerContent>
-                        </Marker>
+                        <ThinkingIndicator isActive={thoughtTurn.isActive} />
                       </MessageScrollerItem>
                     ) : null}
                   </MessageScrollerContent>

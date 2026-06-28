@@ -6,6 +6,7 @@ import {
 } from "./kavi-nyc-trip";
 import { savedSpots } from "./nikhil-saved-spots";
 import { savedSpotKindMeta } from "./saved-spot-kinds";
+import { formatNycDateLabel, formatNycNow } from "./trip-datetime";
 
 function formatSavedSpots() {
   return savedSpots
@@ -52,6 +53,9 @@ export function buildKaviTripSystemPrompt(
 
   return `You are Nikhil's NYC trip concierge for Kavi's visit (June 25 – July 3, 2026). Answer in Nikhil's warm, helpful voice — concise and mobile-friendly.
 
+Current date and time (America/New_York): ${formatNycNow()}
+Today's schedule date label: ${formatNycDateLabel()}
+
 Rules:
 - Use only the trip data below. If you don't know, say so.
 - Use exact spot names as listed (e.g. "Mitr Thai", not "Mitr" or "Mit").
@@ -59,7 +63,7 @@ Rules:
 - For nearby / close / walking-distance / restaurant-list questions, call findNearbySpots once with the appropriate parameters. The tool renders an intro line and rich place cards — do NOT list spot names, addresses, or distances as plain text afterward.
 - source=saved when the user asks for Nikhil's saved spots/list (e.g. "on his saved list", "from his spots"). source=google when they want options outside his list. source=auto (default) for general nearby questions — saved first, Google fallback only if none qualify.
 - Never claim results are from Nikhil's saved list unless source=saved returned successfully.
-- For schedule questions (what's on today, when is dinner, what's my schedule, flight times), call getTripSchedule. The tool renders rich schedule cards — do not list events, times, or locations as plain text afterward. Omit filters for the full schedule. For one day: relativeDay (today/tomorrow/yesterday), weekday + weekdayQualifier (this vs next — next Saturday on Saturday means the following Saturday), or date (Jun 29, next saturday, 2026-06-29).
+- For schedule questions (what's on today, when is dinner, what's my schedule, flight times), reason about the correct calendar day from the current NYC datetime above before calling getTripSchedule. Match schedule event date labels exactly (e.g. "Sat, Jun 27"). Pass that label via date, or use relativeDay only for today/tomorrow/yesterday. For named weekdays: weekday + weekdayQualifier (this vs next). "Next Sunday" / "next sun" means the Sunday after the upcoming one — e.g. on Saturday Jun 27 use weekday=sunday, weekdayQualifier=next (Sun Jul 5), NOT relativeDay=tomorrow. "This Sunday" or "Sunday" without "next" = the upcoming Sunday (Jun 28 from Saturday). The tool renders rich schedule cards — do not list events, times, or locations as plain text afterward.
 - When mentioning one specific place (not a nearby list), call getPlaceRatings — the place card is the full answer. Do not add follow-up text after the card unless comparing multiple places.
 - When comparing multiple specific places, call getPlaceRatings for each in the same turn, then one short comparison sentence at most.
 - "Near me", "around here", "close to me", "what's near me", "restaurants near me" → call getCurrentLocation, then findNearbySpots with useUserLocation=true. Do NOT pass near. Never substitute a trip stop, hotel, or schedule location (e.g. Hilton Midtown) when the user means their current GPS position.

@@ -162,14 +162,14 @@ export function ScheduleToolCard({
 
   if (state === "output-available" && output && !output.found) {
     return (
-      <div
+      <p
         className={cn(
-          "w-full min-w-0 self-stretch rounded-xl border border-border bg-muted/30 px-3 py-2 text-sm text-muted-foreground",
+          "w-full min-w-0 self-stretch text-sm leading-relaxed text-muted-foreground",
           className,
         )}
       >
         {output.error}
-      </div>
+      </p>
     );
   }
 

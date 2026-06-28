@@ -1,4 +1,3 @@
-import { gateway } from "@ai-sdk/gateway";
 import {
   convertToModelMessages,
   stepCountIs,
@@ -8,6 +7,10 @@ import {
 } from "ai";
 
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
+import {
+  getKaviChatModel,
+  getKaviChatReasoningEffort,
+} from "@/app/lib/kavi-chat-model";
 import {
   createKaviTripAiTools,
   type NearbySpotsToolOutput,
@@ -110,9 +113,10 @@ export async function POST(req: Request) {
         mode: "unavailable" as const,
       };
   const tools = createKaviTripAiTools(locationContext, tripEvents);
+  const reasoning = getKaviChatReasoningEffort();
 
   const result = streamText({
-    model: gateway("openai/gpt-4o-mini"),
+    model: getKaviChatModel(),
     system: buildKaviTripSystemPrompt(
       tripEvents,
       nycCoordinatesFromContext(locationContext),
@@ -120,10 +124,12 @@ export async function POST(req: Request) {
     messages: await convertToModelMessages(messages),
     tools,
     stopWhen: [stopAfterRichPlaceResponse, stepCountIs(5)],
-    maxOutputTokens: 600,
+    maxOutputTokens: 4000,
+    ...(reasoning ? { reasoning } : {}),
   });
 
   return result.toUIMessageStreamResponse({
+    sendReasoning: true,
     onError: formatStreamError,
   });
 }

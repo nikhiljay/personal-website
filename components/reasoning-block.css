@@ -1,0 +1,62 @@
+@keyframes reasoning-shimmer-slide {
+  from {
+    background-position: 100% center;
+  }
+
+  to {
+    background-position: 0% center;
+  }
+}
+
+.reasoning-label-shimmer {
+  --reasoning-shimmer-base: var(--muted-foreground);
+  --reasoning-shimmer-highlight: var(--foreground);
+
+  /* Two identical tiles so the loop boundary is invisible. */
+  background-image: linear-gradient(
+    90deg,
+    var(--reasoning-shimmer-base) 0%,
+    var(--reasoning-shimmer-base) 13%,
+    var(--reasoning-shimmer-highlight) 18%,
+    var(--reasoning-shimmer-highlight) 32%,
+    var(--reasoning-shimmer-base) 37%,
+    var(--reasoning-shimmer-base) 50%,
+    var(--reasoning-shimmer-base) 63%,
+    var(--reasoning-shimmer-highlight) 68%,
+    var(--reasoning-shimmer-highlight) 82%,
+    var(--reasoning-shimmer-base) 87%,
+    var(--reasoning-shimmer-base) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: reasoning-shimmer-slide 2.4s linear infinite;
+  backface-visibility: hidden;
+}
+
+.reasoning-panel {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-muted) 35%, transparent)
+    transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reasoning-label-shimmer {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: unset;
+    color: var(--muted-foreground);
+  }
+}
+
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .reasoning-label-shimmer {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: unset;
+    color: var(--muted-foreground);
+  }
+}

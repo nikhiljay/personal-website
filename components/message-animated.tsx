@@ -1,6 +1,7 @@
 "use client";
 
 import type { UIMessage } from "ai";
+import type { ReactNode } from "react";
 
 import { PlaceRatingCard } from "@/app/components/place-rating-card";
 import { LocationToolCard } from "@/app/components/location-tool-card";
@@ -13,6 +14,7 @@ import type {
 } from "@/app/lib/kavi-trip-ai-tools";
 import { sanitizeAssistantText } from "@/app/lib/sanitize-assistant-text";
 import { MessageMarkdown } from "@/components/message-markdown";
+import { ReasoningBlock, type ThoughtTurnTiming } from "@/components/reasoning-block";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Message, MessageContent } from "@/components/ui/message";
 import { MessageScrollerItem } from "@/components/ui/message-scroller";
@@ -24,7 +26,30 @@ type MessageAnimatedProps = {
   textSize?: string;
   userVariant?: React.ComponentProps<typeof Bubble>["variant"];
   assistantVariant?: React.ComponentProps<typeof Bubble>["variant"];
+  turnTiming?: ThoughtTurnTiming;
 };
+
+function flushReasoningBlock(
+  elements: ReactNode[],
+  text: string,
+  state: "streaming" | "done" | undefined,
+  key: string,
+  turnTiming?: ThoughtTurnTiming,
+) {
+  if (!text.trim() && state !== "streaming") {
+    return;
+  }
+
+  elements.push(
+    <ReasoningBlock
+      key={key}
+      text={text}
+      state={state}
+      turnTiming={turnTiming}
+      className="w-full min-w-0 self-stretch"
+    />,
+  );
+}
 
 export function MessageAnimated({
   message,
@@ -32,8 +57,170 @@ export function MessageAnimated({
   textSize = "text-sm/relaxed",
   userVariant = "muted",
   assistantVariant = "ghost",
+  turnTiming,
 }: MessageAnimatedProps) {
   const isUser = message.role === "user";
+
+  const renderedParts: ReactNode[] = [];
+  let reasoningText = "";
+  let reasoningState: "streaming" | "done" | undefined;
+  let reasoningKey = "";
+
+  const flushReasoning = () => {
+    flushReasoningBlock(
+      renderedParts,
+      reasoningText,
+      reasoningState,
+      reasoningKey || `${message.id}-reasoning`,
+      turnTiming,
+    );
+    reasoningText = "";
+    reasoningState = undefined;
+    reasoningKey = "";
+  };
+
+  message.parts.forEach((part, index) => {
+    if (part.type === "reasoning") {
+      reasoningText += part.text;
+      reasoningKey = `${message.id}-reasoning-${index}`;
+      if (part.state === "streaming") {
+        reasoningState = "streaming";
+      } else if (reasoningState !== "streaming") {
+        reasoningState = part.state ?? "done";
+      }
+      return;
+    }
+
+    flushReasoning();
+
+    if (part.type === "tool-getCurrentLocation") {
+      const output = part.output as CurrentLocationToolOutput | undefined;
+
+      renderedParts.push(
+        <LocationToolCard
+          key={`${message.id}-${part.toolCallId}`}
+          state={part.state}
+          output={output}
+          textSize={textSize}
+        />,
+      );
+      return;
+    }
+
+    if (part.type === "tool-getTripSchedule") {
+      const output = part.output as ScheduleToolOutput | undefined;
+
+      renderedParts.push(
+        <ScheduleToolCard
+          key={`${message.id}-${part.toolCallId}`}
+          state={part.state}
+          output={output}
+          className="w-full min-w-0 self-stretch"
+        />,
+      );
+      return;
+    }
+
+    if (part.type === "tool-findNearbySpots") {
+      if (part.state !== "output-available") {
+        renderedParts.push(
+          <PlaceRatingCard
+            key={`${message.id}-${part.toolCallId}`}
+            state={part.state}
+            textSize={textSize}
+            className="w-full min-w-0 self-stretch"
+          />,
+        );
+        return;
+      }
+
+      const output = part.output as NearbySpotsToolOutput | undefined;
+
+      if (!output?.found || output.places.length === 0) {
+        return;
+      }
+
+      const hasPriorText = message.parts
+        .slice(0, index)
+        .some(
+          (priorPart) => priorPart.type === "text" && priorPart.text.trim(),
+        );
+
+      renderedParts.push(
+        <div
+          key={`${message.id}-${part.toolCallId}`}
+          className="flex w-full min-w-0 flex-col gap-2 self-stretch"
+        >
+          {!hasPriorText && output.intro ? (
+            <Bubble variant={assistantVariant}>
+              <BubbleContent className={cn(textSize, "overflow-visible")}>
+                <MessageMarkdown>
+                  {sanitizeAssistantText(output.intro)}
+                </MessageMarkdown>
+              </BubbleContent>
+            </Bubble>
+          ) : null}
+          {output.places.map((place) => (
+            <PlaceRatingCard
+              key={`${part.toolCallId}-${place.spotId ?? place.name}`}
+              state="output-available"
+              output={place}
+              textSize={textSize}
+              className="w-full min-w-0 self-stretch"
+            />
+          ))}
+        </div>,
+      );
+      return;
+    }
+
+    if (part.type === "tool-getPlaceRatings") {
+      const input = part.input as
+        | { name?: string; address?: string; spotId?: string }
+        | undefined;
+      const output = part.output as PlaceRatingsToolOutput | undefined;
+
+      renderedParts.push(
+        <PlaceRatingCard
+          key={`${message.id}-${part.toolCallId}`}
+          state={part.state}
+          input={input}
+          output={output}
+          textSize={textSize}
+          className="w-full min-w-0 self-stretch"
+        />,
+      );
+      return;
+    }
+
+    if (part.type !== "text") {
+      return;
+    }
+
+    if (!part.text.trim()) {
+      return;
+    }
+
+    renderedParts.push(
+      <Bubble
+        key={`${message.id}-text-${part.text.slice(0, 24)}`}
+        variant={isUser ? userVariant : assistantVariant}
+        className={!isUser ? "w-full min-w-0 self-stretch" : undefined}
+      >
+        <BubbleContent className={cn(textSize, !isUser && "overflow-visible")}>
+          {isUser ? (
+            <span className="whitespace-pre-wrap">{part.text}</span>
+          ) : (
+            <MessageMarkdown>
+              {sanitizeAssistantText(part.text)}
+            </MessageMarkdown>
+          )}
+        </BubbleContent>
+      </Bubble>,
+    );
+  });
+
+  flushReasoning();
 
   return (
     <MessageScrollerItem
@@ -41,131 +228,10 @@ export function MessageAnimated({
       scrollAnchor={scrollAnchor ?? isUser}
     >
       <Message align={isUser ? "end" : "start"} className={textSize}>
-        <MessageContent className={isUser ? undefined : "[&>*]:w-full [&>*]:min-w-0"}>
-          {message.parts.map((part, index) => {
-            if (part.type === "tool-getCurrentLocation") {
-              const output = part.output as
-                | CurrentLocationToolOutput
-                | undefined;
-
-              return (
-                <LocationToolCard
-                  key={`${message.id}-${part.toolCallId}`}
-                  state={part.state}
-                  output={output}
-                  textSize={textSize}
-                />
-              );
-            }
-
-            if (part.type === "tool-getTripSchedule") {
-              const output = part.output as ScheduleToolOutput | undefined;
-
-              return (
-                <ScheduleToolCard
-                  key={`${message.id}-${part.toolCallId}`}
-                  state={part.state}
-                  output={output}
-                  className="w-full min-w-0 self-stretch"
-                />
-              );
-            }
-
-            if (part.type === "tool-findNearbySpots") {
-              if (part.state !== "output-available") {
-                return (
-                  <PlaceRatingCard
-                    key={`${message.id}-${part.toolCallId}`}
-                    state={part.state}
-                    textSize={textSize}
-                    className="w-full min-w-0 self-stretch"
-                  />
-                );
-              }
-
-              const output = part.output as NearbySpotsToolOutput | undefined;
-
-              if (!output?.found || output.places.length === 0) {
-                return null;
-              }
-
-              const hasPriorText = message.parts
-                .slice(0, index)
-                .some(
-                  (priorPart) =>
-                    priorPart.type === "text" && priorPart.text.trim(),
-                );
-
-              return (
-                <div
-                  key={`${message.id}-${part.toolCallId}`}
-                  className="flex w-full min-w-0 flex-col gap-2 self-stretch"
-                >
-                  {!hasPriorText && output.intro ? (
-                    <Bubble variant={assistantVariant}>
-                      <BubbleContent className={cn(textSize, "overflow-visible")}>
-                        <MessageMarkdown>
-                          {sanitizeAssistantText(output.intro)}
-                        </MessageMarkdown>
-                      </BubbleContent>
-                    </Bubble>
-                  ) : null}
-                  {output.places.map((place) => (
-                    <PlaceRatingCard
-                      key={`${part.toolCallId}-${place.spotId ?? place.name}`}
-                      state="output-available"
-                      output={place}
-                      textSize={textSize}
-                      className="w-full min-w-0 self-stretch"
-                    />
-                  ))}
-                </div>
-              );
-            }
-
-            if (part.type === "tool-getPlaceRatings") {
-              const input = part.input as
-                | { name?: string; address?: string; spotId?: string }
-                | undefined;
-              const output = part.output as PlaceRatingsToolOutput | undefined;
-
-              return (
-                <PlaceRatingCard
-                  key={`${message.id}-${part.toolCallId}`}
-                  state={part.state}
-                  input={input}
-                  output={output}
-                  textSize={textSize}
-                  className="w-full min-w-0 self-stretch"
-                />
-              );
-            }
-
-            if (part.type !== "text") {
-              return null;
-            }
-
-            if (!part.text.trim()) {
-              return null;
-            }
-
-            return (
-              <Bubble
-                key={`${message.id}-${index}`}
-                variant={isUser ? userVariant : assistantVariant}
-              >
-                <BubbleContent className={cn(textSize, !isUser && "overflow-visible")}>
-                  {isUser ? (
-                    <span className="whitespace-pre-wrap">{part.text}</span>
-                  ) : (
-                    <MessageMarkdown>
-                      {sanitizeAssistantText(part.text)}
-                    </MessageMarkdown>
-                  )}
-                </BubbleContent>
-              </Bubble>
-            );
-          })}
+        <MessageContent
+          className={isUser ? undefined : "[&>*]:w-full [&>*]:min-w-0"}
+        >
+          {renderedParts}
         </MessageContent>
       </Message>
     </MessageScrollerItem>

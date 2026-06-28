@@ -135,9 +135,9 @@ function daysUntilWeekday(
   const targetDow = WEEKDAY_JS[weekday];
   let daysUntil = (targetDow - refDow + 7) % 7;
 
-  // "Next Saturday" on Saturday means the following week, not today.
-  if (qualifier === "next" && daysUntil === 0) {
-    daysUntil = 7;
+  if (qualifier === "next") {
+    // "Next Sunday" on Saturday skips this Sunday (+8d), not tomorrow.
+    daysUntil = daysUntil === 0 ? 7 : daysUntil + 7;
   }
 
   return daysUntil;
@@ -249,8 +249,46 @@ function expandDateQueryVariants(query: string) {
   return [...variants];
 }
 
+const MONTH_SHORT: Record<string, string> = {
+  jan: "01",
+  feb: "02",
+  mar: "03",
+  apr: "04",
+  may: "05",
+  jun: "06",
+  jul: "07",
+  aug: "08",
+  sep: "09",
+  oct: "10",
+  nov: "11",
+  dec: "12",
+};
+
+const SCHEDULE_LABEL_RE =
+  /^[A-Za-z]{3},\s*([A-Za-z]{3})\s+(\d{1,2})$/;
+
+function tripDayLabelFromScheduleLabel(label: string) {
+  const match = label.trim().match(SCHEDULE_LABEL_RE);
+  if (!match) {
+    return null;
+  }
+
+  const month = MONTH_SHORT[match[1].toLowerCase().slice(0, 3)];
+  if (!month) {
+    return null;
+  }
+
+  const day = match[2].padStart(2, "0");
+  return formatTripDayLabel(`2026-${month}-${day}`);
+}
+
 function tripDayLabelFromDateQuery(dateQuery: string) {
   const trimmed = dateQuery.trim();
+  const fromScheduleLabel = tripDayLabelFromScheduleLabel(trimmed);
+  if (fromScheduleLabel) {
+    return fromScheduleLabel;
+  }
+
   const ymd = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (ymd) {
     return formatTripDayLabel(trimmed);
@@ -281,41 +319,62 @@ function eventMatchesDateQuery(eventDate: string, dateQuery: string) {
 function resolveScheduleFilter(filter?: ScheduleFilter): {
   relativeDay?: RelativeTripDay;
   weekdayDayLabel?: string;
+  exactDayLabel?: string;
   dateQuery?: string;
   resolvedLabel?: string;
 } {
-  const parsedWeekdayFromDate = parseWeekdayQuery(filter?.date);
-  const weekday = filter?.weekday ?? parsedWeekdayFromDate?.weekday;
+  const dateTrimmed = filter?.date?.trim();
+  if (dateTrimmed) {
+    const exactLabel = tripDayLabelFromDateQuery(dateTrimmed);
+    if (exactLabel) {
+      return {
+        exactDayLabel: exactLabel,
+        resolvedLabel: exactLabel,
+      };
+    }
 
-  if (weekday) {
-    const qualifier =
-      filter?.weekdayQualifier ??
-      parsedWeekdayFromDate?.qualifier ??
-      "this";
-    const dayLabel = tripDayLabelForWeekday(weekday, qualifier);
-    const qualifierPrefix = qualifier === "next" ? "Next " : "";
+    const relativeFromDate = normalizeRelativeDayFromText(dateTrimmed);
+    if (relativeFromDate) {
+      return {
+        relativeDay: relativeFromDate,
+        resolvedLabel: tripDayLabelForRelative(relativeFromDate),
+      };
+    }
+
+    const parsedWeekdayFromDate = parseWeekdayQuery(dateTrimmed);
+    if (parsedWeekdayFromDate && !/\d/.test(dateTrimmed)) {
+      const qualifier =
+        filter?.weekdayQualifier ?? parsedWeekdayFromDate.qualifier;
+      const dayLabel = tripDayLabelForWeekday(
+        parsedWeekdayFromDate.weekday,
+        qualifier,
+      );
+      return {
+        weekdayDayLabel: dayLabel,
+        resolvedLabel: `${qualifier === "next" ? "Next " : ""}${WEEKDAY_LABEL[parsedWeekdayFromDate.weekday]} (${dayLabel})`,
+      };
+    }
+
+    return {
+      dateQuery: dateTrimmed,
+      resolvedLabel: dateTrimmed,
+    };
+  }
+
+  if (filter?.weekday) {
+    const qualifier = filter?.weekdayQualifier ?? "this";
+    const dayLabel = tripDayLabelForWeekday(filter.weekday, qualifier);
     return {
       weekdayDayLabel: dayLabel,
-      resolvedLabel: `${qualifierPrefix}${WEEKDAY_LABEL[weekday]} (${dayLabel})`,
+      resolvedLabel: `${qualifier === "next" ? "Next " : ""}${WEEKDAY_LABEL[filter.weekday]} (${dayLabel})`,
     };
   }
 
-  const relativeFromDay = normalizeRelativeDayFromText(filter?.relativeDay);
-  const relativeFromDate = normalizeRelativeDayFromText(filter?.date);
-
-  const relativeDay = relativeFromDay ?? relativeFromDate;
-
-  if (relativeDay) {
+  const relativeFromParam = normalizeRelativeDayFromText(filter?.relativeDay);
+  if (relativeFromParam) {
     return {
-      relativeDay,
-      resolvedLabel: tripDayLabelForRelative(relativeDay),
-    };
-  }
-
-  if (filter?.date?.trim()) {
-    return {
-      dateQuery: filter.date.trim(),
-      resolvedLabel: filter.date.trim(),
+      relativeDay: relativeFromParam,
+      resolvedLabel: tripDayLabelForRelative(relativeFromParam),
     };
   }
 
@@ -342,11 +401,13 @@ export function buildScheduleToolOutput(
   tripEvents: TripEvent[],
   filter?: ScheduleFilter,
 ): ScheduleToolOutput {
-  const { relativeDay, weekdayDayLabel, dateQuery, resolvedLabel } =
+  const { relativeDay, weekdayDayLabel, exactDayLabel, dateQuery, resolvedLabel } =
     resolveScheduleFilter(filter);
   let events = tripEvents;
 
-  if (weekdayDayLabel) {
+  if (exactDayLabel) {
+    events = events.filter((event) => event.date === exactDayLabel);
+  } else if (weekdayDayLabel) {
     events = events.filter((event) => event.date === weekdayDayLabel);
   } else if (relativeDay) {
     const dayLabel = tripDayLabelForRelative(relativeDay);

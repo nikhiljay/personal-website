@@ -448,13 +448,13 @@ export function createKaviTripAiTools(
     }),
     getTripSchedule: tool({
       description:
-        "Get Kavi's NYC trip schedule as rich event cards. Omit filters for the full trip schedule. Filter to one day via relativeDay, weekday, or date. Do not list events as plain text afterward.",
+        "Get Kavi's NYC trip schedule as rich event cards. For weekdays: weekday + weekdayQualifier. 'Next Sunday' on Saturday = following Sunday (Jul 5), not tomorrow — use weekdayQualifier=next, never relativeDay=tomorrow. Omit filters for the full schedule.",
       inputSchema: z.object({
         relativeDay: z
           .enum(["today", "tomorrow", "yesterday"])
           .optional()
           .describe(
-            "Use for today, tomorrow, or yesterday — resolved in NYC time. Preferred over date for relative questions.",
+            "Only for today, tomorrow, or yesterday. Do not use for 'next Sunday' — use weekday + weekdayQualifier=next instead.",
           ),
         weekday: z
           .enum([
@@ -468,19 +468,19 @@ export function createKaviTripAiTools(
           ])
           .optional()
           .describe(
-            "Weekday name. Pair with weekdayQualifier for this vs next (e.g. saturday + next).",
+            "Weekday name for 'next sun', 'this Monday', etc. Takes precedence over relativeDay.",
           ),
         weekdayQualifier: z
           .enum(["this", "next"])
           .optional()
           .describe(
-            "this = upcoming occurrence (today if it is that weekday). next = following occurrence — on that weekday already, use next (e.g. next Saturday on Saturday = +7 days).",
+            "this = upcoming occurrence (Sat → this Sunday = tomorrow). next = skip the upcoming one (Sat → next Sunday = following Sunday).",
           ),
         date: z
           .string()
           .optional()
           .describe(
-            "Specific day: Jun 29, 2026-06-29, or parsed phrases like next saturday.",
+            "Exact day: Sun, Jul 5, 2026-07-05, or next sunday. When set with a calendar date, do not pass conflicting weekday params.",
           ),
       }),
       execute: async ({
