@@ -270,7 +270,8 @@ export function KaviAskAiChat({
           <CardFooter
             className={cn(
               "shrink-0 flex-col gap-2 bg-popover",
-              isFullscreen && "pb-[max(--spacing(4),env(safe-area-inset-bottom,0px))]",
+              isFullscreen &&
+                "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
             )}
           >
             <form
@@ -288,9 +289,12 @@ export function KaviAskAiChat({
                 )}
               >
                 <InputGroupInput
+                  type="text"
+                  name="message"
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask about spots, schedule, neighborhoods…"
+                  aria-label="Message"
                   className={cn(
                     "h-full min-w-0 px-3 py-0 text-foreground placeholder:text-muted-foreground",
                     inputTextSize,
@@ -299,35 +303,21 @@ export function KaviAskAiChat({
                   autoComplete="off"
                   autoCorrect="on"
                   disabled={isBusy}
-                  onTouchEnd={(event) => {
-                    // iOS runs a delayed "scroll focused input into view" that
-                    // pans the whole viewport up even when the input is already
-                    // above the keyboard (the jerk on mobile). Focusing the
-                    // input ourselves with preventScroll suppresses that pan.
-                    // Done on touchend (after the tap commits) so the focus
-                    // sticks — doing it on pointerdown drops the keyboard. The
-                    // preventDefault stops the native tap from re-focusing with
-                    // a scroll. Skip if already focused so cursor taps work.
-                    const el = event.currentTarget;
-                    if (el === document.activeElement) {
-                      return;
-                    }
-                    event.preventDefault();
-                    el.focus({ preventScroll: true });
-                  }}
-                  onPointerUp={(event) => {
-                    // Simulator testing often uses mouse clicks, which skip
-                    // touchend and let iOS run its delayed reveal-pan.
-                    if (event.pointerType === "touch") {
-                      return;
-                    }
-                    const el = event.currentTarget;
-                    if (el === document.activeElement) {
-                      return;
-                    }
-                    event.preventDefault();
-                    el.focus({ preventScroll: true });
-                  }}
+                  onTouchEnd={
+                    isFullscreen
+                      ? (event) => {
+                          // iOS scrolls the visual viewport to reveal focused
+                          // inputs even inside fixed overlays. preventScroll on
+                          // touchend is the supported way to opt out.
+                          const el = event.currentTarget;
+                          if (el === document.activeElement) {
+                            return;
+                          }
+                          event.preventDefault();
+                          el.focus({ preventScroll: true });
+                        }
+                      : undefined
+                  }
                   onKeyDown={(event) => {
                     if (
                       event.key !== "Enter" ||

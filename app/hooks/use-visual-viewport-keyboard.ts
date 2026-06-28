@@ -6,9 +6,10 @@ import { useLayoutEffect } from "react";
 // focus has nothing exact to pre-apply — fall back to a typical iPhone keyboard
 // height, then reuse the real measured height on every subsequent open.
 const FALLBACK_KEYBOARD_INSET = 300;
-// Pre-lift during the opening animation only — preventScroll handles the pan
-// once focused, so the margin doesn't need to carry into the settled position.
+// Pre-lift during the opening animation only before the first measured frame.
 const KEYBOARD_REVEAL_MARGIN = 8;
+// Pull the settled input a little closer to the keyboard top.
+const KEYBOARD_SIT_CLOSER_OFFSET = 8;
 // A shrink larger than this means the on-screen keyboard is genuinely up.
 const KEYBOARD_UP_THRESHOLD = 100;
 // An inset at or below this counts as fully closed — small enough that resuming
@@ -94,7 +95,6 @@ export function useVisualViewportKeyboard(active: boolean) {
       }
 
       const layoutHeight = html.clientHeight;
-      const offsetTop = Math.max(0, Math.round(vv.offsetTop));
       const keyboardInset = readKeyboardInset(layoutHeight, vv);
 
       if (
@@ -105,12 +105,11 @@ export function useVisualViewportKeyboard(active: boolean) {
         cachedKeyboardInset = keyboardInset;
       }
 
-      // We lift the chat from the bottom; while an input is focused, ignore
-      // visual-viewport pan (offsetTop) so header/body top don't bob after the
-      // keyboard settles. Real devices stay ~0 thanks to preventScroll; the
-      // simulator reports noisy scroll events, especially on mouse-driven focus.
-      const effectiveTop = isTextInputFocused() ? 0 : offsetTop;
-      html.style.setProperty("--vv-top", `${effectiveTop}px`);
+      // This hook only runs for the fullscreen chat overlay, which positions
+      // itself from the bottom via --keyboard-inset. iOS pan (offsetTop) during
+      // keyboard open must never shift the header/body top — combined with a
+      // bottom inset it can invert the body box and shoot the input to the top.
+      html.style.setProperty("--vv-top", "0px");
 
       // While dismissing, hold the inset at 0 (set on focusout) and only resume
       // tracking once the viewport confirms the keyboard is fully gone. Resuming
@@ -151,11 +150,18 @@ export function useVisualViewportKeyboard(active: boolean) {
         // Never merge a raw (possibly spurious) frame — sessionInsetMax is the
         // only source of truth while focused.
         insetToApply = sessionInsetMax;
+        if (hasMeasuredKeyboard) {
+          insetToApply = Math.max(
+            KEYBOARD_CLOSED_INSET,
+            sessionInsetMax - KEYBOARD_SIT_CLOSER_OFFSET,
+          );
+        }
       } else if (keyboardInset != null) {
         insetToApply = keyboardInset;
       } else {
         return;
       }
+
       html.style.setProperty("--keyboard-inset", `${insetToApply}px`);
     };
 
