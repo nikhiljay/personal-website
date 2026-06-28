@@ -149,10 +149,10 @@ export const mapHighlights: MapHighlight[] = [
 
 export const mapHighlightIds = new Set(mapHighlights.map((place) => place.id));
 
-/** Manhattan: Battery Park to ~80th St. */
+/** Manhattan: Battery Park through upper 70s — north trimmed slightly for default framing. */
 export const mapBounds: [[number, number], [number, number]] = [
   [-74.015, 40.704],
-  [-73.965, 40.786],
+  [-73.965, 40.768],
 ];
 
 /** Manhattan street grid is ~29° east of true north; rotate so the island reads vertically. */

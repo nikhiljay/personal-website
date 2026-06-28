@@ -13,8 +13,8 @@ import {
   getPlaceByStopId,
   manhattanNeighborhoods,
   mapBearing,
-  mapBounds,
   mapHighlightIds,
+  mapBounds,
   mapHighlights,
   tripStops,
 } from "../lib/kavi-nyc-trip";
@@ -38,13 +38,7 @@ const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? "";
 const MAP_STYLE = "mapbox://styles/mapbox/standard";
 const MAP_PITCH = 22;
 
-const MAP_FIT_PADDING = {
-  top: 0,
-  bottom: 20,
-  left: 8,
-  right: 8,
-};
-const MAP_FIT_MAX_ZOOM = 12.75;
+const MAP_FRAME_PADDING = { top: 2, bottom: 6, left: 8, right: 8 };
 
 const LABEL_FONT = ["Inter Regular", "Open Sans Regular", "Arial Unicode MS Regular"];
 const MARKER_DOT_RADIUS = 5;
@@ -224,7 +218,7 @@ function basemapConfig(theme: PreferredColorScheme) {
     showPlaceLabels: false,
     showRoadLabels: false,
     showTransitLabels: false,
-    show3dObjects: false,
+    show3dObjects: true,
   };
 }
 
@@ -242,7 +236,7 @@ function configureBasemap(map: mapboxgl.Map, theme: PreferredColorScheme) {
     map.setConfigProperty("basemap", "showPlaceLabels", false);
     map.setConfigProperty("basemap", "showRoadLabels", false);
     map.setConfigProperty("basemap", "showTransitLabels", false);
-    map.setConfigProperty("basemap", "show3dObjects", false);
+    map.setConfigProperty("basemap", "show3dObjects", true);
   } catch {
     // Standard-style config is unavailable until the basemap is ready.
   }
@@ -393,13 +387,12 @@ function labelColors(theme: "light" | "dark") {
       };
 }
 
-function fitMapBounds(map: mapboxgl.Map) {
+function applyMapCamera(map: mapboxgl.Map) {
   map.fitBounds(mapBounds, {
-    padding: MAP_FIT_PADDING,
-    animate: false,
+    padding: MAP_FRAME_PADDING,
     bearing: mapBearing,
     pitch: MAP_PITCH,
-    maxZoom: MAP_FIT_MAX_ZOOM,
+    animate: false,
   });
 }
 
@@ -1246,7 +1239,7 @@ export function TripMap({
       currentLocationMarkerRef,
       currentLocationRef.current,
     );
-    fitMapBounds(map);
+    applyMapCamera(map);
     raiseMarkerLayers(map);
   }, [colorScheme, mapLoaded]);
 
@@ -1369,7 +1362,7 @@ export function TripMap({
         return;
       }
 
-      fitMapBounds(map);
+      applyMapCamera(map);
 
       if (!hasCalledReadyRef.current) {
         hasCalledReadyRef.current = true;
@@ -1406,7 +1399,7 @@ export function TripMap({
           (mapBounds[0][0] + mapBounds[1][0]) / 2,
           (mapBounds[0][1] + mapBounds[1][1]) / 2,
         ],
-        zoom: 11,
+        zoom: 12.4,
         bearing: mapBearing,
         pitch: MAP_PITCH,
         attributionControl: false,
