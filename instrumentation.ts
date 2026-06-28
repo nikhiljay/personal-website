@@ -3,9 +3,7 @@ export async function register() {
     return;
   }
 
-  const { ensureKaviBraintrustTelemetry } = await import(
-    "@/app/lib/kavi-braintrust"
-  );
+  const { ensureKaviAiTelemetry } = await import("@/app/lib/kavi-braintrust");
 
-  ensureKaviBraintrustTelemetry();
+  await ensureKaviAiTelemetry();
 }

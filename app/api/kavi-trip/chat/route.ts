@@ -7,7 +7,7 @@ import {
 } from "ai";
 
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
-import { ensureKaviBraintrustTelemetry } from "@/app/lib/kavi-braintrust";
+import { ensureKaviAiTelemetry } from "@/app/lib/kavi-braintrust";
 import {
   getKaviChatModel,
   getKaviChatReasoningEffort,
@@ -95,7 +95,7 @@ function formatStreamError(error: unknown) {
 }
 
 export async function POST(req: Request) {
-  ensureKaviBraintrustTelemetry();
+  await ensureKaviAiTelemetry();
 
   const {
     messages,

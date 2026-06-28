@@ -4,21 +4,36 @@ import { braintrustAISDKTelemetry, initLogger } from "braintrust";
 import { registerTelemetry, type Telemetry } from "ai";
 
 const initializedKey = Symbol.for("kavi.braintrust.initialized");
+const otelInitializedKey = Symbol.for("kavi.otel.initialized");
 
-type GlobalWithBraintrust = typeof globalThis & {
+const DEFAULT_PROJECT_ID = "cdbbcd5f-8a55-4c4f-b514-12a53ecacf6d";
+const DEFAULT_PROJECT_NAME = "braintrust-aqua-ball";
+
+type GlobalWithTelemetry = typeof globalThis & {
   [initializedKey]?: boolean;
+  [otelInitializedKey]?: boolean;
 };
 
-export function ensureKaviBraintrustTelemetry() {
-  const global = globalThis as GlobalWithBraintrust;
+function getBraintrustApiKey() {
+  return process.env.BRAINTRUST_API_KEY?.trim() || undefined;
+}
+
+function registerBraintrustSdkTelemetry() {
+  const global = globalThis as GlobalWithTelemetry;
   if (global[initializedKey]) {
     return;
   }
   global[initializedKey] = true;
 
+  const apiKey = getBraintrustApiKey();
+  if (!apiKey) {
+    return;
+  }
+
   initLogger({
-    projectName: process.env.BRAINTRUST_PROJECT_NAME ?? "braintrust-aqua-ball",
-    apiKey: process.env.BRAINTRUST_API_KEY,
+    projectId: process.env.BRAINTRUST_PROJECT_ID ?? DEFAULT_PROJECT_ID,
+    projectName: process.env.BRAINTRUST_PROJECT_NAME ?? DEFAULT_PROJECT_NAME,
+    apiKey,
   });
 
   // Braintrust's v7 integration implements `onFinish`, but AI SDK v7 emits `onEnd`
@@ -31,4 +46,46 @@ export function ensureKaviBraintrustTelemetry() {
     ...braintrustTelemetry,
     onEnd: braintrustTelemetry.onFinish,
   });
+}
+
+async function registerVercelOtelTelemetry() {
+  const global = globalThis as GlobalWithTelemetry;
+  if (global[otelInitializedKey]) {
+    return;
+  }
+  global[otelInitializedKey] = true;
+
+  const { registerOTel } = await import("@vercel/otel");
+  registerOTel({ serviceName: "personal-website" });
+
+  const { OpenTelemetry } = await import("@ai-sdk/otel");
+  registerTelemetry(new OpenTelemetry() as Telemetry);
+}
+
+/** Direct Braintrust SDK tracing when BRAINTRUST_API_KEY is set. */
+export function ensureKaviBraintrustTelemetry() {
+  registerBraintrustSdkTelemetry();
+}
+
+/**
+ * Production-safe telemetry bootstrap:
+ * - SDK path when BRAINTRUST_API_KEY is present (local dev or explicit Vercel env)
+ * - Vercel OTel drain path when deployed without an API key (Marketplace integration)
+ */
+export async function ensureKaviAiTelemetry() {
+  if (getBraintrustApiKey()) {
+    registerBraintrustSdkTelemetry();
+    return;
+  }
+
+  if (process.env.VERCEL === "1") {
+    await registerVercelOtelTelemetry();
+    return;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    console.warn(
+      "[kavi-ai] Braintrust tracing disabled — set BRAINTRUST_API_KEY in .env.local",
+    );
+  }
 }
