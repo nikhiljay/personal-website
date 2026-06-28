@@ -1,6 +1,13 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "./kavi.css";
+
+export const metadata: Metadata = {
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
+};
 
 export const viewport: Viewport = {
   width: "device-width",

@@ -2,14 +2,25 @@
 
 import { useLayoutEffect } from "react";
 
+function isStandalonePwa() {
+  const nav = window.navigator as Navigator & { standalone?: boolean };
+  return (
+    nav.standalone === true ||
+    window.matchMedia("(display-mode: standalone)").matches
+  );
+}
+
 // iOS only reports the keyboard height once it has opened, so the very first
 // focus has nothing exact to pre-apply — fall back to a typical iPhone keyboard
 // height, then reuse the real measured height on every subsequent open.
 const FALLBACK_KEYBOARD_INSET = 300;
 // Pre-lift during the opening animation only before the first measured frame.
 const KEYBOARD_REVEAL_MARGIN = 8;
-// Pull the settled input a little closer to the keyboard top.
+// Pull the settled input a little closer to the keyboard top (Safari browser only).
 const KEYBOARD_SIT_CLOSER_OFFSET = 8;
+// iOS standalone web apps show a form accessory bar above the keyboard that
+// layout/viewport math does not include in the keyboard inset.
+const STANDALONE_ACCESSORY_BAR_INSET = 68;
 // A shrink larger than this means the on-screen keyboard is genuinely up.
 const KEYBOARD_UP_THRESHOLD = 100;
 // An inset at or below this counts as fully closed — small enough that resuming
@@ -27,10 +38,17 @@ function isTextInputFocused() {
   );
 }
 
-function getMaxPlausibleKeyboardInset(layoutHeight: number) {
+function getMaxPlausibleKeyboardInset(
+  layoutHeight: number,
+  isStandalone: boolean,
+) {
+  const absoluteMax = isStandalone
+    ? KEYBOARD_INSET_ABSOLUTE_MAX + STANDALONE_ACCESSORY_BAR_INSET
+    : KEYBOARD_INSET_ABSOLUTE_MAX;
+
   return Math.min(
     Math.round(layoutHeight * 0.52),
-    KEYBOARD_INSET_ABSOLUTE_MAX,
+    absoluteMax,
     (cachedKeyboardInset || FALLBACK_KEYBOARD_INSET) + 48,
   );
 }
@@ -39,6 +57,8 @@ function getMaxPlausibleKeyboardInset(layoutHeight: number) {
 function readKeyboardInset(
   layoutHeight: number,
   vv: VisualViewport,
+  focusBaseline: { vvHeight: number; layoutHeight: number } | null,
+  isStandalone: boolean,
 ): number | null {
   const offsetTop = Math.max(0, Math.round(vv.offsetTop));
   const inset = Math.max(
@@ -46,12 +66,31 @@ function readKeyboardInset(
     Math.round(layoutHeight - offsetTop - vv.height),
   );
 
-  if (inset === 0) {
+  // iOS standalone PWA: clientHeight shrinks with the keyboard, zeroing the
+  // live layout delta. Pin the pre-keyboard layout height captured at focus.
+  const pinnedLayoutDelta =
+    focusBaseline && focusBaseline.layoutHeight > 0
+      ? Math.max(
+          0,
+          Math.round(
+            focusBaseline.layoutHeight - offsetTop - vv.height,
+          ),
+        )
+      : 0;
+
+  const vvDelta =
+    focusBaseline && focusBaseline.vvHeight > 0
+      ? Math.max(0, Math.round(focusBaseline.vvHeight - vv.height))
+      : 0;
+
+  const combined = Math.max(inset, pinnedLayoutDelta, vvDelta);
+
+  if (combined === 0) {
     return 0;
   }
 
-  const maxPlausible = getMaxPlausibleKeyboardInset(layoutHeight);
-  if (inset > maxPlausible) {
+  const maxPlausible = getMaxPlausibleKeyboardInset(layoutHeight, isStandalone);
+  if (combined > maxPlausible) {
     return null;
   }
 
@@ -60,7 +99,7 @@ function readKeyboardInset(
     return null;
   }
 
-  return inset;
+  return combined;
 }
 
 /** Syncs --vv-top and --keyboard-inset to the visual viewport on every change. */
@@ -71,12 +110,17 @@ export function useVisualViewportKeyboard(active: boolean) {
     }
 
     const html = document.documentElement;
+    const isStandalone = isStandalonePwa();
     const previousHtml = {
       position: html.style.position,
       width: html.style.width,
       height: html.style.height,
       overscrollBehavior: html.style.overscrollBehavior,
     };
+
+    if (isStandalone) {
+      html.dataset.standalonePwa = "";
+    }
 
     html.style.position = "fixed";
     html.style.width = "100%";
@@ -95,7 +139,12 @@ export function useVisualViewportKeyboard(active: boolean) {
       }
 
       const layoutHeight = html.clientHeight;
-      const keyboardInset = readKeyboardInset(layoutHeight, vv);
+      const keyboardInset = readKeyboardInset(
+        layoutHeight,
+        vv,
+        isStandalone ? focusBaseline : null,
+        isStandalone,
+      );
 
       if (
         keyboardInset != null &&
@@ -151,10 +200,14 @@ export function useVisualViewportKeyboard(active: boolean) {
         // only source of truth while focused.
         insetToApply = sessionInsetMax;
         if (hasMeasuredKeyboard) {
+          const sitCloser = isStandalone ? 0 : KEYBOARD_SIT_CLOSER_OFFSET;
           insetToApply = Math.max(
             KEYBOARD_CLOSED_INSET,
-            sessionInsetMax - KEYBOARD_SIT_CLOSER_OFFSET,
+            sessionInsetMax - sitCloser,
           );
+          if (isStandalone) {
+            insetToApply += STANDALONE_ACCESSORY_BAR_INSET;
+          }
         }
       } else if (keyboardInset != null) {
         insetToApply = keyboardInset;
@@ -169,6 +222,8 @@ export function useVisualViewportKeyboard(active: boolean) {
     let dismissGuard = 0;
     let dismissEnd = 0;
     let dismissing = false;
+    // Pre-keyboard viewport snapshot for standalone inset math.
+    let focusBaseline: { vvHeight: number; layoutHeight: number } | null = null;
     // Max inset seen during the current input-focus session. iOS (especially
     // the simulator) can emit a trailing burst of slightly smaller keyboard
     // heights after the UI has settled; holding the peak stops the bottom
@@ -185,6 +240,27 @@ export function useVisualViewportKeyboard(active: boolean) {
     // prediction entirely and let sync track the (unchanging) viewport.
     const canSoftKeyboard =
       window.matchMedia?.("(pointer: coarse)").matches ?? false;
+
+    const captureFocusBaseline = (vv: VisualViewport | null) => {
+      focusBaseline = {
+        vvHeight: vv?.height ?? 0,
+        layoutHeight: html.clientHeight,
+      };
+    };
+
+    const applyPredictedKeyboardInset = (vv: VisualViewport | null) => {
+      captureFocusBaseline(vv);
+
+      const predicted =
+        (cachedKeyboardInset
+          ? Math.min(cachedKeyboardInset, KEYBOARD_INSET_ABSOLUTE_MAX) +
+            KEYBOARD_REVEAL_MARGIN
+          : FALLBACK_KEYBOARD_INSET) +
+        (isStandalone ? STANDALONE_ACCESSORY_BAR_INSET : 0);
+      sessionInsetMax = predicted;
+      hasMeasuredKeyboard = false;
+      html.style.setProperty("--keyboard-inset", `${predicted}px`);
+    };
 
     const onFocusIn = (event: FocusEvent) => {
       if (!canSoftKeyboard) {
@@ -207,13 +283,7 @@ export function useVisualViewportKeyboard(active: boolean) {
         return;
       }
 
-      const predicted = cachedKeyboardInset
-        ? Math.min(cachedKeyboardInset, KEYBOARD_INSET_ABSOLUTE_MAX) +
-          KEYBOARD_REVEAL_MARGIN
-        : FALLBACK_KEYBOARD_INSET;
-      sessionInsetMax = predicted;
-      hasMeasuredKeyboard = false;
-      html.style.setProperty("--keyboard-inset", `${predicted}px`);
+      applyPredictedKeyboardInset(vv);
 
       // Undo the speculative inset if no on-screen keyboard actually shows up
       // (e.g. an external keyboard), so the input isn't left lifted.
@@ -251,6 +321,8 @@ export function useVisualViewportKeyboard(active: boolean) {
           return;
         }
 
+        focusBaseline = null;
+
         // Collapse the inset right away so the body glides down in step with the
         // keyboard instead of waiting for iOS's sparse end-of-animation resize.
         // sync() holds it at 0 and resumes tracking once the close is confirmed.
@@ -268,6 +340,31 @@ export function useVisualViewportKeyboard(active: boolean) {
       }, 0);
     };
 
+    const onTouchStart = (event: TouchEvent) => {
+      if (!isStandalone || !canSoftKeyboard) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        !(target instanceof HTMLElement) ||
+        !target.matches("input, textarea, [contenteditable]")
+      ) {
+        return;
+      }
+
+      if (target === document.activeElement) {
+        return;
+      }
+
+      const vv = window.visualViewport;
+      if (vv && html.clientHeight - vv.height > KEYBOARD_UP_THRESHOLD) {
+        return;
+      }
+
+      applyPredictedKeyboardInset(vv);
+    };
+
     sync();
 
     const viewport = window.visualViewport;
@@ -275,6 +372,10 @@ export function useVisualViewportKeyboard(active: boolean) {
     viewport?.addEventListener("scroll", sync);
     document.addEventListener("focusin", onFocusIn);
     document.addEventListener("focusout", onFocusOut);
+    document.addEventListener("touchstart", onTouchStart, {
+      capture: true,
+      passive: true,
+    });
 
     return () => {
       window.clearTimeout(revealGuard);
@@ -284,6 +385,7 @@ export function useVisualViewportKeyboard(active: boolean) {
       viewport?.removeEventListener("scroll", sync);
       document.removeEventListener("focusin", onFocusIn);
       document.removeEventListener("focusout", onFocusOut);
+      document.removeEventListener("touchstart", onTouchStart, true);
       html.style.removeProperty("--vv-top");
       html.style.removeProperty("--keyboard-inset");
       html.style.position = previousHtml.position;

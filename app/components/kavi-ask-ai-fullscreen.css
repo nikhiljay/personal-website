@@ -9,6 +9,11 @@
   pointer-events: auto;
 }
 
+/* Standalone PWAs may report safe-area-inset-bottom as 0 on older installs. */
+html[data-standalone-pwa] .kavi-ask-ai-chat-footer {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px), 46px);
+}
+
 /*
  * iOS fires visualViewport resize/scroll sparsely during the keyboard
  * animation, so --vv-top / --keyboard-inset update in a few big steps. A

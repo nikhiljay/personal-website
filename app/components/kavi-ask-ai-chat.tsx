@@ -243,7 +243,7 @@ export function KaviAskAiChat({
 
           <CardFooter
             className={cn(
-              "shrink-0 flex-col gap-2 bg-popover",
+              "kavi-ask-ai-chat-footer shrink-0 flex-col gap-2 bg-popover",
               isFullscreen &&
                 "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
             )}
