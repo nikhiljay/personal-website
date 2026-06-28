@@ -7,6 +7,7 @@ import {
 } from "ai";
 
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
+import { getKaviAiTraceFunctionId } from "@/app/lib/kavi-ai-trace-env";
 import { ensureKaviAiTelemetry } from "@/app/lib/kavi-braintrust";
 import {
   getKaviChatModel,
@@ -128,7 +129,7 @@ export async function POST(req: Request) {
     stopWhen: [stopAfterRichPlaceResponse, stepCountIs(5)],
     maxOutputTokens: 4000,
     telemetry: {
-      functionId: "kavi-trip-chat",
+      functionId: getKaviAiTraceFunctionId(),
       recordInputs: true,
       recordOutputs: true,
     },
