@@ -27,6 +27,11 @@ export type PlaceCardData = {
   todayHours: string | null;
   lat: number | null;
   lng: number | null;
+  priceLabel: string | null;
+  cuisine: string | null;
+  mustOrder: string[] | null;
+  bestFor: string[] | null;
+  reservation: string | null;
 };
 
 type GoogleOpeningHours = {
@@ -34,19 +39,115 @@ type GoogleOpeningHours = {
   weekdayDescriptions?: string[];
 };
 
-type GooglePlacesSearchResponse = {
-  places?: Array<{
-    displayName?: { text?: string };
-    formattedAddress?: string;
-    rating?: number;
-    userRatingCount?: number;
-    googleMapsUri?: string;
-    photos?: Array<{ name?: string }>;
-    location?: { latitude?: number; longitude?: number };
-    currentOpeningHours?: GoogleOpeningHours;
-    regularOpeningHours?: GoogleOpeningHours;
-  }>;
+type GooglePlaceResult = {
+  displayName?: { text?: string };
+  formattedAddress?: string;
+  rating?: number;
+  userRatingCount?: number;
+  googleMapsUri?: string;
+  photos?: Array<{ name?: string }>;
+  location?: { latitude?: number; longitude?: number };
+  currentOpeningHours?: GoogleOpeningHours;
+  regularOpeningHours?: GoogleOpeningHours;
+  primaryType?: string;
+  types?: string[];
+  priceLevel?: string;
 };
+
+type GooglePlacesSearchResponse = {
+  places?: GooglePlaceResult[];
+};
+
+const googleCafeTypes = new Set([
+  "cafe",
+  "coffee_shop",
+  "bakery",
+  "tea_house",
+  "donut_shop",
+  "bagel_shop",
+  "breakfast_restaurant",
+  "brunch_restaurant",
+]);
+
+const googleBarTypes = new Set([
+  "bar",
+  "wine_bar",
+  "pub",
+  "night_club",
+  "cocktail_bar",
+  "liquor_store",
+]);
+
+const googleActivityTypes = new Set([
+  "park",
+  "museum",
+  "tourist_attraction",
+  "art_gallery",
+  "amusement_park",
+  "movie_theater",
+  "performing_arts_theater",
+  "stadium",
+  "zoo",
+  "aquarium",
+]);
+
+function inferKindFromGooglePlace(place: GooglePlaceResult): string | null {
+  const typeTokens = new Set<string>();
+  if (place.primaryType) {
+    typeTokens.add(place.primaryType.toLowerCase());
+  }
+  for (const type of place.types ?? []) {
+    typeTokens.add(type.toLowerCase());
+  }
+
+  if ([...typeTokens].some((type) => googleCafeTypes.has(type))) {
+    return savedSpotKindMeta.cafe.label;
+  }
+
+  if ([...typeTokens].some((type) => googleBarTypes.has(type))) {
+    return savedSpotKindMeta.bar.label;
+  }
+
+  if ([...typeTokens].some((type) => googleActivityTypes.has(type))) {
+    return savedSpotKindMeta.activity.label;
+  }
+
+  if (
+    place.priceLevel === "PRICE_LEVEL_EXPENSIVE" ||
+    place.priceLevel === "PRICE_LEVEL_VERY_EXPENSIVE"
+  ) {
+    return savedSpotKindMeta.nice.label;
+  }
+
+  if (
+    typeTokens.has("restaurant") ||
+    typeTokens.has("meal_takeaway") ||
+    typeTokens.has("meal_delivery") ||
+    typeTokens.has("food") ||
+    typeTokens.has("fast_food_restaurant") ||
+    typeTokens.has("pizza_restaurant") ||
+    typeTokens.has("sandwich_shop")
+  ) {
+    return savedSpotKindMeta.casual.label;
+  }
+
+  return null;
+}
+
+export function formatGooglePriceLevel(priceLevel?: string): string | null {
+  switch (priceLevel) {
+    case "PRICE_LEVEL_INEXPENSIVE":
+      return "$";
+    case "PRICE_LEVEL_MODERATE":
+      return "$$";
+    case "PRICE_LEVEL_EXPENSIVE":
+      return "$$$";
+    case "PRICE_LEVEL_VERY_EXPENSIVE":
+      return "$$$$";
+    default:
+      return null;
+  }
+}
 
 const CACHE_TTL_MS = 60 * 60 * 1000;
 const cache = new Map<string, { value: PlaceCardData; expiresAt: number }>();
@@ -275,7 +376,7 @@ function parseTodayHours(openingHours?: GoogleOpeningHours) {
 
 function buildPlaceCardData(
   savedSpot: SavedSpot | undefined,
-  place: NonNullable<GooglePlacesSearchResponse["places"]>[number],
+  place: GooglePlaceResult,
   fallbackName: string,
   fallbackAddress?: string,
 ): PlaceCardData {
@@ -296,7 +397,9 @@ function buildPlaceCardData(
     userRatingCount: place.userRatingCount ?? null,
     googleMapsUri: place.googleMapsUri ?? null,
     photoUrl,
-    kind: savedSpot ? savedSpotKindMeta[savedSpot.kind].label : null,
+    kind: savedSpot
+      ? savedSpotKindMeta[savedSpot.kind].label
+      : (inferKindFromGooglePlace(place) ?? savedSpotKindMeta.casual.label),
     note: savedSpot?.note ?? null,
     visited: savedSpot?.visited ?? false,
     spotId: savedSpot?.id ?? null,
@@ -304,6 +407,11 @@ function buildPlaceCardData(
     todayHours: hours.todayHours,
     lat: savedSpot?.lat ?? place.location?.latitude ?? null,
     lng: savedSpot?.lng ?? place.location?.longitude ?? null,
+    priceLabel: formatGooglePriceLevel(place.priceLevel),
+    cuisine: savedSpot?.cuisine ?? null,
+    mustOrder: savedSpot?.mustOrder ?? null,
+    bestFor: savedSpot?.bestFor ?? null,
+    reservation: savedSpot?.reservation ?? null,
   };
 }
 
@@ -349,7 +457,7 @@ export async function getPlaceCardData(input: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": apiKey,
       "X-Goog-FieldMask":
-        "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours",
+        "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours,places.primaryType,places.types,places.priceLevel",
     },
     body: JSON.stringify(body),
   });
@@ -400,7 +508,7 @@ export async function getPlaceCardDataForSpot(input: {
 }
 
 function placeCardFromGoogleResult(
-  place: NonNullable<GooglePlacesSearchResponse["places"]>[number],
+  place: GooglePlaceResult,
 ): PlaceCardData {
   return buildPlaceCardData(undefined, place, place.displayName?.text ?? "Unknown");
 }
@@ -423,7 +531,7 @@ export async function searchNearbyGooglePlaces(input: {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask":
-          "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours",
+          "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours,places.primaryType,places.types,places.priceLevel",
       },
       body: JSON.stringify({
         locationRestriction: {

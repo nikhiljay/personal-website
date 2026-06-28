@@ -54,31 +54,40 @@ function parseLegacyCurrentLocation(value: unknown) {
   });
 }
 
-// Place cards are the response — skip a second LLM turn (saves a Gateway call and
-// avoids free-tier rate limits that surfaced as "An error occurred.").
-// Schedule cards are NOT included: many schedule questions need a follow-up
-// answer (e.g. which days need food recs) after the tool runs.
-const stopAfterRichPlaceResponse: StopCondition<
+// Allow one follow-up turn after rich tool cards so the model can add a short
+// analysis (pick, timing, tradeoffs). Stop once that text lands — avoids extra
+// loops while still saving most multi-step churn vs an open-ended agent.
+const stopAfterToolAnalysis: StopCondition<
   ReturnType<typeof createKaviTripAiTools>
 > = ({ steps }) => {
-  const lastStep = steps.at(-1);
-  if (!lastStep) {
+  if (steps.length < 2) {
     return false;
   }
 
-  return lastStep.staticToolResults.some((result) => {
-    if (result.toolName === "findNearbySpots") {
-      const output = result.output as NearbySpotsToolOutput | undefined;
-      return output?.found === true && output.places.length > 0;
-    }
+  const lastStep = steps.at(-1);
+  if (!lastStep?.text.trim() || lastStep.toolCalls.length > 0) {
+    return false;
+  }
 
-    if (result.toolName !== "getPlaceRatings") {
+  return steps.slice(0, -1).some((step) =>
+    step.staticToolResults.some((result) => {
+      if (result.toolName === "findNearbySpots") {
+        const output = result.output as NearbySpotsToolOutput | undefined;
+        return output?.found === true && output.places.length > 0;
+      }
+
+      if (result.toolName === "getPlaceRatings") {
+        const output = result.output as PlaceRatingsToolOutput | undefined;
+        return output?.found === true;
+      }
+
+      if (result.toolName === "getTripSchedule") {
+        return true;
+      }
+
       return false;
-    }
-
-    const output = result.output as PlaceRatingsToolOutput | undefined;
-    return output?.found === true;
-  });
+    }),
+  );
 };
 
 function formatStreamError(error: unknown) {
@@ -126,7 +135,7 @@ export async function POST(req: Request) {
     ),
     messages: await convertToModelMessages(messages),
     tools,
-    stopWhen: [stopAfterRichPlaceResponse, stepCountIs(5)],
+    stopWhen: [stopAfterToolAnalysis, stepCountIs(5)],
     maxOutputTokens: 4000,
     telemetry: {
       functionId: getKaviAiTraceFunctionId(),

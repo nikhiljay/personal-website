@@ -51,15 +51,17 @@ function PlaceTag({
   variant = "muted",
 }: {
   children: React.ReactNode;
-  variant?: "muted" | "visited";
+  variant?: "muted" | "saved" | "suggested";
 }) {
   return (
     <span
       className={cn(
         "rounded-full px-2 py-0.5 text-xs font-medium",
-        variant === "visited"
+        variant === "saved"
           ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-          : "bg-muted text-muted-foreground",
+          : variant === "suggested"
+            ? "bg-sky-500/10 text-sky-700 dark:text-sky-400"
+            : "bg-muted text-muted-foreground",
       )}
     >
       {children}
@@ -89,9 +91,13 @@ function PlaceRatingCardContent({
         })
       : null;
 
-  const hasTags = place.kind || place.visited;
+  const hasTags =
+    place.kind || place.fromSavedList != null || place.visited;
   const hasStatus = place.openNow != null || hoursLabel;
-  const hasRating = place.rating != null || place.userRatingCount != null;
+  const hasRating =
+    place.rating != null ||
+    place.userRatingCount != null ||
+    place.priceLabel != null;
 
   return (
     <div className="w-full min-w-0">
@@ -167,6 +173,14 @@ function PlaceRatingCardContent({
                   {formatReviewCount(place.userRatingCount)}
                 </span>
               ) : null}
+              {place.priceLabel ? (
+                <span className="text-muted-foreground">
+                  {place.rating != null || place.userRatingCount != null
+                    ? " · "
+                    : ""}
+                  {place.priceLabel}
+                </span>
+              ) : null}
             </div>
           ) : null}
 
@@ -204,23 +218,53 @@ function PlaceRatingCardContent({
           {hasTags ? (
             <div className="flex flex-wrap items-center gap-1 pt-0.5">
               {place.kind ? <PlaceTag>{place.kind}</PlaceTag> : null}
-              {place.visited ? (
-                <PlaceTag variant="visited">Nikhil visited</PlaceTag>
+              {place.cuisine ? <PlaceTag>{place.cuisine}</PlaceTag> : null}
+              {place.fromSavedList ? (
+                place.visited ? (
+                  <PlaceTag variant="saved">Nikhil visited</PlaceTag>
+                ) : (
+                  <PlaceTag variant="saved">On Nikhil&apos;s list</PlaceTag>
+                )
+              ) : place.fromSavedList === false ? (
+                <PlaceTag variant="suggested">Suggested</PlaceTag>
               ) : null}
             </div>
           ) : null}
         </div>
       </div>
 
-      {place.note ? (
-        <p
+      {place.note || place.mustOrder?.length || place.bestFor?.length || place.reservation ? (
+        <div
           className={cn(
-            "border-t border-border bg-muted/20 px-3 py-2.5 leading-relaxed text-muted-foreground",
+            "space-y-1.5 border-t border-border bg-muted/20 px-3 py-2.5 leading-relaxed text-muted-foreground",
             textSize,
           )}
         >
-          <span className="font-medium text-foreground">Nikhil:</span> {place.note}
-        </p>
+          {place.mustOrder?.length ? (
+            <p>
+              <span className="font-medium text-foreground">Must order:</span>{" "}
+              {place.mustOrder.join(", ")}
+            </p>
+          ) : null}
+          {place.bestFor?.length ? (
+            <p>
+              <span className="font-medium text-foreground">Best for:</span>{" "}
+              {place.bestFor.join(", ")}
+            </p>
+          ) : null}
+          {place.reservation ? (
+            <p>
+              <span className="font-medium text-foreground">Reservation:</span>{" "}
+              {place.reservation}
+            </p>
+          ) : null}
+          {place.note ? (
+            <p>
+              <span className="font-medium text-foreground">Nikhil:</span>{" "}
+              {place.note}
+            </p>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

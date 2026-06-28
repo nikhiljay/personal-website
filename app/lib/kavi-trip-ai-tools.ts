@@ -57,6 +57,11 @@ export type PlaceRatingsToolOutput =
       walkingDistanceLabel: string | null;
       walkingDurationLabel: string | null;
       fromSavedList?: boolean;
+      priceLabel?: string | null;
+      cuisine?: string | null;
+      mustOrder?: string[] | null;
+      bestFor?: string[] | null;
+      reservation?: string | null;
     };
 
 export type NearbySpotsToolOutput =
@@ -64,7 +69,7 @@ export type NearbySpotsToolOutput =
   | {
       found: true;
       intro: string;
-      source: "saved" | "google";
+      source: "saved" | "google" | "mixed";
       referenceName: string | null;
       places: Array<PlaceRatingsToolOutput & { found: true }>;
     };
@@ -78,12 +83,25 @@ const savedSpotKindByLabel = Object.fromEntries(
 
 const restaurantKinds: SavedSpotKind[] = ["cafe", "casual", "nice", "bar"];
 
-function resolveSavedSpotKinds(kind?: string): SavedSpotKind[] | null {
+type SavedSpotFilter =
+  | { mode: "all" }
+  | { mode: "kinds"; kinds: SavedSpotKind[] }
+  | { mode: "tags"; tags: string[] };
+
+function resolveSavedSpotFilter(kind?: string): SavedSpotFilter {
   if (!kind) {
-    return null;
+    return { mode: "all" };
   }
 
   const normalized = kind.trim().toLowerCase();
+  if (
+    normalized === "brunch" ||
+    normalized === "breakfast" ||
+    normalized === "morning meal"
+  ) {
+    return { mode: "tags", tags: ["brunch", "breakfast"] };
+  }
+
   if (
     normalized === "restaurant" ||
     normalized === "restaurants" ||
@@ -91,14 +109,44 @@ function resolveSavedSpotKinds(kind?: string): SavedSpotKind[] | null {
     normalized === "dining" ||
     normalized === "eat"
   ) {
-    return restaurantKinds;
+    return { mode: "kinds", kinds: restaurantKinds };
   }
 
   const single = savedSpotKindByLabel[normalized];
-  return single ? [single] : null;
+  if (single) {
+    return { mode: "kinds", kinds: [single] };
+  }
+
+  return { mode: "all" };
+}
+
+function resolveSavedSpotKinds(kind?: string): SavedSpotKind[] | null {
+  const filter = resolveSavedSpotFilter(kind);
+  return filter.mode === "kinds" ? filter.kinds : null;
+}
+
+function filterSavedSpotsByKind(kind?: string) {
+  const filter = resolveSavedSpotFilter(kind);
+
+  if (filter.mode === "all") {
+    return savedSpots;
+  }
+
+  if (filter.mode === "tags") {
+    return savedSpots.filter((spot) =>
+      spot.tags?.some((tag) => filter.tags.includes(tag)),
+    );
+  }
+
+  return savedSpots.filter((spot) => filter.kinds.includes(spot.kind));
 }
 
 function googleTypesForKind(kind?: string): string[] {
+  const filter = resolveSavedSpotFilter(kind);
+  if (filter.mode === "tags") {
+    return ["cafe", "restaurant"];
+  }
+
   const kinds = resolveSavedSpotKinds(kind);
   if (!kinds) {
     return ["restaurant"];
@@ -119,6 +167,15 @@ function googleTypesForKind(kind?: string): string[] {
 }
 
 function spotTypeLabel(kind?: string) {
+  if (!kind) {
+    return "spots";
+  }
+
+  const normalized = kind.trim().toLowerCase();
+  if (normalized === "brunch" || normalized === "breakfast") {
+    return "brunch spots";
+  }
+
   const kinds = resolveSavedSpotKinds(kind);
   if (!kinds) {
     return "spots";
@@ -157,13 +214,21 @@ function formatNearbyReference(referenceName: string | null) {
 }
 
 function buildNearbyIntro(input: {
-  source: "saved" | "google";
+  source: "saved" | "google" | "mixed";
   referenceName: string | null;
   kind?: string;
   autoFallback?: boolean;
+  savedCount?: number;
 }) {
   const reference = formatNearbyReference(input.referenceName);
   const typeLabel = spotTypeLabel(input.kind);
+
+  if (input.source === "mixed") {
+    const savedCount = input.savedCount ?? 0;
+    const savedLabel =
+      savedCount === 1 ? "one from Nikhil's list" : `${savedCount} from Nikhil's list`;
+    return `Here are ${typeLabel} near ${reference} — ${savedLabel}, plus a few other picks:`;
+  }
 
   if (input.source === "saved") {
     return `Here are ${typeLabel} from Nikhil's saved spots near ${reference}:`;
@@ -285,6 +350,11 @@ function placeCardToOutput(
     walkingDistanceLabel: walking.walkingDistanceLabel,
     walkingDurationLabel: walking.walkingDurationLabel,
     fromSavedList,
+    priceLabel: place.priceLabel,
+    cuisine: place.cuisine,
+    mustOrder: place.mustOrder,
+    bestFor: place.bestFor,
+    reservation: place.reservation,
   };
 }
 
@@ -293,10 +363,7 @@ async function buildSavedSpotCards(
   kind: string | undefined,
   limit: number,
 ): Promise<Array<PlaceRatingsToolOutput & { found: true }>> {
-  const kindFilters = resolveSavedSpotKinds(kind);
-  const candidates = kindFilters
-    ? savedSpots.filter((spot) => kindFilters.includes(spot.kind))
-    : savedSpots;
+  const candidates = filterSavedSpotsByKind(kind);
 
   if (candidates.length === 0) {
     return [];
@@ -362,6 +429,11 @@ async function buildSavedSpotCards(
             todayHours: null,
             lat: spot.lat,
             lng: spot.lng,
+            priceLabel: null,
+            cuisine: spot.cuisine ?? null,
+            mustOrder: spot.mustOrder ?? null,
+            bestFor: spot.bestFor ?? null,
+            reservation: spot.reservation ?? null,
           },
           {
             walkingDistanceLabel: formatWalkingDistance(
@@ -394,6 +466,7 @@ async function buildGoogleSpotCards(
   kind: string | undefined,
   limit: number,
   fetchExtra = false,
+  excludeSpotIds: string[] = [],
 ): Promise<Array<PlaceRatingsToolOutput & { found: true }>> {
   const googlePlaces = await searchNearbyGooglePlaces({
     origin,
@@ -401,7 +474,10 @@ async function buildGoogleSpotCards(
     maxResultCount: fetchExtra ? 20 : 15,
   });
 
-  const candidates = googlePlaces.filter((place) => !isKnownSavedSpot(place));
+  const excludedIds = new Set(excludeSpotIds);
+  const candidates = googlePlaces.filter(
+    (place) => !isKnownSavedSpot(place) && !excludedIds.has(place.spotId ?? ""),
+  );
 
   const ranked = await rankPlacesByWalkingDistance(
     origin,
@@ -417,6 +493,53 @@ async function buildGoogleSpotCards(
       false,
     ),
   );
+}
+
+async function buildAutoNearbyPlaces(
+  origin: Coordinates,
+  kind: string | undefined,
+  limit: number,
+): Promise<{
+  places: Array<PlaceRatingsToolOutput & { found: true }>;
+  source: "saved" | "google" | "mixed";
+  savedCount: number;
+}> {
+  const savedPlaces = await buildSavedSpotCards(origin, kind, limit);
+  const hasKindFilter = Boolean(kind?.trim());
+
+  if (!hasKindFilter) {
+    if (savedPlaces.length > 0) {
+      return { places: savedPlaces, source: "saved", savedCount: savedPlaces.length };
+    }
+
+    const googlePlaces = await buildGoogleSpotCards(origin, kind, limit);
+    return { places: googlePlaces, source: "google", savedCount: 0 };
+  }
+
+  const remaining = limit - savedPlaces.length;
+  if (remaining <= 0) {
+    return { places: savedPlaces, source: "saved", savedCount: savedPlaces.length };
+  }
+
+  const googlePlaces = await buildGoogleSpotCards(
+    origin,
+    kind,
+    remaining,
+    true,
+    savedPlaces
+      .map((place) => place.spotId)
+      .filter((spotId): spotId is string => spotId != null),
+  );
+
+  const combined = [...savedPlaces, ...googlePlaces].slice(0, limit);
+  const source =
+    savedPlaces.length > 0 && googlePlaces.length > 0
+      ? "mixed"
+      : savedPlaces.length > 0
+        ? "saved"
+        : "google";
+
+  return { places: combined, source, savedCount: savedPlaces.length };
 }
 
 function savedListEmptyMessage(
@@ -516,7 +639,7 @@ export function createKaviTripAiTools(
           .string()
           .optional()
           .describe(
-            "Optional filter: restaurant (all food/drink), Café, Casual, Sit-Down, Nice, Bar, or Activity",
+            "Filter by type — pass whenever the user asks for a specific kind: brunch, breakfast, restaurant, Café, Casual, Sit-Down, Nice, Bar, or Activity",
           ),
         source: z
           .enum(["saved", "google", "auto"])
@@ -590,9 +713,9 @@ export function createKaviTripAiTools(
             };
           }
 
-          const savedPlaces = await buildSavedSpotCards(origin, kind, limit);
-
           if (source === "saved") {
+            const savedPlaces = await buildSavedSpotCards(origin, kind, limit);
+
             if (savedPlaces.length === 0) {
               return {
                 found: false,
@@ -613,23 +736,10 @@ export function createKaviTripAiTools(
             };
           }
 
-          if (savedPlaces.length > 0) {
-            return {
-              found: true,
-              source: "saved",
-              intro: buildNearbyIntro({
-                source: "saved",
-                referenceName,
-                kind,
-              }),
-              referenceName,
-              places: savedPlaces,
-            };
-          }
+          const { places, source: resultSource, savedCount } =
+            await buildAutoNearbyPlaces(origin, kind, limit);
 
-          const googlePlaces = await buildGoogleSpotCards(origin, kind, limit);
-
-          if (googlePlaces.length === 0) {
+          if (places.length === 0) {
             return {
               found: false,
               error:
@@ -639,15 +749,16 @@ export function createKaviTripAiTools(
 
           return {
             found: true,
-            source: "google",
+            source: resultSource,
             intro: buildNearbyIntro({
-              source: "google",
+              source: resultSource,
               referenceName,
               kind,
-              autoFallback: true,
+              autoFallback: resultSource === "google",
+              savedCount,
             }),
             referenceName,
-            places: googlePlaces,
+            places,
           };
         } catch (error) {
           return {
@@ -714,6 +825,11 @@ export function createKaviTripAiTools(
           lat: result.lat,
           lng: result.lng,
           fromSavedList: result.spotId != null,
+          priceLabel: result.priceLabel,
+          cuisine: result.cuisine,
+          mustOrder: result.mustOrder,
+          bestFor: result.bestFor,
+          reservation: result.reservation,
           ...walking,
         };
       },
