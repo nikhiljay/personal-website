@@ -159,7 +159,7 @@ export function KaviTripSchedule({
                           onClick={() =>
                             onStopSelect(isSelected ? null : stop.id)
                           }
-                          className={`flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-left text-[13px] leading-5 transition-colors ${
+                          className={`inline-flex w-fit max-w-full cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-left text-[13px] leading-5 transition-colors ${
                             isSelected ? "text-fg" : "text-muted hover:text-fg"
                           }`}
                         >
