@@ -267,7 +267,7 @@ export function KaviAskAiChat({
                   name="message"
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
-                  placeholder="Ask about spots, schedule, neighborhoods…"
+                  placeholder="Ask me anything!"
                   aria-label="Message"
                   className={cn(
                     "h-full min-w-0 px-3 py-0 text-foreground placeholder:text-muted-foreground",
