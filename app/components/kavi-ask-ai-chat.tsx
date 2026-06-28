@@ -270,7 +270,7 @@ export function KaviAskAiChat({
           <CardFooter
             className={cn(
               "shrink-0 flex-col gap-2 bg-popover",
-              isFullscreen && "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]",
+              isFullscreen && "pb-[max(--spacing(4),env(safe-area-inset-bottom,0px))]",
             )}
           >
             <form
@@ -308,6 +308,19 @@ export function KaviAskAiChat({
                     // sticks — doing it on pointerdown drops the keyboard. The
                     // preventDefault stops the native tap from re-focusing with
                     // a scroll. Skip if already focused so cursor taps work.
+                    const el = event.currentTarget;
+                    if (el === document.activeElement) {
+                      return;
+                    }
+                    event.preventDefault();
+                    el.focus({ preventScroll: true });
+                  }}
+                  onPointerUp={(event) => {
+                    // Simulator testing often uses mouse clicks, which skip
+                    // touchend and let iOS run its delayed reveal-pan.
+                    if (event.pointerType === "touch") {
+                      return;
+                    }
                     const el = event.currentTarget;
                     if (el === document.activeElement) {
                       return;

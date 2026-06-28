@@ -6,15 +6,61 @@ import { useLayoutEffect } from "react";
 // focus has nothing exact to pre-apply — fall back to a typical iPhone keyboard
 // height, then reuse the real measured height on every subsequent open.
 const FALLBACK_KEYBOARD_INSET = 300;
-// Pre-lift the input a little ABOVE the measured keyboard so iOS sees clearance
-// and skips its reveal-pan; a flush fit still triggers the pan.
-const KEYBOARD_REVEAL_MARGIN = 16;
+// Pre-lift during the opening animation only — preventScroll handles the pan
+// once focused, so the margin doesn't need to carry into the settled position.
+const KEYBOARD_REVEAL_MARGIN = 8;
 // A shrink larger than this means the on-screen keyboard is genuinely up.
 const KEYBOARD_UP_THRESHOLD = 100;
 // An inset at or below this counts as fully closed — small enough that resuming
 // inset tracking here can't visibly snap the body back up.
 const KEYBOARD_CLOSED_INSET = 4;
+// No on-screen keyboard exceeds ~420px including accessory bars.
+const KEYBOARD_INSET_ABSOLUTE_MAX = 420;
 let cachedKeyboardInset = 0;
+
+function isTextInputFocused() {
+  const active = document.activeElement;
+  return (
+    active instanceof HTMLElement &&
+    active.matches("input, textarea, [contenteditable]")
+  );
+}
+
+function getMaxPlausibleKeyboardInset(layoutHeight: number) {
+  return Math.min(
+    Math.round(layoutHeight * 0.52),
+    KEYBOARD_INSET_ABSOLUTE_MAX,
+    (cachedKeyboardInset || FALLBACK_KEYBOARD_INSET) + 48,
+  );
+}
+
+/** Drop sparse iOS/simulator frames where vv.height briefly implodes. */
+function readKeyboardInset(
+  layoutHeight: number,
+  vv: VisualViewport,
+): number | null {
+  const offsetTop = Math.max(0, Math.round(vv.offsetTop));
+  const inset = Math.max(
+    0,
+    Math.round(layoutHeight - offsetTop - vv.height),
+  );
+
+  if (inset === 0) {
+    return 0;
+  }
+
+  const maxPlausible = getMaxPlausibleKeyboardInset(layoutHeight);
+  if (inset > maxPlausible) {
+    return null;
+  }
+
+  // A real keyboard leaves at least ~38% of the layout visible.
+  if (vv.height < layoutHeight * 0.38) {
+    return null;
+  }
+
+  return inset;
+}
 
 /** Syncs --vv-top and --keyboard-inset to the visual viewport on every change. */
 export function useVisualViewportKeyboard(active: boolean) {
@@ -49,22 +95,31 @@ export function useVisualViewportKeyboard(active: boolean) {
 
       const layoutHeight = html.clientHeight;
       const offsetTop = Math.max(0, Math.round(vv.offsetTop));
-      const keyboardInset = Math.max(
-        0,
-        Math.round(layoutHeight - vv.offsetTop - vv.height),
-      );
+      const keyboardInset = readKeyboardInset(layoutHeight, vv);
 
-      if (keyboardInset > cachedKeyboardInset) {
+      if (
+        keyboardInset != null &&
+        keyboardInset > cachedKeyboardInset &&
+        keyboardInset > KEYBOARD_UP_THRESHOLD
+      ) {
         cachedKeyboardInset = keyboardInset;
       }
 
-      html.style.setProperty("--vv-top", `${offsetTop}px`);
+      // We lift the chat from the bottom; while an input is focused, ignore
+      // visual-viewport pan (offsetTop) so header/body top don't bob after the
+      // keyboard settles. Real devices stay ~0 thanks to preventScroll; the
+      // simulator reports noisy scroll events, especially on mouse-driven focus.
+      const effectiveTop = isTextInputFocused() ? 0 : offsetTop;
+      html.style.setProperty("--vv-top", `${effectiveTop}px`);
 
       // While dismissing, hold the inset at 0 (set on focusout) and only resume
       // tracking once the viewport confirms the keyboard is fully gone. Resuming
       // any earlier would re-read a mid-close height and snap the body back up
       // and down — the jerk at the bottom of the dismiss.
       if (dismissing) {
+        if (keyboardInset === null) {
+          return;
+        }
         if (keyboardInset > KEYBOARD_CLOSED_INSET) {
           return;
         }
@@ -72,13 +127,50 @@ export function useVisualViewportKeyboard(active: boolean) {
         window.clearTimeout(dismissEnd);
       }
 
-      html.style.setProperty("--keyboard-inset", `${keyboardInset}px`);
+      let insetToApply: number;
+      if (isTextInputFocused()) {
+        if (keyboardInset != null) {
+          const settledThreshold = Math.max(
+            KEYBOARD_UP_THRESHOLD,
+            (cachedKeyboardInset || FALLBACK_KEYBOARD_INSET) -
+              KEYBOARD_REVEAL_MARGIN,
+          );
+
+          if (keyboardInset >= settledThreshold) {
+            if (!hasMeasuredKeyboard) {
+              hasMeasuredKeyboard = true;
+              sessionInsetMax = keyboardInset;
+            } else {
+              sessionInsetMax = Math.max(sessionInsetMax, keyboardInset);
+            }
+          } else if (!hasMeasuredKeyboard) {
+            sessionInsetMax = Math.max(sessionInsetMax, keyboardInset);
+          }
+        }
+
+        // Never merge a raw (possibly spurious) frame — sessionInsetMax is the
+        // only source of truth while focused.
+        insetToApply = sessionInsetMax;
+      } else if (keyboardInset != null) {
+        insetToApply = keyboardInset;
+      } else {
+        return;
+      }
+      html.style.setProperty("--keyboard-inset", `${insetToApply}px`);
     };
 
     let revealGuard = 0;
     let dismissGuard = 0;
     let dismissEnd = 0;
     let dismissing = false;
+    // Max inset seen during the current input-focus session. iOS (especially
+    // the simulator) can emit a trailing burst of slightly smaller keyboard
+    // heights after the UI has settled; holding the peak stops the bottom
+    // transition from bouncing.
+    let sessionInsetMax = 0;
+    // Once the real keyboard height is reported, snap off the speculative
+    // pre-lift and only hold peak measured values against trailing shrink.
+    let hasMeasuredKeyboard = false;
 
     // The pre-lift only makes sense where focusing an input actually summons a
     // software keyboard — i.e. touch-primary devices. On a fine-pointer device
@@ -110,8 +202,11 @@ export function useVisualViewportKeyboard(active: boolean) {
       }
 
       const predicted = cachedKeyboardInset
-        ? cachedKeyboardInset + KEYBOARD_REVEAL_MARGIN
+        ? Math.min(cachedKeyboardInset, KEYBOARD_INSET_ABSOLUTE_MAX) +
+          KEYBOARD_REVEAL_MARGIN
         : FALLBACK_KEYBOARD_INSET;
+      sessionInsetMax = predicted;
+      hasMeasuredKeyboard = false;
       html.style.setProperty("--keyboard-inset", `${predicted}px`);
 
       // Undo the speculative inset if no on-screen keyboard actually shows up
@@ -153,6 +248,8 @@ export function useVisualViewportKeyboard(active: boolean) {
         // Collapse the inset right away so the body glides down in step with the
         // keyboard instead of waiting for iOS's sparse end-of-animation resize.
         // sync() holds it at 0 and resumes tracking once the close is confirmed.
+        sessionInsetMax = 0;
+        hasMeasuredKeyboard = false;
         dismissing = true;
         html.style.setProperty("--keyboard-inset", "0px");
         // Fallback only: release the guard if no resize ever confirms the close,
