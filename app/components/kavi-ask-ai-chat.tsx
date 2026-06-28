@@ -3,7 +3,7 @@
 import type { RefObject } from "react";
 import type { UIMessage } from "ai";
 import type { useChat } from "@ai-sdk/react";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import {
   ArrowUpIcon,
   MessageCircleDashedIcon,
@@ -14,9 +14,7 @@ import type { UserLocationContext } from "@/app/lib/user-location";
 import { usePreferredColorScheme } from "@/app/hooks/use-preferred-color-scheme";
 import { useThoughtTurnTiming } from "@/app/hooks/use-thought-turn-timing";
 import { MessageAnimated } from "@/components/message-animated";
-import { ReasoningBlock } from "@/components/reasoning-block";
 import { Button } from "@/components/ui/button";
-import { Message, MessageContent } from "@/components/ui/message";
 import {
   Card,
   CardAction,
@@ -42,13 +40,20 @@ import {
   MessageScroller,
   MessageScrollerButton,
   MessageScrollerContent,
-  MessageScrollerItem,
   MessageScrollerProvider,
   MessageScrollerViewport,
   useMessageScroller,
   useMessageScrollerScrollable,
 } from "@/components/ui/message-scroller";
 import { cn } from "@/lib/utils";
+
+const IN_PROGRESS_ASSISTANT_ID = "in-progress-assistant";
+
+const PENDING_ASSISTANT_MESSAGE: UIMessage = {
+  id: IN_PROGRESS_ASSISTANT_ID,
+  role: "assistant",
+  parts: [],
+};
 
 type KaviAskAiChatProps = {
   className?: string;
@@ -143,8 +148,6 @@ export function KaviAskAiChat({
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
   const lastMessage = messages.at(-1);
-  const latestAssistantMessageId =
-    lastMessage?.role === "assistant" ? lastMessage.id : null;
 
   const thoughtTurn = useThoughtTurnTiming(status);
   const hasStreamingAssistant =
@@ -159,6 +162,16 @@ export function KaviAskAiChat({
     thoughtTurn.isActive &&
     !hasStreamingAssistant &&
     lastMessage?.role !== "assistant";
+  const displayMessages = useMemo(
+    () =>
+      showFallbackThinking
+        ? [...messages, PENDING_ASSISTANT_MESSAGE]
+        : messages,
+    [messages, showFallbackThinking],
+  );
+  const latestRenderableAssistantId =
+    displayMessages.findLast((message) => message.role === "assistant")?.id ??
+    null;
   const colorScheme = usePreferredColorScheme();
   const isSubmitDisabled = !input.trim() || isBusy;
   const sendButtonColors = getSendButtonColors(colorScheme, isSubmitDisabled);
@@ -235,7 +248,7 @@ export function KaviAskAiChat({
               <MessageScroller className="h-full touch-auto">
                 <ChatBottomPin
                   isBusy={isBusy}
-                  messages={messages}
+                  messages={displayMessages}
                   showFallbackThinking={showFallbackThinking}
                 />
                 <MessageScrollerViewport
@@ -248,35 +261,33 @@ export function KaviAskAiChat({
                     aria-busy={isBusy}
                     className="p-(--card-spacing)"
                   >
-                    {messages.map((message, index) => (
-                      <MessageAnimated
-                        key={message.id}
-                        message={message}
-                        scrollAnchor={false}
-                        layoutStable={index >= messages.length - 2}
-                        textSize={textSize}
-                        turnTiming={
-                          message.role === "assistant" &&
-                          message.id === latestAssistantMessageId &&
-                          thoughtTurn.isActive
-                            ? thoughtTurn
-                            : undefined
-                        }
-                      />
-                    ))}
-                    {showFallbackThinking ? (
-                      <MessageScrollerItem messageId="thinking" layoutStable>
-                        <Message align="start" className={textSize}>
-                          <MessageContent className="[&>*]:w-full [&>*]:min-w-0 gap-1.5 [&>[data-slot=reasoning-block]+*]:-mt-1.5">
-                            <ReasoningBlock
-                              text=""
-                              turnTiming={thoughtTurn}
-                              className="w-full min-w-0 self-stretch"
-                            />
-                          </MessageContent>
-                        </Message>
-                      </MessageScrollerItem>
-                    ) : null}
+                    {displayMessages.map((message, index) => {
+                      const isInProgressAssistantTurn =
+                        message.role === "assistant" &&
+                        index === displayMessages.length - 1 &&
+                        thoughtTurn.isActive;
+                      const scrollerMessageId = isInProgressAssistantTurn
+                        ? IN_PROGRESS_ASSISTANT_ID
+                        : message.id;
+
+                      return (
+                        <MessageAnimated
+                          key={scrollerMessageId}
+                          message={message}
+                          scrollerMessageId={scrollerMessageId}
+                          scrollAnchor={false}
+                          layoutStable={index >= displayMessages.length - 2}
+                          textSize={textSize}
+                          turnTiming={
+                            message.role === "assistant" &&
+                            message.id === latestRenderableAssistantId &&
+                            thoughtTurn.isActive
+                              ? thoughtTurn
+                              : undefined
+                          }
+                        />
+                      );
+                    })}
                   </MessageScrollerContent>
                 </MessageScrollerViewport>
                 <MessageScrollerButton />

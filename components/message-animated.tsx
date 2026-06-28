@@ -29,11 +29,18 @@ type MessageAnimatedProps = {
   message: UIMessage;
   scrollAnchor?: boolean;
   layoutStable?: boolean;
+  scrollerMessageId?: string;
   textSize?: string;
   userVariant?: React.ComponentProps<typeof Bubble>["variant"];
   assistantVariant?: React.ComponentProps<typeof Bubble>["variant"];
   turnTiming?: ThoughtTurnTiming;
 };
+
+function getReasoningBlockKey(ownerId: string, flushIndex: number) {
+  return flushIndex === 0
+    ? `${ownerId}-reasoning`
+    : `${ownerId}-reasoning-${flushIndex}`;
+}
 
 function flushReasoningBlock(
   elements: ReactNode[],
@@ -58,12 +65,14 @@ export const MessageAnimated = memo(function MessageAnimated({
   message,
   scrollAnchor,
   layoutStable = false,
+  scrollerMessageId,
   textSize = "text-sm/relaxed",
   userVariant = "muted",
   assistantVariant = "ghost",
   turnTiming,
 }: MessageAnimatedProps) {
   const isUser = message.role === "user";
+  const reasoningOwnerId = scrollerMessageId ?? message.id;
 
   const renderedParts: ReactNode[] = [];
   let reasoningText = "";
@@ -82,7 +91,7 @@ export const MessageAnimated = memo(function MessageAnimated({
       renderedParts,
       reasoningText,
       reasoningState,
-      `${message.id}-reasoning-${reasoningFlushIndex}`,
+      getReasoningBlockKey(reasoningOwnerId, reasoningFlushIndex),
       turnTiming,
       reasoningState === "streaming",
     );
@@ -256,7 +265,7 @@ export const MessageAnimated = memo(function MessageAnimated({
       renderedParts,
       "",
       undefined,
-      `${message.id}-reasoning-pending`,
+      getReasoningBlockKey(reasoningOwnerId, 0),
       turnTiming,
       true,
     );
@@ -264,7 +273,7 @@ export const MessageAnimated = memo(function MessageAnimated({
 
   return (
     <MessageScrollerItem
-      messageId={message.id}
+      messageId={reasoningOwnerId}
       scrollAnchor={scrollAnchor ?? false}
       layoutStable={layoutStable}
     >
