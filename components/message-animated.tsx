@@ -38,13 +38,14 @@ function flushReasoningBlock(
   state: "streaming" | "done" | undefined,
   key: string,
   turnTiming?: ThoughtTurnTiming,
+  useTurnTiming = false,
 ) {
   elements.push(
     <ReasoningBlock
       key={key}
       text={text}
       state={state}
-      turnTiming={turnTiming}
+      turnTiming={useTurnTiming ? turnTiming : undefined}
       className="w-full min-w-0 self-stretch"
     />,
   );
@@ -79,6 +80,7 @@ export function MessageAnimated({
       reasoningState,
       `${message.id}-reasoning-${reasoningFlushIndex}`,
       turnTiming,
+      reasoningState === "streaming",
     );
     reasoningFlushIndex += 1;
     reasoningText = "";
@@ -238,6 +240,7 @@ export function MessageAnimated({
       undefined,
       `${message.id}-reasoning-pending`,
       turnTiming,
+      true,
     );
   }
 

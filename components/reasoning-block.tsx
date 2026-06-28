@@ -60,27 +60,19 @@ export function ReasoningBlock({
   className,
   turnTiming,
 }: ReasoningBlockProps) {
-  const usesTurnTiming = turnTiming != null;
-  const isStreaming = usesTurnTiming
-    ? turnTiming.isActive
-    : state === "streaming";
+  const displayText = useMemo(() => flattenReasoningText(text), [text]);
+  const isPendingTurnTiming =
+    turnTiming?.isActive === true &&
+    state !== "streaming" &&
+    state !== "done" &&
+    displayText.trim().length === 0;
+  const isStreaming = state === "streaming" || isPendingTurnTiming;
   const [open, setOpen] = useState(false);
   const startedAtRef = useRef<number | null>(null);
-  const [localElapsedSeconds, setLocalElapsedSeconds] = useState(1);
-  const [frozenElapsedSeconds, setFrozenElapsedSeconds] = useState<
-    number | null
-  >(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(1);
   const contentRef = useRef<HTMLDivElement>(null);
-  const displayText = useMemo(() => flattenReasoningText(text), [text]);
 
   useEffect(() => {
-    if (usesTurnTiming) {
-      if (!turnTiming.isActive && turnTiming.elapsedSeconds > 0) {
-        setFrozenElapsedSeconds(turnTiming.elapsedSeconds);
-      }
-      return;
-    }
-
     if (isStreaming) {
       if (startedAtRef.current == null) {
         startedAtRef.current = Date.now();
@@ -89,16 +81,12 @@ export function ReasoningBlock({
     }
 
     if (startedAtRef.current != null) {
-      setLocalElapsedSeconds(
+      setElapsedSeconds(
         Math.max(1, Math.ceil((Date.now() - startedAtRef.current) / 1000)),
       );
       startedAtRef.current = null;
     }
-  }, [isStreaming, turnTiming, usesTurnTiming]);
-
-  const elapsedSeconds =
-    frozenElapsedSeconds ??
-    (usesTurnTiming ? turnTiming.elapsedSeconds : localElapsedSeconds);
+  }, [isStreaming]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll when streamed text grows
   useEffect(() => {
