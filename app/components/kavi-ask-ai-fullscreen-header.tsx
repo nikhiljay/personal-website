@@ -19,9 +19,9 @@ export const KaviAskAiFullscreenHeader = memo(function KaviAskAiFullscreenHeader
   onClose,
 }: KaviAskAiFullscreenHeaderProps) {
   return (
-    <CardHeader className="gap-1 bg-popover pb-2.5 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] [--card-spacing:--spacing(5)]">
+    <CardHeader className="gap-1 bg-popover pb-5 pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] [--card-spacing:--spacing(5)]">
       <CardTitle id="ask-ai-title">Nikhil Agent</CardTitle>
-      <CardDescription className="text-sm/relaxed">
+      <CardDescription className="text-sm/tight">
         How can I help you today?
       </CardDescription>
       <CardAction>

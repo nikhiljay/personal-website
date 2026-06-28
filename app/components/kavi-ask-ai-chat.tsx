@@ -332,9 +332,9 @@ export function KaviAskAiChat({
   const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
 
   const header = (
-    <CardHeader className="shrink-0 gap-1 border-b bg-popover">
+    <CardHeader className="shrink-0 gap-1 border-b bg-popover py-5 [.border-b]:pb-5">
       <CardTitle>Nikhil Agent</CardTitle>
-      <CardDescription className={textSize}>
+      <CardDescription className="text-sm/tight">
         How can I help you today?
       </CardDescription>
       {onClose ? (
@@ -362,7 +362,7 @@ export function KaviAskAiChat({
             textSize,
             isFullscreen
               ? "!grid min-h-0 grid-rows-[minmax(0,1fr)_auto] max-w-none rounded-none border-0 bg-popover py-0 shadow-none ring-0 [--card-spacing:--spacing(5)]"
-              : "max-w-sm flex flex-col",
+              : "max-w-sm flex flex-col pt-0",
           )}
         >
           {!isFullscreen ? header : null}

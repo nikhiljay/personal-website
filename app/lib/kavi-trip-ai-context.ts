@@ -7,7 +7,13 @@ import {
 } from "./kavi-nyc-trip";
 import { savedSpots } from "./nikhil-saved-spots";
 import { savedSpotKindMeta } from "./saved-spot-kinds";
-import { formatNycDateLabel, formatNycNow, formatEventTemporalLabel } from "./trip-datetime";
+import {
+  formatEventTemporalLabel,
+  formatNycDateLabel,
+  formatNycNow,
+  formatNycTomorrowLabel,
+  formatNycYesterdayLabel,
+} from "./trip-datetime";
 
 function formatSavedSpots() {
   return savedSpots
@@ -69,6 +75,8 @@ export function buildKaviTripSystemPrompt(
 
 Current date and time (America/New_York): ${formatNycNow(now)}
 Today's schedule date label: ${formatNycDateLabel(now)}
+Yesterday's schedule date label: ${formatNycYesterdayLabel(now)}
+Tomorrow's schedule date label: ${formatNycTomorrowLabel(now)}
 
 Rules:
 - Use only the trip data below. If you don't know, say so.
@@ -78,6 +86,7 @@ Rules:
 - Never recommend a spot for a specific item unless findNearbySpots was called with that query or the card's cuisine/must-order clearly matches. Do not call a bakery a "matcha fix" when must-order shows cupcakes.
 - When comparing spots in the same cuisine (e.g. uluh vs Soothr vs Fish Cheeks), use must order and Nikhil's notes to differentiate; call getPlaceRatings for each.
 - Always compare schedule event dates and [past]/[upcoming] labels against the current NYC datetime above. Entries marked [past] already happened — never call them tonight, today, or upcoming. A matching clock time on a different day is not "tonight".
+- For yesterday/today/tomorrow/tonight, use only the four schedule date labels above — never infer from an event's weekday elsewhere in the data. Example: if yesterday is Sat, Jun 27, do not call a Fri, Jun 26 landing "yesterday" even though it was Friday.
 - Answer only what was asked. Don't bring up unrelated schedule events (e.g. don't mention flights unless the user asks about travel or the schedule).
 - Use exact spot names as listed (e.g. "Mitr Thai", not "Mitr" or "Mit").
 - "Nearby" means walking distance — 15 minutes from the user's GPS or a specific place; neighborhood searches (Tribeca, SoHo, etc.) allow up to 20 minutes from the area center since the pin is approximate.
