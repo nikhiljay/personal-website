@@ -10,7 +10,6 @@ import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
 import { ensureKaviBraintrustTelemetry } from "@/app/lib/kavi-braintrust";
 import {
   getKaviChatModel,
-  getKaviChatModelId,
   getKaviChatReasoningEffort,
 } from "@/app/lib/kavi-chat-model";
 import {
@@ -115,13 +114,6 @@ export async function POST(req: Request) {
       };
   const tools = createKaviTripAiTools(locationContext, tripEvents);
   const reasoning = getKaviChatReasoningEffort();
-  const lastUserText = [...messages]
-    .reverse()
-    .find((message) => message.role === "user")
-    ?.parts.filter((part) => part.type === "text")
-    .map((part) => part.text)
-    .join("\n")
-    .trim();
 
   let streamCallId: string | undefined;
 
@@ -139,12 +131,6 @@ export async function POST(req: Request) {
       functionId: "kavi-trip-chat",
       recordInputs: true,
       recordOutputs: true,
-      metadata: {
-        locationMode: locationContext.mode,
-        tripEventCount: tripEvents.length,
-        model: getKaviChatModelId(),
-        ...(lastUserText ? { userMessage: lastUserText.slice(0, 500) } : {}),
-      },
     },
     ...(reasoning ? { reasoning } : {}),
     onStart: ({ callId }) => {
