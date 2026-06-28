@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -13,41 +15,49 @@ type ReasoningInlineMarkdownProps = {
   isActive?: boolean;
 };
 
+function createReasoningMarkdownComponents(isActive: boolean) {
+  const blockClass = isActive ? "reasoning-body-active" : "reasoning-body-muted";
+
+  return {
+    p: ({ children: content }: { children?: ReactNode }) => (
+      <p className={cn("mb-2 last:mb-0", blockClass)}>{content}</p>
+    ),
+    ul: ({ children: content }: { children?: ReactNode }) => (
+      <ul className={cn("mb-2 list-disc pl-4 last:mb-0", blockClass)}>
+        {content}
+      </ul>
+    ),
+    ol: ({ children: content }: { children?: ReactNode }) => (
+      <ol className={cn("mb-2 list-decimal pl-4 last:mb-0", blockClass)}>
+        {content}
+      </ol>
+    ),
+    li: ({ children: content }: { children?: ReactNode }) => (
+      <li className="mb-0.5">{content}</li>
+    ),
+    strong: ({ children: content }: { children?: ReactNode }) => (
+      <strong className="font-medium">{content}</strong>
+    ),
+    code: ({ children: content }: { children?: ReactNode }) => (
+      <code className="rounded-sm bg-muted/60 px-1 py-0.5 font-mono text-[0.6875rem]">
+        {content}
+      </code>
+    ),
+    em: ({ children: content }: { children?: ReactNode }) => <em>{content}</em>,
+  };
+}
+
 function ReasoningInlineMarkdown({
   children,
   isActive = false,
 }: ReasoningInlineMarkdownProps) {
-  const blockClass = isActive ? "reasoning-body-active" : "reasoning-body-muted";
+  const components = useMemo(
+    () => createReasoningMarkdownComponents(isActive),
+    [isActive],
+  );
 
   return (
-    <Markdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        p: ({ children: content }) => (
-          <p className={cn("mb-2 last:mb-0", blockClass)}>{content}</p>
-        ),
-        ul: ({ children: content }) => (
-          <ul className={cn("mb-2 list-disc pl-4 last:mb-0", blockClass)}>
-            {content}
-          </ul>
-        ),
-        ol: ({ children: content }) => (
-          <ol className={cn("mb-2 list-decimal pl-4 last:mb-0", blockClass)}>
-            {content}
-          </ol>
-        ),
-        li: ({ children: content }) => <li className="mb-0.5">{content}</li>,
-        strong: ({ children: content }) => (
-          <strong className="font-medium">{content}</strong>
-        ),
-        code: ({ children: content }) => (
-          <code className="rounded-sm bg-muted/60 px-1 py-0.5 font-mono text-[0.6875rem]">
-            {content}
-          </code>
-        ),
-        em: ({ children: content }) => <em>{content}</em>,
-      }}
-    >
+    <Markdown remarkPlugins={[remarkGfm]} components={components}>
       {children}
     </Markdown>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import type { RefObject } from "react";
-import { useRef, useState } from "react";
 import type { useChat } from "@ai-sdk/react";
 import {
   ArrowUpIcon,
@@ -94,39 +93,11 @@ export function KaviAskAiChat({
   getLocationContext,
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
-  const [savedThoughtSeconds, setSavedThoughtSeconds] = useState<
-    Record<string, number>
-  >({});
   const lastMessage = messages.at(-1);
   const latestAssistantMessageId =
     lastMessage?.role === "assistant" ? lastMessage.id : null;
-  const latestAssistantMessageIdRef = useRef(latestAssistantMessageId);
-  latestAssistantMessageIdRef.current = latestAssistantMessageId;
 
-  const thoughtTurn = useThoughtTurnTiming(status, (elapsed) => {
-    const messageId = latestAssistantMessageIdRef.current;
-    if (!messageId) {
-      return;
-    }
-
-    setSavedThoughtSeconds((current) => ({
-      ...current,
-      [messageId]: elapsed,
-    }));
-  });
-
-  const getTurnTimingForMessage = (messageId: string) => {
-    if (messageId === latestAssistantMessageId) {
-      return thoughtTurn;
-    }
-
-    const saved = savedThoughtSeconds[messageId];
-    if (saved == null) {
-      return undefined;
-    }
-
-    return { isActive: false, elapsedSeconds: saved };
-  };
+  const thoughtTurn = useThoughtTurnTiming(status);
   const hasStreamingAssistant =
     lastMessage?.role === "assistant" &&
     lastMessage.parts.some(
@@ -230,8 +201,10 @@ export function KaviAskAiChat({
                         scrollAnchor={message.role === "user"}
                         textSize={textSize}
                         turnTiming={
-                          message.role === "assistant"
-                            ? getTurnTimingForMessage(message.id)
+                          message.role === "assistant" &&
+                          message.id === latestAssistantMessageId &&
+                          thoughtTurn.isActive
+                            ? thoughtTurn
                             : undefined
                         }
                       />

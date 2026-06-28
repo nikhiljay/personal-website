@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -40,25 +39,6 @@ export function useThoughtTurnTiming(
       onTurnCompleteRef.current?.(elapsed);
     }
   }, [status]);
-
-  useEffect(() => {
-    if (!isActive || startedAtRef.current == null) {
-      return;
-    }
-
-    const tick = () => {
-      if (startedAtRef.current == null) {
-        return;
-      }
-
-      setElapsedSeconds(
-        Math.max(1, Math.ceil((Date.now() - startedAtRef.current) / 1000)),
-      );
-    };
-
-    const id = window.setInterval(tick, 250);
-    return () => window.clearInterval(id);
-  }, [isActive]);
 
   return { isActive, elapsedSeconds };
 }

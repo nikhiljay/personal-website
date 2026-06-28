@@ -1,7 +1,7 @@
 "use client";
 
 import type { UIMessage } from "ai";
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 
 import { PlaceRatingCard } from "@/app/components/place-rating-card";
 import { LocationToolCard } from "@/app/components/location-tool-card";
@@ -51,7 +51,7 @@ function flushReasoningBlock(
   );
 }
 
-export function MessageAnimated({
+export const MessageAnimated = memo(function MessageAnimated({
   message,
   scrollAnchor,
   textSize = "text-sm/relaxed",
@@ -262,4 +262,4 @@ export function MessageAnimated({
       </Message>
     </MessageScrollerItem>
   );
-}
+});
