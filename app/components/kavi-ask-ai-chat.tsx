@@ -162,9 +162,9 @@ export function KaviAskAiChat({
                   <EmptyMedia variant="icon">
                     <MessageCircleDashedIcon />
                   </EmptyMedia>
-                  <EmptyTitle>Hey Kavi!</EmptyTitle>
+                  <EmptyTitle>Hey Kavi 🤏🏽</EmptyTitle>
                   <EmptyDescription className={textSize}>
-                    Ask about your schedule, saved spots, or neighborhoods. Send
+                    Ask about your schedule, my saved spots, or neighborhoods. Send
                     a message to start.
                   </EmptyDescription>
                 </EmptyHeader>
@@ -191,11 +191,13 @@ export function KaviAskAiChat({
                     ))}
                     {status === "submitted" ? (
                       <MessageScrollerItem messageId="thinking">
-                        <Marker role="status" className={textSize}>
+                        <Marker role="status" className={cn(textSize, "leading-none")}>
                           <MarkerIcon>
-                            <Spinner />
+                            <Spinner className="size-3.5" />
                           </MarkerIcon>
-                          <MarkerContent>Thinking…</MarkerContent>
+                          <MarkerContent className="leading-none">
+                            Thinking…
+                          </MarkerContent>
                         </Marker>
                       </MessageScrollerItem>
                     ) : null}
@@ -249,6 +251,22 @@ export function KaviAskAiChat({
                   autoComplete="off"
                   autoCorrect="on"
                   disabled={isBusy}
+                  onTouchEnd={(event) => {
+                    // iOS runs a delayed "scroll focused input into view" that
+                    // pans the whole viewport up even when the input is already
+                    // above the keyboard (the jerk on mobile). Focusing the
+                    // input ourselves with preventScroll suppresses that pan.
+                    // Done on touchend (after the tap commits) so the focus
+                    // sticks — doing it on pointerdown drops the keyboard. The
+                    // preventDefault stops the native tap from re-focusing with
+                    // a scroll. Skip if already focused so cursor taps work.
+                    const el = event.currentTarget;
+                    if (el === document.activeElement) {
+                      return;
+                    }
+                    event.preventDefault();
+                    el.focus({ preventScroll: true });
+                  }}
                   onKeyDown={(event) => {
                     if (
                       event.key !== "Enter" ||

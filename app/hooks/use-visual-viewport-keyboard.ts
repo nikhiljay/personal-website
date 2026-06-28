@@ -6,7 +6,16 @@ import { useLayoutEffect } from "react";
 // focus has nothing exact to pre-apply — fall back to a typical iPhone keyboard
 // height, then reuse the real measured height on every subsequent open.
 const FALLBACK_KEYBOARD_INSET = 300;
+// Pre-lift the input a little ABOVE the measured keyboard so iOS sees clearance
+// and skips its reveal-pan; a flush fit still triggers the pan.
+const KEYBOARD_REVEAL_MARGIN = 16;
+// A shrink larger than this means the on-screen keyboard is genuinely up.
+const KEYBOARD_UP_THRESHOLD = 100;
 let cachedKeyboardInset = 0;
+
+// TEMP: on-screen readout to confirm behavior on real iOS. Flip off / delete the
+// dbg* blocks once dialed in.
+const DEBUG = true;
 
 /** Syncs --vv-top and --keyboard-inset to the visual viewport on every change. */
 export function useVisualViewportKeyboard(active: boolean) {
@@ -28,39 +37,66 @@ export function useVisualViewportKeyboard(active: boolean) {
     html.style.height = "100%";
     html.style.overscrollBehavior = "none";
 
-    // Write synchronously on each event so --vv-top tracks the visual
-    // viewport top tightly (the header reads it directly). offsetTop and
-    // height are read from the same vv snapshot, so they are always
-    // consistent; smoothing between sparse iOS events is done in CSS via a
-    // transition on the (now absolutely-positioned) header/body.
+    // ---- TEMP DEBUG ----
+    let dbgBox: HTMLPreElement | null = null;
+    let dbgFocusLine = "";
+    const dbgSyncLog: string[] = [];
+    let dbgT0 = 0;
+    let dbgMaxTop = 0;
+    const dbgRender = () => {
+      if (dbgBox) {
+        dbgBox.textContent = [
+          `PEAK pan(top)=${dbgMaxTop}  <- 0 = good`,
+          dbgFocusLine,
+          ...dbgSyncLog.slice(-10),
+        ].join("\n");
+      }
+    };
+    if (DEBUG) {
+      dbgBox = document.createElement("pre");
+      dbgBox.style.cssText =
+        "position:fixed;top:0;left:0;z-index:99999;margin:0;padding:6px;background:rgba(0,0,0,.82);color:#0f0;font:11px/1.3 monospace;white-space:pre;pointer-events:none;max-width:78vw;";
+      document.body.appendChild(dbgBox);
+    }
+
+    // The keyboard height is (layout viewport) - (visual viewport bottom).
+    // Use documentElement.clientHeight for the layout viewport: on iOS
+    // window.innerHeight tracks the *visual* viewport (so innerHeight - vv ≈ 0
+    // always), but clientHeight stays the full layout height the keyboard
+    // overlays. Lifting the input by this amount puts it above the keyboard, so
+    // iOS has no hidden input to reveal and skips its janky pan.
     const sync = () => {
       const vv = window.visualViewport;
       if (!vv) {
         return;
       }
 
+      const layoutHeight = html.clientHeight;
       const offsetTop = Math.max(0, Math.round(vv.offsetTop));
       const keyboardInset = Math.max(
         0,
-        Math.round(window.innerHeight - vv.offsetTop - vv.height),
+        Math.round(layoutHeight - vv.offsetTop - vv.height),
       );
 
-      if (keyboardInset > 0) {
+      if (keyboardInset > cachedKeyboardInset) {
         cachedKeyboardInset = keyboardInset;
       }
 
       html.style.setProperty("--vv-top", `${offsetTop}px`);
       html.style.setProperty("--keyboard-inset", `${keyboardInset}px`);
+
+      if (DEBUG && dbgBox) {
+        if (offsetTop > dbgMaxTop) {
+          dbgMaxTop = offsetTop;
+        }
+        const t = dbgT0 ? Math.round(performance.now() - dbgT0) : 0;
+        dbgSyncLog.push(
+          `+${t} top=${offsetTop} h=${Math.round(vv.height)} ch=${layoutHeight} kb=${keyboardInset}`,
+        );
+        dbgRender();
+      }
     };
 
-    // On focus iOS scrolls the visual viewport up to reveal the input it
-    // assumes the keyboard will cover, spiking offsetTop and whipping the
-    // header / chat top around before it settles back to 0 (the input stays
-    // smooth because it tracks the keyboard top, not offsetTop). Pre-applying
-    // the expected keyboard inset the instant an input is focused lifts the
-    // input above the keyboard first, so iOS finds nothing to reveal and skips
-    // the scroll. The visualViewport resize then corrects to the exact height,
-    // and the CSS transition smooths the estimate -> measured handoff.
     let revealGuard = 0;
 
     const onFocusIn = (event: FocusEvent) => {
@@ -72,23 +108,41 @@ export function useVisualViewportKeyboard(active: boolean) {
         return;
       }
 
-      const currentInset =
-        Number.parseFloat(html.style.getPropertyValue("--keyboard-inset")) || 0;
-      if (currentInset > 0) {
+      const vv = window.visualViewport;
+      const shrink = vv ? Math.round(html.clientHeight - vv.height) : -1;
+
+      if (DEBUG) {
+        dbgT0 = performance.now();
+        dbgSyncLog.length = 0;
+        dbgMaxTop = 0;
+      }
+
+      // Skip only if a keyboard is genuinely already up (refocus). Use the live
+      // layout-vs-visual delta, not --keyboard-inset (which keeps a residual).
+      if (vv && shrink > KEYBOARD_UP_THRESHOLD) {
+        if (DEBUG) {
+          dbgFocusLine = `FOCUS skip shrink=${shrink}`;
+          dbgRender();
+        }
         return;
       }
 
-      html.style.setProperty(
-        "--keyboard-inset",
-        `${cachedKeyboardInset || FALLBACK_KEYBOARD_INSET}px`,
-      );
+      const predicted = cachedKeyboardInset
+        ? cachedKeyboardInset + KEYBOARD_REVEAL_MARGIN
+        : FALLBACK_KEYBOARD_INSET;
+      html.style.setProperty("--keyboard-inset", `${predicted}px`);
+
+      if (DEBUG) {
+        dbgFocusLine = `FOCUS lift=${predicted} cached=${cachedKeyboardInset} ch=${html.clientHeight}`;
+        dbgRender();
+      }
 
       // Undo the speculative inset if no on-screen keyboard actually shows up
-      // (e.g. an external/hardware keyboard), so the input isn't left lifted.
+      // (e.g. an external keyboard), so the input isn't left lifted.
       window.clearTimeout(revealGuard);
       revealGuard = window.setTimeout(() => {
-        const vv = window.visualViewport;
-        if (vv && window.innerHeight - vv.height < 100) {
+        const live = window.visualViewport;
+        if (live && html.clientHeight - live.height < KEYBOARD_UP_THRESHOLD) {
           sync();
         }
       }, 400);
@@ -106,6 +160,7 @@ export function useVisualViewportKeyboard(active: boolean) {
       viewport?.removeEventListener("resize", sync);
       viewport?.removeEventListener("scroll", sync);
       document.removeEventListener("focusin", onFocusIn);
+      dbgBox?.remove();
       html.style.removeProperty("--vv-top");
       html.style.removeProperty("--keyboard-inset");
       html.style.position = previousHtml.position;

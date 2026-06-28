@@ -39,3 +39,4 @@ project-thumbnails/
 yarn.lock
 package-lock.json
 npm-shrinkwrap.json
+.env*
