@@ -17,14 +17,6 @@ type LocationToolCardProps = {
   className?: string;
 };
 
-function locationStatusLabel(output: CurrentLocationToolOutput) {
-  if (output.mode === "unavailable") {
-    return "Location unavailable";
-  }
-
-  return output.label;
-}
-
 export function LocationToolCard({
   state,
   output,
@@ -40,9 +32,7 @@ export function LocationToolCard({
         <MarkerIcon className="size-4">
           <CurrentLocationDot active={output.mode === "in_nyc"} />
         </MarkerIcon>
-        <MarkerContent className="leading-none">
-          {locationStatusLabel(output)}
-        </MarkerContent>
+        <MarkerContent className="leading-none">{output.label}</MarkerContent>
       </Marker>
     );
   }

@@ -1,4 +1,5 @@
 import { isInNyc, type Coordinates } from "./geo";
+import { reverseGeocodeAddress } from "./google-geocode";
 
 export type UserLocationMode = "unavailable" | "outside_nyc" | "in_nyc";
 
@@ -10,12 +11,19 @@ export type CurrentLocationToolOutput = {
   mode: UserLocationMode;
   lat: number | null;
   lng: number | null;
+  address: string | null;
   label: string;
   message: string;
 };
 
-export function formatLocationLabel({ lat, lng }: Coordinates) {
-  return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+const LOCATION_STATUS_LABELS: Record<UserLocationMode, string> = {
+  unavailable: "Location unavailable",
+  outside_nyc: "Outside NYC",
+  in_nyc: "In NYC",
+};
+
+export function locationStatusLabel(mode: UserLocationMode) {
+  return LOCATION_STATUS_LABELS[mode];
 }
 
 export function nycCoordinatesFromContext(
@@ -97,29 +105,34 @@ export function parseLocationContext(value: unknown): UserLocationContext {
   return { mode, ...coordinates };
 }
 
-export function buildCurrentLocationToolOutput(
+export async function buildCurrentLocationToolOutput(
   context: UserLocationContext,
-): CurrentLocationToolOutput {
+): Promise<CurrentLocationToolOutput> {
   if (context.mode === "unavailable") {
     return {
       mode: "unavailable",
       lat: null,
       lng: null,
-      label: "Location unavailable",
+      address: null,
+      label: locationStatusLabel("unavailable"),
       message:
         "Location permission not granted or unavailable. Ask the user to allow location access on the trip page.",
     };
   }
 
-  const label = formatLocationLabel(context);
+  const address = await reverseGeocodeAddress(context);
+  const label = address ?? locationStatusLabel(context.mode);
 
   if (context.mode === "outside_nyc") {
     return {
       mode: "outside_nyc",
       lat: context.lat,
       lng: context.lng,
+      address,
       label,
-      message: `User is outside NYC (${label}). Walking-distance queries from their location are not available.`,
+      message: address
+        ? `Location access is enabled. The user is at ${address}, outside NYC. Do NOT ask them to enable location access — they already have. Walking-distance and near-me spot recommendations only work in NYC. If they ask whether you have their location, say yes and mention they're at ${address}, outside NYC.`
+        : "Location access is enabled. The user is outside NYC. Do NOT ask them to enable location access — they already have. Walking-distance and near-me spot recommendations only work in NYC. If they ask whether you have their location, say yes and that they're outside NYC.",
     };
   }
 
@@ -127,7 +140,10 @@ export function buildCurrentLocationToolOutput(
     mode: "in_nyc",
     lat: context.lat,
     lng: context.lng,
+    address,
     label,
-    message: `User is in NYC (${label}). Use for near-me and walking-distance queries.`,
+    message: address
+      ? `Location access is enabled. The user is at ${address} in NYC. Use their location for near-me and walking-distance queries. If they ask whether you have their location, say yes and mention they're at ${address}.`
+      : "Location access is enabled. The user is in NYC. Use their location for near-me and walking-distance queries.",
   };
 }

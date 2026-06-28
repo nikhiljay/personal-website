@@ -134,15 +134,13 @@ function PlaceRatingCardContent({
             citymapperUrl && "pr-7",
           )}
         >
-          <p className="truncate text-sm leading-tight">
-            <span className="font-semibold">{place.name}</span>
+          <p className="flex min-w-0 text-sm leading-tight">
+            <span className="shrink-0 font-semibold">{place.name}</span>
             {place.address ? (
-              <>
-                <span className="font-normal text-muted-foreground">
-                  {" "}
-                  — {place.address}
-                </span>
-              </>
+              <span className="min-w-0 truncate font-normal text-muted-foreground">
+                {" "}
+                — {place.address}
+              </span>
             ) : null}
           </p>
 

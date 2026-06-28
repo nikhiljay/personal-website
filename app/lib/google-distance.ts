@@ -112,14 +112,14 @@ export function formatWalkingDistance(meters: number) {
   const miles = meters / 1609.344;
 
   if (miles < 0.1) {
-    return "< 0.1 mi walk";
+    return "< 0.1 mi";
   }
 
   if (miles < 10) {
-    return `${miles.toFixed(1)} mi walk`;
+    return `${miles.toFixed(1)} mi`;
   }
 
-  return `${Math.round(miles)} mi walk`;
+  return `${Math.round(miles)} mi`;
 }
 
 export function formatWalkingDuration(seconds: number) {

@@ -137,13 +137,25 @@ function spotTypeLabel(kind?: string) {
   return `${label}s`;
 }
 
+function formatNearbyReference(referenceName: string | null) {
+  if (!referenceName) {
+    return "here";
+  }
+
+  if (referenceName === "your location") {
+    return "you";
+  }
+
+  return referenceName;
+}
+
 function buildNearbyIntro(input: {
   source: "saved" | "google";
   referenceName: string | null;
   kind?: string;
   autoFallback?: boolean;
 }) {
-  const reference = input.referenceName ?? "here";
+  const reference = formatNearbyReference(input.referenceName);
   const typeLabel = spotTypeLabel(input.kind);
 
   if (input.source === "saved") {
@@ -180,6 +192,24 @@ function resolveReferenceName(
   }
 
   return currentLocation ? "your location" : null;
+}
+
+function resolveNearbySearchContext(
+  near: string | undefined,
+  useUserLocation: boolean | undefined,
+  currentLocation: Coordinates | null | undefined,
+): { origin: Coordinates | null; referenceName: string | null } {
+  if (useUserLocation) {
+    return {
+      origin: currentLocation ?? null,
+      referenceName: currentLocation ? "your location" : null,
+    };
+  }
+
+  return {
+    origin: resolveOrigin(near, currentLocation),
+    referenceName: resolveReferenceName(near, currentLocation),
+  };
 }
 
 async function attachWalkingDistance(
@@ -404,17 +434,23 @@ export function createKaviTripAiTools(locationContext: UserLocationContext) {
         "Check the user's current location. Call this before 'near me' questions or whenever proximity to the user matters. Returns whether location is available and in NYC.",
       inputSchema: z.object({}),
       execute: async (): Promise<CurrentLocationToolOutput> =>
-        buildCurrentLocationToolOutput(locationContext),
+        await buildCurrentLocationToolOutput(locationContext),
     }),
     findNearbySpots: tool({
       description:
-        "Find nearby restaurants/spots within a 15-minute walk, returning rich place cards. Set source explicitly: saved = Nikhil's list only, google = outside his list, auto = saved first then Google fallback.",
+        "Find nearby restaurants/spots within a 15-minute walk, returning rich place cards. For 'near me' / 'around here' questions, set useUserLocation=true and do not pass near. Set source explicitly: saved = Nikhil's list only, google = outside his list, auto = saved first then Google fallback.",
       inputSchema: z.object({
+        useUserLocation: z
+          .boolean()
+          .optional()
+          .describe(
+            "Required for 'near me', 'around here', 'close to me' questions. Uses the user's GPS location — do not pass near when this is true.",
+          ),
         near: z
           .string()
           .optional()
           .describe(
-            "Reference place from trip data (name or id). Use for questions like 'restaurants near Hilton Midtown'.",
+            "Named trip landmark only when the user names a specific place (e.g. 'near MoMA'). Never use for 'near me' — set useUserLocation instead.",
           ),
         kind: z
           .string()
@@ -438,30 +474,33 @@ export function createKaviTripAiTools(locationContext: UserLocationContext) {
       }),
       execute: async ({
         near,
+        useUserLocation,
         kind,
         source = "auto",
         limit = 5,
       }): Promise<NearbySpotsToolOutput> => {
-        const origin = resolveOrigin(near, currentLocation);
+        const { origin, referenceName } = resolveNearbySearchContext(
+          near,
+          useUserLocation,
+          currentLocation,
+        );
 
         if (!origin) {
-          if (near) {
+          if (useUserLocation || !near) {
             return {
               found: false,
-              error: `Could not find "${near}" in trip data. Use an exact trip stop, highlight, neighborhood, or saved spot name.`,
+              error:
+                "Location unavailable — ask the user to allow location access on the trip page.",
             };
           }
 
           return {
             found: false,
-            error:
-              "Location unavailable — pass a trip place as near, or ask the user to allow location access on the trip page.",
+            error: `Could not find "${near}" in trip data. Use an exact trip stop, highlight, neighborhood, or saved spot name.`,
           };
         }
 
         try {
-          const referenceName = resolveReferenceName(near, currentLocation);
-
           if (source === "google") {
             const googlePlaces = await buildGoogleSpotCards(
               origin,
