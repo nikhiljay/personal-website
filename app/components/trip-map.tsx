@@ -737,7 +737,7 @@ function savedSpotLabelFilter(
   return ["in", ["get", "kind"], ["literal", activeKinds]];
 }
 
-function pointLabelLayout() {
+function pointLabelLayout(): mapboxgl.SymbolLayerSpecification["layout"] {
   return {
     "text-field": ["get", "name"],
     "text-font": LABEL_FONT,
