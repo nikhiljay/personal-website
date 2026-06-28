@@ -194,11 +194,12 @@ export function KaviAskAiChat({
                     aria-busy={isBusy}
                     className="p-(--card-spacing)"
                   >
-                    {messages.map((message) => (
+                    {messages.map((message, index) => (
                       <MessageAnimated
                         key={message.id}
                         message={message}
                         scrollAnchor={message.role === "user"}
+                        layoutStable={index >= messages.length - 2}
                         textSize={textSize}
                         turnTiming={
                           message.role === "assistant" &&
@@ -210,7 +211,7 @@ export function KaviAskAiChat({
                       />
                     ))}
                     {showFallbackThinking ? (
-                      <MessageScrollerItem messageId="thinking">
+                      <MessageScrollerItem messageId="thinking" layoutStable>
                         <Message align="start" className={textSize}>
                           <MessageContent className="[&>*]:w-full [&>*]:min-w-0 gap-1.5 [&>[data-slot=reasoning-block]+*]:-mt-1.5">
                             <ReasoningBlock

@@ -1,27 +1,20 @@
 "use client";
 
 import { ChevronRightIcon } from "lucide-react";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { ThoughtTurnTiming } from "@/app/hooks/use-thought-turn-timing";
 import { flattenReasoningText } from "@/app/lib/flatten-reasoning-text";
 import { ReasoningBody } from "@/components/reasoning-steps";
-import { ShimmeringText } from "@/components/ui/shimmering-text";
+import {
+  Marker,
+  MarkerContent,
+  MarkerIcon,
+} from "@/components/ui/marker";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 import "./reasoning-block.css";
-
-const StreamingThoughtLabel = memo(function StreamingThoughtLabel() {
-  return (
-    <ShimmeringText
-      text="Thinking"
-      duration={1.6}
-      repeat
-      spread={2}
-      className="text-sm leading-none"
-    />
-  );
-});
 
 function ThoughtHeader({
   isStreaming,
@@ -31,17 +24,25 @@ function ThoughtHeader({
   elapsedSeconds: number;
 }) {
   if (isStreaming) {
-    return <StreamingThoughtLabel />;
+    return (
+      <Marker role="status" className="w-auto text-sm leading-none">
+        <MarkerIcon>
+          <Spinner className="size-3.5" />
+        </MarkerIcon>
+        <MarkerContent className="shimmer leading-none">Thinking</MarkerContent>
+      </Marker>
+    );
   }
 
   return (
-    <span className="text-sm leading-none">
-      <span className="text-muted-foreground">Thought</span>
-      <span className="text-muted-foreground/45">
-        {" "}
-        for {Math.max(1, elapsedSeconds)}s
-      </span>
-    </span>
+    <Marker className="w-auto text-sm leading-none">
+      <MarkerContent className="leading-none">
+        Thought{" "}
+        <span className="text-muted-foreground/45">
+          for {Math.max(1, elapsedSeconds)}s
+        </span>
+      </MarkerContent>
+    </Marker>
   );
 }
 

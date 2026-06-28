@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 type MessageAnimatedProps = {
   message: UIMessage;
   scrollAnchor?: boolean;
+  layoutStable?: boolean;
   textSize?: string;
   userVariant?: React.ComponentProps<typeof Bubble>["variant"];
   assistantVariant?: React.ComponentProps<typeof Bubble>["variant"];
@@ -54,6 +55,7 @@ function flushReasoningBlock(
 export const MessageAnimated = memo(function MessageAnimated({
   message,
   scrollAnchor,
+  layoutStable = false,
   textSize = "text-sm/relaxed",
   userVariant = "muted",
   assistantVariant = "ghost",
@@ -248,6 +250,7 @@ export const MessageAnimated = memo(function MessageAnimated({
     <MessageScrollerItem
       messageId={message.id}
       scrollAnchor={scrollAnchor ?? isUser}
+      layoutStable={layoutStable}
     >
       <Message align={isUser ? "end" : "start"} className={textSize}>
         <MessageContent
