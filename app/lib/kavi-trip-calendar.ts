@@ -265,7 +265,7 @@ function toTripEvent(event: ParsedIcsEvent): TripEvent {
 async function fetchCalendarIcs() {
   const url = process.env.KAVI_TRIP_CALENDAR_ICAL_URL;
   if (!url) {
-    throw new Error("KAVI_TRIP_CALENDAR_ICAL_URL is not set");
+    return null;
   }
 
   const response = await fetch(url, {
@@ -282,7 +282,7 @@ async function fetchCalendarIcs() {
 export async function getTripEventsFromCalendar(): Promise<TripEvent[]> {
   const ics = await fetchCalendarIcs();
 
-  return [...parseIcsEvents(ics), ...STATIC_TRIP_EVENTS]
+  return [...(ics ? parseIcsEvents(ics) : []), ...STATIC_TRIP_EVENTS]
     .filter(isTripEvent)
     .sort((a, b) => a.start.getTime() - b.start.getTime())
     .map(toTripEvent);

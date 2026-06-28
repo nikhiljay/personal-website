@@ -5,6 +5,10 @@
   touch-action: pan-x pan-y pinch-zoom;
 }
 
+.trip-map-shell .mapboxgl-ctrl-logo {
+  display: none;
+}
+
 /* Slightly larger than map markers so current location reads clearly. */
 .trip-map-current-location {
   position: relative;
@@ -103,7 +107,7 @@
   }
 }
 
-.trip-map-popup .maplibregl-popup-content {
+.trip-map-popup .mapboxgl-popup-content {
   padding: 10px 12px;
   border-radius: 0;
   border: 1px solid light-dark(#e8e8e8, #333333);
@@ -115,31 +119,31 @@
   box-shadow: none;
 }
 
-.trip-map-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+.trip-map-popup.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
   border-top-color: var(--color-bg);
 }
 
-.trip-map-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+.trip-map-popup.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
   border-bottom-color: var(--color-bg);
 }
 
-.trip-map-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-left-top .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-left-bottom .maplibregl-popup-tip {
+.trip-map-popup.mapboxgl-popup-anchor-left .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-left-top .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-left-bottom .mapboxgl-popup-tip {
   border-right-color: var(--color-bg);
 }
 
-.trip-map-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-right-top .maplibregl-popup-tip,
-.trip-map-popup.maplibregl-popup-anchor-right-bottom .maplibregl-popup-tip {
+.trip-map-popup.mapboxgl-popup-anchor-right .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-right-top .mapboxgl-popup-tip,
+.trip-map-popup.mapboxgl-popup-anchor-right-bottom .mapboxgl-popup-tip {
   border-left-color: var(--color-bg);
 }
 
-.trip-map-popup .maplibregl-popup-close-button {
+.trip-map-popup .mapboxgl-popup-close-button {
   color: var(--color-muted);
   font-size: 16px;
   padding: 4px 8px;

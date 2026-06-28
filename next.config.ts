@@ -24,18 +24,8 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
   experimental: {
-    optimizePackageImports: ["maplibre-gl"],
+    optimizePackageImports: ["mapbox-gl"],
   },
-  rewrites: async () => [
-    {
-      source: "/carto/basemaps/:path*",
-      destination: "https://basemaps.cartocdn.com/:path*",
-    },
-    {
-      source: "/carto/tiles/:path*",
-      destination: "https://tiles.basemaps.cartocdn.com/:path*",
-    },
-  ],
   headers: async () => [
     {
       source: "/fonts/:path*",

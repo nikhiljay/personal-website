@@ -1,14 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
-import maplibregl from "maplibre-gl";
+import mapboxgl from "mapbox-gl";
 import type {
   ExpressionSpecification,
   FilterSpecification,
   GeoJSONSource,
   MapLayerMouseEvent,
-  StyleSpecification,
-} from "maplibre-gl";
+} from "mapbox-gl";
 
 import {
   getPlaceByStopId,
@@ -27,34 +26,27 @@ import {
   savedSpotKindColors,
   type SavedSpotKind,
 } from "../lib/saved-spot-kinds";
+import {
+  getPreferredColorScheme,
+  usePreferredColorScheme,
+  type PreferredColorScheme,
+} from "../hooks/use-preferred-color-scheme";
 
-import "maplibre-gl/dist/maplibre-gl.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
-const STYLES: Record<"light" | "dark", string> = {
-  light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-  dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-};
-
-function proxiedCartoUrl(url: string) {
-  if (url.startsWith("https://basemaps.cartocdn.com/")) {
-    return url.replace("https://basemaps.cartocdn.com/", "/carto/basemaps/");
-  }
-
-  if (url.startsWith("https://tiles.basemaps.cartocdn.com/")) {
-    return url.replace("https://tiles.basemaps.cartocdn.com/", "/carto/tiles/");
-  }
-
-  return url;
-}
+const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ?? "";
+const MAP_STYLE = "mapbox://styles/mapbox/standard";
+const MAP_PITCH = 22;
 
 const MAP_FIT_PADDING = {
-  top: -10,
+  top: 0,
   bottom: 20,
-  left: 10,
-  right: 10,
+  left: 8,
+  right: 8,
 };
+const MAP_FIT_MAX_ZOOM = 12.75;
 
-const LABEL_FONT = ["Inter", "system-ui", "sans-serif"];
+const LABEL_FONT = ["Inter Regular", "Open Sans Regular", "Arial Unicode MS Regular"];
 const MARKER_DOT_RADIUS = 5;
 const SELECTED_MARKER_DOT_RADIUS = 6.5;
 const VISITED_MARKER_IMAGE_PX = 24;
@@ -74,12 +66,16 @@ const SELECTED_VISITED_ICON_SIZE =
 const MOBILE_MARKER_HIT_PADDING = 16;
 const HIGHLIGHT_RING_RADIUS = 8;
 const MARKER_STROKE_WIDTH = 2;
+const CIRCLE_EMISSIVE_STRENGTH = 1;
+const TEXT_EMISSIVE_STRENGTH = 1;
+const ICON_EMISSIVE_STRENGTH = 1;
+const MAP_SYMBOL_SLOT = "top";
+const MARKER_SYMBOL_Z_OFFSET = 2;
 const HIGHLIGHT_LABEL_SIZE = 11;
 const HIGHLIGHT_LABEL_LETTER_SPACING = 0.01;
 const CURRENT_LOCATION_LABEL_LETTER_SPACING = -0.02;
 const HIGHLIGHT_LABEL_HALO_WIDTH = 1.5;
 const HIGHLIGHT_LABEL_OFFSET: [number, number] = [0, 0.65];
-const styleCache = new Map<string, StyleSpecification>();
 
 const NEIGHBORHOODS_SOURCE = "neighborhoods";
 const NEIGHBORHOOD_LABELS_LAYER = "neighborhood-labels";
@@ -94,6 +90,17 @@ const HIGHLIGHT_LAYER = "map-highlights-dot";
 const HIGHLIGHT_SQUARE_LAYER = "map-highlights-square";
 const HIGHLIGHT_LABELS_LAYER = "map-highlight-labels";
 
+const MARKER_LAYER_STACK = [
+  NEIGHBORHOOD_LABELS_LAYER,
+  SAVED_LAYER,
+  SAVED_VISITED_LAYER,
+  STOPS_LAYER,
+  HIGHLIGHT_RING_LAYER,
+  HIGHLIGHT_LAYER,
+  HIGHLIGHT_SQUARE_LAYER,
+  HIGHLIGHT_LABELS_LAYER,
+] as const;
+
 const MARKER_LAYERS = [
   SAVED_LAYER,
   SAVED_VISITED_LAYER,
@@ -104,17 +111,28 @@ const MARKER_LAYERS = [
   HIGHLIGHT_LABELS_LAYER,
 ] as const;
 
+const MARKER_CIRCLE_PAINT = {
+  "circle-emissive-strength": CIRCLE_EMISSIVE_STRENGTH,
+  "circle-pitch-alignment": "viewport",
+  "circle-pitch-scale": "viewport",
+} as const;
+
+const MARKER_SYMBOL_PAINT = {
+  "icon-emissive-strength": ICON_EMISSIVE_STRENGTH,
+  "symbol-z-offset": MARKER_SYMBOL_Z_OFFSET,
+} as const;
+
 function markerHitPadding() {
   return window.matchMedia("(pointer: coarse)").matches
     ? MOBILE_MARKER_HIT_PADDING
     : 0;
 }
 
-function toScreenPoint(point: maplibregl.PointLike) {
+function toScreenPoint(point: mapboxgl.PointLike) {
   return Array.isArray(point) ? { x: point[0], y: point[1] } : point;
 }
 
-function queryMarkerFeatures(map: maplibregl.Map, point: maplibregl.PointLike) {
+function queryMarkerFeatures(map: mapboxgl.Map, point: mapboxgl.PointLike) {
   const { x, y } = toScreenPoint(point);
   const padding = markerHitPadding();
   const features =
@@ -162,18 +180,80 @@ async function ensureInterLoaded() {
   ]);
 }
 
-async function fetchMapStyle(url: string) {
-  const cached = styleCache.get(url);
-  if (cached) {
-    return cached;
+function applyCircleEmissive(map: mapboxgl.Map, layerId: string) {
+  map.setPaintProperty(layerId, "circle-emissive-strength", CIRCLE_EMISSIVE_STRENGTH);
+}
+
+function applyTextEmissive(map: mapboxgl.Map, layerId: string) {
+  map.setPaintProperty(layerId, "text-emissive-strength", TEXT_EMISSIVE_STRENGTH);
+}
+
+function applyMarkerCirclePaint(map: mapboxgl.Map, layerId: string) {
+  applyCircleEmissive(map, layerId);
+  map.setPaintProperty(layerId, "circle-pitch-alignment", "viewport");
+  map.setPaintProperty(layerId, "circle-pitch-scale", "viewport");
+}
+
+function applyIconEmissive(map: mapboxgl.Map, layerId: string) {
+  map.setPaintProperty(layerId, "icon-emissive-strength", ICON_EMISSIVE_STRENGTH);
+}
+
+function applyMarkerSymbolPaint(map: mapboxgl.Map, layerId: string) {
+  applyIconEmissive(map, layerId);
+  map.setPaintProperty(layerId, "symbol-z-offset", MARKER_SYMBOL_Z_OFFSET);
+}
+
+function raiseMarkerLayers(map: mapboxgl.Map) {
+  for (const layerId of MARKER_LAYER_STACK) {
+    if (map.getLayer(layerId)) {
+      map.moveLayer(layerId);
+    }
+  }
+}
+
+function basemapAppearance(theme: PreferredColorScheme) {
+  return theme === "dark"
+    ? { lightPreset: "night" as const, theme: "monochrome" as const }
+    : { lightPreset: "day" as const, theme: "monochrome" as const };
+}
+
+function basemapConfig(theme: PreferredColorScheme) {
+  return {
+    ...basemapAppearance(theme),
+    showPointOfInterestLabels: false,
+    showPlaceLabels: false,
+    showRoadLabels: false,
+    showTransitLabels: false,
+    show3dObjects: false,
+  };
+}
+
+function configureBasemap(map: mapboxgl.Map, theme: PreferredColorScheme) {
+  if (!map.isStyleLoaded()) {
+    return;
   }
 
-  const response = await fetch(proxiedCartoUrl(url));
-  const style = (await response.json()) as StyleSpecification;
-  const { glyphs: _glyphs, ...styleWithoutGlyphs } = style;
+  const config = basemapConfig(theme);
 
-  styleCache.set(url, styleWithoutGlyphs);
-  return styleWithoutGlyphs;
+  try {
+    map.setConfigProperty("basemap", "lightPreset", config.lightPreset);
+    map.setConfigProperty("basemap", "theme", config.theme);
+    map.setConfigProperty("basemap", "showPointOfInterestLabels", false);
+    map.setConfigProperty("basemap", "showPlaceLabels", false);
+    map.setConfigProperty("basemap", "showRoadLabels", false);
+    map.setConfigProperty("basemap", "showTransitLabels", false);
+    map.setConfigProperty("basemap", "show3dObjects", false);
+  } catch {
+    // Standard-style config is unavailable until the basemap is ready.
+  }
+}
+
+function mapHasImage(map: mapboxgl.Map, id: string) {
+  if (!map.isStyleLoaded()) {
+    return false;
+  }
+
+  return map.hasImage(id);
 }
 
 function escapeHtml(text: string) {
@@ -313,12 +393,22 @@ function labelColors(theme: "light" | "dark") {
       };
 }
 
-function fitMapBounds(map: maplibregl.Map) {
+function fitMapBounds(map: mapboxgl.Map) {
   map.fitBounds(mapBounds, {
     padding: MAP_FIT_PADDING,
     animate: false,
     bearing: mapBearing,
+    pitch: MAP_PITCH,
+    maxZoom: MAP_FIT_MAX_ZOOM,
   });
+}
+
+function refreshMapDisplay(map: mapboxgl.Map) {
+  if (!map.getContainer().isConnected) {
+    return;
+  }
+
+  map.resize();
 }
 
 const OVERLAY_LAYERS = [
@@ -339,7 +429,7 @@ const OVERLAY_SOURCES = [
   SAVED_SOURCE,
 ] as const;
 
-function removeMapOverlays(map: maplibregl.Map) {
+function removeMapOverlays(map: mapboxgl.Map) {
   for (const layerId of OVERLAY_LAYERS) {
     if (map.getLayer(layerId)) {
       map.removeLayer(layerId);
@@ -353,7 +443,7 @@ function removeMapOverlays(map: maplibregl.Map) {
   }
 
   for (const legacyId of ["saved-visited-square", "saved-visited-square-v2"]) {
-    if (map.hasImage(legacyId)) {
+    if (mapHasImage(map, legacyId)) {
       map.removeImage(legacyId);
     }
   }
@@ -361,7 +451,7 @@ function removeMapOverlays(map: maplibregl.Map) {
   for (const kind of VISITED_MARKER_KINDS) {
     for (const theme of ["light", "dark"] as const) {
       const id = visitedMarkerImageId(kind, theme);
-      if (map.hasImage(id)) {
+      if (mapHasImage(map, id)) {
         map.removeImage(id);
       }
     }
@@ -370,28 +460,14 @@ function removeMapOverlays(map: maplibregl.Map) {
   for (const place of squareHighlights()) {
     for (const theme of ["light", "dark"] as const) {
       const id = highlightSquareImageId(place.id, theme);
-      if (map.hasImage(id)) {
+      if (mapHasImage(map, id)) {
         map.removeImage(id);
       }
     }
   }
 }
 
-function hideBasemapLabels(map: maplibregl.Map) {
-  for (const layer of map.getStyle()?.layers ?? []) {
-    if (layer.type !== "symbol" || !layer.layout?.["text-field"]) {
-      continue;
-    }
-
-    try {
-      map.setLayoutProperty(layer.id, "visibility", "none");
-    } catch {
-      // Ignore layers that can't be hidden.
-    }
-  }
-}
-
-function setupNeighborhoodLayers(map: maplibregl.Map, theme: "light" | "dark") {
+function setupNeighborhoodLayers(map: mapboxgl.Map, theme: "light" | "dark") {
   const colors = labelColors(theme);
 
   if (map.getLayer(NEIGHBORHOOD_LABELS_LAYER)) {
@@ -408,6 +484,7 @@ function setupNeighborhoodLayers(map: maplibregl.Map, theme: "light" | "dark") {
       "text-halo-color",
       colors.halo,
     );
+    applyTextEmissive(map, NEIGHBORHOOD_LABELS_LAYER);
     return;
   }
 
@@ -419,6 +496,7 @@ function setupNeighborhoodLayers(map: maplibregl.Map, theme: "light" | "dark") {
   map.addLayer({
     id: NEIGHBORHOOD_LABELS_LAYER,
     type: "symbol",
+    slot: MAP_SYMBOL_SLOT,
     source: NEIGHBORHOODS_SOURCE,
     layout: {
       "text-field": ["get", "name"],
@@ -432,6 +510,7 @@ function setupNeighborhoodLayers(map: maplibregl.Map, theme: "light" | "dark") {
       "text-color": colors.neighborhood,
       "text-halo-color": colors.halo,
       "text-halo-width": 1.5,
+      "text-emissive-strength": TEXT_EMISSIVE_STRENGTH,
     },
   });
 }
@@ -487,19 +566,19 @@ function createVisitedSquareImage(fill: string, stroke: string) {
   return ctx.getImageData(0, 0, size, size);
 }
 
-function ensureVisitedMarkerImages(map: maplibregl.Map, theme: "light" | "dark") {
+function ensureVisitedMarkerImages(map: mapboxgl.Map, theme: "light" | "dark") {
   const colors = savedSpotKindColors[theme];
   const stroke = labelColors(theme).stroke;
 
   for (const legacyId of ["saved-visited-square", "saved-visited-square-v2"]) {
-    if (map.hasImage(legacyId)) {
+    if (mapHasImage(map, legacyId)) {
       map.removeImage(legacyId);
     }
   }
 
   for (const kind of VISITED_MARKER_KINDS) {
     const id = visitedMarkerImageId(kind, theme);
-    if (map.hasImage(id)) {
+    if (mapHasImage(map, id)) {
       map.removeImage(id);
     }
 
@@ -528,7 +607,7 @@ function visitedMarkerImageExpression(theme: "light" | "dark"): ExpressionSpecif
 function visitedSquareLayerLayout(
   theme: "light" | "dark",
   iconSize: number = VISITED_ICON_SIZE,
-): maplibregl.SymbolLayerSpecification["layout"] {
+): mapboxgl.SymbolLayerSpecification["layout"] {
   return {
     "icon-image": visitedMarkerImageExpression(theme),
     "icon-size": iconSize,
@@ -545,12 +624,12 @@ function highlightSquareImageId(id: string, theme: "light" | "dark") {
   return `highlight-square-${id}-${theme}`;
 }
 
-function ensureHighlightSquareImages(map: maplibregl.Map, theme: "light" | "dark") {
+function ensureHighlightSquareImages(map: mapboxgl.Map, theme: "light" | "dark") {
   const stroke = labelColors(theme).stroke;
 
   for (const place of squareHighlights()) {
     const imageId = highlightSquareImageId(place.id, theme);
-    if (map.hasImage(imageId)) {
+    if (mapHasImage(map, imageId)) {
       map.removeImage(imageId);
     }
 
@@ -572,7 +651,7 @@ function highlightSquareImageExpression(
 
 function highlightSquareLayerLayout(
   theme: "light" | "dark",
-): maplibregl.SymbolLayerSpecification["layout"] {
+): mapboxgl.SymbolLayerSpecification["layout"] {
   return {
     "icon-image": highlightSquareImageExpression(theme),
     "icon-size": VISITED_ICON_SIZE,
@@ -581,7 +660,7 @@ function highlightSquareLayerLayout(
   };
 }
 
-function ensureHighlightSquareLayer(map: maplibregl.Map, theme: "light" | "dark") {
+function ensureHighlightSquareLayer(map: mapboxgl.Map, theme: "light" | "dark") {
   ensureHighlightSquareImages(map, theme);
 
   if (!map.getSource(HIGHLIGHT_SOURCE)) {
@@ -594,6 +673,7 @@ function ensureHighlightSquareLayer(map: maplibregl.Map, theme: "light" | "dark"
       "icon-image",
       highlightSquareImageExpression(theme),
     );
+    applyMarkerSymbolPaint(map, HIGHLIGHT_SQUARE_LAYER);
     return;
   }
 
@@ -604,6 +684,7 @@ function ensureHighlightSquareLayer(map: maplibregl.Map, theme: "light" | "dark"
       source: HIGHLIGHT_SOURCE,
       filter: ["==", ["get", "shape"], "square"],
       layout: highlightSquareLayerLayout(theme),
+      paint: MARKER_SYMBOL_PAINT,
     },
     HIGHLIGHT_LAYER,
   );
@@ -629,7 +710,7 @@ function savedSpotLayerFilter(
 }
 
 function applySavedSpotKindFilter(
-  map: maplibregl.Map,
+  map: mapboxgl.Map,
   activeKinds: SavedSpotKind[],
 ) {
   if (!map.getLayer(SAVED_LAYER)) {
@@ -646,7 +727,7 @@ function applySavedSpotKindFilter(
 }
 
 function applyTripStopsVisibility(
-  map: maplibregl.Map,
+  map: mapboxgl.Map,
   activeKinds: SavedSpotKind[],
 ) {
   if (!map.getLayer(STOPS_LAYER)) {
@@ -661,7 +742,7 @@ function applyTripStopsVisibility(
 }
 
 function applySavedSpotSelection(
-  map: maplibregl.Map,
+  map: mapboxgl.Map,
   selectedId: string | null,
 ) {
   if (!map.getLayer(SAVED_LAYER)) {
@@ -694,7 +775,7 @@ function applySavedSpotSelection(
 }
 
 function ensureSavedVisitedLayer(
-  map: maplibregl.Map,
+  map: mapboxgl.Map,
   theme: "light" | "dark",
 ) {
   ensureVisitedMarkerImages(map, theme);
@@ -705,6 +786,7 @@ function ensureSavedVisitedLayer(
       "icon-image",
       visitedMarkerImageExpression(theme),
     );
+    applyMarkerSymbolPaint(map, SAVED_VISITED_LAYER);
     return;
   }
 
@@ -719,13 +801,14 @@ function ensureSavedVisitedLayer(
       source: SAVED_SOURCE,
       filter: ["==", ["get", "visited"], true],
       layout: visitedSquareLayerLayout(theme),
+      paint: MARKER_SYMBOL_PAINT,
     },
     SAVED_LAYER,
   );
 }
 
 function setupSavedSpotLayers(
-  map: maplibregl.Map,
+  map: mapboxgl.Map,
   theme: "light" | "dark",
   selectedId: string | null,
   activeKinds: SavedSpotKind[],
@@ -740,6 +823,7 @@ function setupSavedSpotLayers(
     applySavedSpotKindFilter(map, activeKinds);
     map.setPaintProperty(SAVED_LAYER, "circle-color", kindColors);
     map.setPaintProperty(SAVED_LAYER, "circle-stroke-color", colors.stroke);
+    applyMarkerCirclePaint(map, SAVED_LAYER);
     ensureSavedVisitedLayer(map, theme);
     applySavedSpotSelection(map, selectedId);
     return;
@@ -758,6 +842,7 @@ function setupSavedSpotLayers(
     source: SAVED_SOURCE,
     filter: savedSpotLayerFilter(true, activeKinds),
     layout: visitedSquareLayerLayout(theme),
+    paint: MARKER_SYMBOL_PAINT,
   });
 
   map.addLayer({
@@ -766,6 +851,7 @@ function setupSavedSpotLayers(
     source: SAVED_SOURCE,
     filter: savedSpotLayerFilter(false, activeKinds),
     paint: {
+      ...MARKER_CIRCLE_PAINT,
       "circle-radius": MARKER_DOT_RADIUS,
       "circle-color": kindColors,
       "circle-stroke-width": MARKER_STROKE_WIDTH,
@@ -777,7 +863,7 @@ function setupSavedSpotLayers(
 }
 
 function setupStopLayers(
-  map: maplibregl.Map,
+  map: mapboxgl.Map,
   theme: "light" | "dark",
   activeKinds: SavedSpotKind[],
 ) {
@@ -790,6 +876,7 @@ function setupStopLayers(
     map.setPaintProperty(STOPS_LAYER, "circle-radius", MARKER_DOT_RADIUS);
     map.setPaintProperty(STOPS_LAYER, "circle-stroke-width", MARKER_STROKE_WIDTH);
     map.setPaintProperty(STOPS_LAYER, "circle-stroke-color", colors.stroke);
+    applyMarkerCirclePaint(map, STOPS_LAYER);
     applyTripStopsVisibility(map, activeKinds);
     return;
   }
@@ -804,6 +891,7 @@ function setupStopLayers(
     type: "circle",
     source: STOPS_SOURCE,
     paint: {
+      ...MARKER_CIRCLE_PAINT,
       "circle-radius": MARKER_DOT_RADIUS,
       "circle-color": colors.fill,
       "circle-stroke-width": MARKER_STROKE_WIDTH,
@@ -814,7 +902,7 @@ function setupStopLayers(
   applyTripStopsVisibility(map, activeKinds);
 }
 
-function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
+function setupHighlightLayers(map: mapboxgl.Map, theme: "light" | "dark") {
   const colors = labelColors(theme);
   const data = highlightsGeoJson();
 
@@ -825,6 +913,8 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
     map.setPaintProperty(HIGHLIGHT_LAYER, "circle-radius", MARKER_DOT_RADIUS);
     map.setPaintProperty(HIGHLIGHT_LAYER, "circle-stroke-width", MARKER_STROKE_WIDTH);
     map.setPaintProperty(HIGHLIGHT_LAYER, "circle-stroke-color", colors.stroke);
+    applyMarkerCirclePaint(map, HIGHLIGHT_RING_LAYER);
+    applyMarkerCirclePaint(map, HIGHLIGHT_LAYER);
     ensureHighlightSquareLayer(map, theme);
     map.setLayoutProperty(
       HIGHLIGHT_LABELS_LAYER,
@@ -837,6 +927,8 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
       HIGHLIGHT_LABEL_OFFSET,
     );
     map.setPaintProperty(HIGHLIGHT_LABELS_LAYER, "text-halo-color", colors.halo);
+    applyTextEmissive(map, HIGHLIGHT_LABELS_LAYER);
+    raiseMarkerLayers(map);
     return;
   }
 
@@ -850,6 +942,7 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
     type: "circle",
     source: HIGHLIGHT_SOURCE,
     paint: {
+      ...MARKER_CIRCLE_PAINT,
       "circle-radius": HIGHLIGHT_RING_RADIUS,
       "circle-color": ["get", "ring"],
       "circle-opacity": 1,
@@ -862,6 +955,7 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
     source: HIGHLIGHT_SOURCE,
     filter: ["!=", ["get", "shape"], "square"],
     paint: {
+      ...MARKER_CIRCLE_PAINT,
       "circle-radius": MARKER_DOT_RADIUS,
       "circle-color": ["get", "fill"],
       "circle-stroke-width": MARKER_STROKE_WIDTH,
@@ -883,13 +977,18 @@ function setupHighlightLayers(map: maplibregl.Map, theme: "light" | "dark") {
       "text-anchor": "top",
       "text-max-width": 10,
       "text-letter-spacing": HIGHLIGHT_LABEL_LETTER_SPACING,
+      "text-allow-overlap": true,
+      "text-ignore-placement": true,
     },
     paint: {
       "text-color": ["get", "fill"],
       "text-halo-color": colors.halo,
       "text-halo-width": HIGHLIGHT_LABEL_HALO_WIDTH,
+      "text-emissive-strength": TEXT_EMISSIVE_STRENGTH,
     },
   });
+
+  raiseMarkerLayers(map);
 }
 
 function createCurrentLocationMarkerElement() {
@@ -929,8 +1028,8 @@ function createCurrentLocationMarkerElement() {
 }
 
 function syncCurrentLocationMarker(
-  map: maplibregl.Map,
-  markerRef: RefObject<maplibregl.Marker | null>,
+  map: mapboxgl.Map,
+  markerRef: RefObject<mapboxgl.Marker | null>,
   location: Coordinates | null,
 ) {
   if (!location) {
@@ -946,7 +1045,7 @@ function syncCurrentLocationMarker(
     return;
   }
 
-  markerRef.current = new maplibregl.Marker({
+  markerRef.current = new mapboxgl.Marker({
     element: createCurrentLocationMarkerElement(),
     anchor: "center",
   })
@@ -978,14 +1077,15 @@ export function TripMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const internalShellRef = useRef<HTMLDivElement>(null);
   const shellRef = shellRefProp ?? internalShellRef;
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const themeRef = useRef<"light" | "dark">("light");
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const themeRef = useRef<PreferredColorScheme>("light");
+  const colorScheme = usePreferredColorScheme();
   const selectedSavedSpotIdRef = useRef(selectedSavedSpotId);
   const selectedStopIdRef = useRef(selectedStopId);
   const activeSavedSpotKindsRef = useRef(activeSavedSpotKinds);
   const currentLocationRef = useRef(currentLocation);
-  const currentLocationMarkerRef = useRef<maplibregl.Marker | null>(null);
-  const popupRef = useRef<maplibregl.Popup | null>(null);
+  const currentLocationMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
   const onSavedSpotSelectRef = useRef(onSavedSpotSelect);
   const onStopSelectRef = useRef(onStopSelect);
   const onReadyRef = useRef(onReady);
@@ -1013,7 +1113,7 @@ export function TripMap({
       const [lng, lat] = coordinates;
 
       popupRef.current?.remove();
-      popupRef.current = new maplibregl.Popup({
+      popupRef.current = new mapboxgl.Popup({
         offset: 12,
         closeButton: false,
         className: "trip-map-popup",
@@ -1121,6 +1221,36 @@ export function TripMap({
   }, [currentLocation, mapLoaded]);
 
   useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded || colorScheme === themeRef.current) {
+      return;
+    }
+
+    popupRef.current?.remove();
+    popupRef.current = null;
+
+    themeRef.current = colorScheme;
+    removeMapOverlays(map);
+    configureBasemap(map, colorScheme);
+    setupNeighborhoodLayers(map, colorScheme);
+    setupSavedSpotLayers(
+      map,
+      colorScheme,
+      selectedSavedSpotIdRef.current,
+      activeSavedSpotKindsRef.current,
+    );
+    setupStopLayers(map, colorScheme, activeSavedSpotKindsRef.current);
+    setupHighlightLayers(map, colorScheme);
+    syncCurrentLocationMarker(
+      map,
+      currentLocationMarkerRef,
+      currentLocationRef.current,
+    );
+    fitMapBounds(map);
+    raiseMarkerLayers(map);
+  }, [colorScheme, mapLoaded]);
+
+  useEffect(() => {
     const container = containerRef.current;
     if (!container) {
       return;
@@ -1128,7 +1258,6 @@ export function TripMap({
 
     let cancelled = false;
     let interactionsBound = false;
-    let themeUpdateId = 0;
 
     const showStopPopup = (
       coordinates: [number, number],
@@ -1215,8 +1344,8 @@ export function TripMap({
       }
     };
 
-    const applyMapOverlays = (map: maplibregl.Map, theme: "light" | "dark") => {
-      hideBasemapLabels(map);
+    const applyMapOverlays = (map: mapboxgl.Map, theme: "light" | "dark") => {
+      configureBasemap(map, theme);
       setupNeighborhoodLayers(map, theme);
       setupSavedSpotLayers(
         map,
@@ -1231,12 +1360,20 @@ export function TripMap({
         currentLocationMarkerRef,
         currentLocationRef.current,
       );
+      raiseMarkerLayers(map);
     };
 
     const onMapReady = () => {
       const map = mapRef.current;
-      if (!map) {
+      if (!map || !map.isStyleLoaded()) {
         return;
+      }
+
+      fitMapBounds(map);
+
+      if (!hasCalledReadyRef.current) {
+        hasCalledReadyRef.current = true;
+        onReadyRef.current?.();
       }
 
       applyMapOverlays(map, themeRef.current);
@@ -1248,94 +1385,66 @@ export function TripMap({
       if (selectedSavedSpotIdRef.current) {
         focusSavedSpot(selectedSavedSpotIdRef.current);
       }
-
-      if (!hasCalledReadyRef.current) {
-        hasCalledReadyRef.current = true;
-        onReadyRef.current?.();
-      }
     };
 
-    const init = async () => {
-      void ensureInterLoaded();
-
-      const style = await fetchMapStyle(STYLES[themeRef.current]);
-      if (cancelled) {
+    const init = () => {
+      if (!MAPBOX_ACCESS_TOKEN) {
+        console.error("Missing NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN");
         return;
       }
 
-      const map = new maplibregl.Map({
+      void ensureInterLoaded();
+
+      const map = new mapboxgl.Map({
         container,
-        style,
-        bounds: mapBounds,
-        fitBoundsOptions: {
-          padding: MAP_FIT_PADDING,
-          animate: false,
-          bearing: mapBearing,
+        style: MAP_STYLE,
+        accessToken: MAPBOX_ACCESS_TOKEN,
+        config: {
+          basemap: basemapConfig(themeRef.current),
         },
+        center: [
+          (mapBounds[0][0] + mapBounds[1][0]) / 2,
+          (mapBounds[0][1] + mapBounds[1][1]) / 2,
+        ],
+        zoom: 11,
         bearing: mapBearing,
-        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+        pitch: MAP_PITCH,
         attributionControl: false,
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
-        transformRequest: (requestUrl) => ({ url: proxiedCartoUrl(requestUrl) }),
+        fadeDuration: 0,
+        precompilePrograms: false,
       });
 
       mapRef.current = map;
 
-      map.on("load", onMapReady);
+      map.on("load", () => {
+        if (map.isStyleLoaded()) {
+          onMapReady();
+          return;
+        }
+
+        map.once("style.load", onMapReady);
+      });
     };
 
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    themeRef.current = media.matches ? "dark" : "light";
+    themeRef.current = getPreferredColorScheme();
 
-    void init();
+    init();
 
     const resizeObserver = new ResizeObserver(() => {
-      mapRef.current?.resize();
+      const map = mapRef.current;
+      if (map) {
+        refreshMapDisplay(map);
+      }
     });
     resizeObserver.observe(container);
-
-    const updateTheme = async (nextTheme: "light" | "dark") => {
-      const map = mapRef.current;
-      if (!map || nextTheme === themeRef.current) {
-        return;
-      }
-
-      const updateId = ++themeUpdateId;
-      popupRef.current?.remove();
-      popupRef.current = null;
-
-      const style = await fetchMapStyle(STYLES[nextTheme]);
-      if (cancelled || updateId !== themeUpdateId || !mapRef.current) {
-        return;
-      }
-
-      map.setStyle(style, { diff: false });
-      await new Promise<void>((resolve) => {
-        map.once("style.load", () => resolve());
-      });
-      if (cancelled || updateId !== themeUpdateId || !mapRef.current) {
-        return;
-      }
-
-      themeRef.current = nextTheme;
-      removeMapOverlays(map);
-      applyMapOverlays(map, nextTheme);
-      fitMapBounds(map);
-    };
-
-    const onThemeChange = (event: MediaQueryListEvent) => {
-      void updateTheme(event.matches ? "dark" : "light");
-    };
-
-    media.addEventListener("change", onThemeChange);
 
     return () => {
       cancelled = true;
       hasCalledReadyRef.current = false;
       setMapLoaded(false);
-      media.removeEventListener("change", onThemeChange);
       resizeObserver.disconnect();
       currentLocationMarkerRef.current?.remove();
       currentLocationMarkerRef.current = null;
