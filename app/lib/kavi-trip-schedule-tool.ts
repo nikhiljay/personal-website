@@ -24,7 +24,10 @@ export type ScheduleFilter = {
   date?: string;
   relativeDay?: RelativeTripDay;
   weekday?: WeekdayName;
+  weekdayQualifier?: WeekdayQualifier;
 };
+
+export type WeekdayQualifier = "this" | "next";
 
 export type WeekdayName =
   | "monday"
@@ -34,16 +37,6 @@ export type WeekdayName =
   | "friday"
   | "saturday"
   | "sunday";
-
-const WEEKDAY_PREFIX: Record<WeekdayName, string> = {
-  monday: "Mon",
-  tuesday: "Tue",
-  wednesday: "Wed",
-  thursday: "Thu",
-  friday: "Fri",
-  saturday: "Sat",
-  sunday: "Sun",
-};
 
 const WEEKDAY_LABEL: Record<WeekdayName, string> = {
   monday: "Monday",
@@ -75,6 +68,16 @@ const WEEKDAY_ALIASES: Record<string, WeekdayName> = {
   sun: "sunday",
 };
 
+const WEEKDAY_JS: Record<WeekdayName, number> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+};
+
 function ymdInTripTimezone(date = new Date()) {
   return date.toLocaleDateString("en-CA", { timeZone: TRIP_TIMEZONE });
 }
@@ -104,6 +107,77 @@ export function tripDayLabelForRelative(relativeDay: RelativeTripDay) {
   return formatTripDayLabel(ymd);
 }
 
+function dowInTripTimezone(ymd: string) {
+  const [year, month, day] = ymd.split("-").map(Number);
+  const utc = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  const weekday = utc.toLocaleDateString("en-US", {
+    timeZone: TRIP_TIMEZONE,
+    weekday: "short",
+  });
+  const map: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+  return map[weekday] ?? 0;
+}
+
+function daysUntilWeekday(
+  referenceYmd: string,
+  weekday: WeekdayName,
+  qualifier: WeekdayQualifier,
+) {
+  const refDow = dowInTripTimezone(referenceYmd);
+  const targetDow = WEEKDAY_JS[weekday];
+  let daysUntil = (targetDow - refDow + 7) % 7;
+
+  // "Next Saturday" on Saturday means the following week, not today.
+  if (qualifier === "next" && daysUntil === 0) {
+    daysUntil = 7;
+  }
+
+  return daysUntil;
+}
+
+export function tripDayLabelForWeekday(
+  weekday: WeekdayName,
+  qualifier: WeekdayQualifier = "this",
+  referenceYmd = ymdInTripTimezone(),
+) {
+  const daysUntil = daysUntilWeekday(referenceYmd, weekday, qualifier);
+  return formatTripDayLabel(addDaysToYmd(referenceYmd, daysUntil));
+}
+
+function parseWeekdayQuery(value: string | undefined):
+  | { weekday: WeekdayName; qualifier: WeekdayQualifier }
+  | undefined {
+  if (!value?.trim()) {
+    return undefined;
+  }
+
+  let text = value.trim().toLowerCase().replace(/[.,]/g, "");
+  let qualifier: WeekdayQualifier = "this";
+
+  if (text.startsWith("next ")) {
+    qualifier = "next";
+    text = text.slice(5).trim();
+  } else if (text.startsWith("this ")) {
+    qualifier = "this";
+    text = text.slice(5).trim();
+  }
+
+  const weekday = WEEKDAY_ALIASES[text];
+  if (!weekday) {
+    return undefined;
+  }
+
+  return { weekday, qualifier };
+}
+
 function normalizeRelativeDayFromText(
   value: string | undefined,
 ): RelativeTripDay | undefined {
@@ -126,15 +200,6 @@ function normalizeRelativeDayFromText(
   }
 
   return undefined;
-}
-
-function normalizeWeekdayName(value: string | undefined): WeekdayName | undefined {
-  if (!value?.trim()) {
-    return undefined;
-  }
-
-  const normalized = value.trim().toLowerCase().replace(/[.,]/g, "");
-  return WEEKDAY_ALIASES[normalized];
 }
 
 const MONTH_ALIASES: Record<string, string> = {
@@ -213,31 +278,25 @@ function eventMatchesDateQuery(eventDate: string, dateQuery: string) {
   );
 }
 
-function eventMatchesWeekdayPrefix(eventDate: string, weekdayPrefix: string) {
-  return new RegExp(`^${weekdayPrefix}\\b`, "i").test(eventDate);
-}
-
 function resolveScheduleFilter(filter?: ScheduleFilter): {
   relativeDay?: RelativeTripDay;
-  weekdayPrefix?: string;
+  weekdayDayLabel?: string;
   dateQuery?: string;
   resolvedLabel?: string;
 } {
-  const weekdayFromParam = filter?.weekday
-    ? WEEKDAY_PREFIX[filter.weekday]
-    : undefined;
-  const weekdayFromDate = normalizeWeekdayName(filter?.date);
-  const weekdayPrefix = weekdayFromParam ?? (
-    weekdayFromDate ? WEEKDAY_PREFIX[weekdayFromDate] : undefined
-  );
+  const parsedWeekdayFromDate = parseWeekdayQuery(filter?.date);
+  const weekday = filter?.weekday ?? parsedWeekdayFromDate?.weekday;
 
-  if (weekdayPrefix) {
-    const weekdayName = filter?.weekday ?? weekdayFromDate;
+  if (weekday) {
+    const qualifier =
+      filter?.weekdayQualifier ??
+      parsedWeekdayFromDate?.qualifier ??
+      "this";
+    const dayLabel = tripDayLabelForWeekday(weekday, qualifier);
+    const qualifierPrefix = qualifier === "next" ? "Next " : "";
     return {
-      weekdayPrefix,
-      resolvedLabel: weekdayName
-        ? WEEKDAY_LABEL[weekdayName]
-        : weekdayPrefix,
+      weekdayDayLabel: dayLabel,
+      resolvedLabel: `${qualifierPrefix}${WEEKDAY_LABEL[weekday]} (${dayLabel})`,
     };
   }
 
@@ -283,14 +342,12 @@ export function buildScheduleToolOutput(
   tripEvents: TripEvent[],
   filter?: ScheduleFilter,
 ): ScheduleToolOutput {
-  const { relativeDay, weekdayPrefix, dateQuery, resolvedLabel } =
+  const { relativeDay, weekdayDayLabel, dateQuery, resolvedLabel } =
     resolveScheduleFilter(filter);
   let events = tripEvents;
 
-  if (weekdayPrefix) {
-    events = events.filter((event) =>
-      eventMatchesWeekdayPrefix(event.date, weekdayPrefix),
-    );
+  if (weekdayDayLabel) {
+    events = events.filter((event) => event.date === weekdayDayLabel);
   } else if (relativeDay) {
     const dayLabel = tripDayLabelForRelative(relativeDay);
     events = events.filter((event) => event.date === dayLabel);

@@ -468,17 +468,33 @@ export function createKaviTripAiTools(
           ])
           .optional()
           .describe(
-            "Use when the user names a weekday (e.g. Monday). Preferred over guessing a date string.",
+            "Weekday name. Pair with weekdayQualifier for this vs next (e.g. saturday + next).",
+          ),
+        weekdayQualifier: z
+          .enum(["this", "next"])
+          .optional()
+          .describe(
+            "this = upcoming occurrence (today if it is that weekday). next = following occurrence — on that weekday already, use next (e.g. next Saturday on Saturday = +7 days).",
           ),
         date: z
           .string()
           .optional()
           .describe(
-            "Specific calendar day only, e.g. 'Jun 29' or 'Mon, Jun 29'. For weekdays use weekday instead.",
+            "Specific day: Jun 29, 2026-06-29, or parsed phrases like next saturday.",
           ),
       }),
-      execute: async ({ date, relativeDay, weekday }): Promise<ScheduleToolOutput> =>
-        buildScheduleToolOutput(tripEvents, { date, relativeDay, weekday }),
+      execute: async ({
+        date,
+        relativeDay,
+        weekday,
+        weekdayQualifier,
+      }): Promise<ScheduleToolOutput> =>
+        buildScheduleToolOutput(tripEvents, {
+          date,
+          relativeDay,
+          weekday,
+          weekdayQualifier,
+        }),
     }),
     findNearbySpots: tool({
       description:
