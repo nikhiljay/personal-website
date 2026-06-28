@@ -1,9 +1,11 @@
 @keyframes enter {
-  from {
+  0% {
+    opacity: 0;
     transform: translateY(10px);
   }
 
-  to {
+  100% {
+    opacity: 1;
     transform: none;
   }
 }
@@ -12,14 +14,16 @@
   --stagger: 0;
   --delay: 0.12s;
   --start: 0s;
-  animation: enter 0.6s both;
-  animation-delay: calc(var(--stagger) * var(--delay) + var(--start));
   overflow-anchor: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: no-preference) {
   [data-animate] {
-    animation: none;
-    will-change: auto;
+    animation: enter 0.6s both;
+    animation-delay: calc(var(--stagger) * var(--delay) + var(--start));
   }
+}
+
+[data-animation-controller="false"] [data-animate] {
+  animation: none;
 }
