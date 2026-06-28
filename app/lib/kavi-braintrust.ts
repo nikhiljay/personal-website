@@ -7,7 +7,7 @@ const initializedKey = Symbol.for("kavi.braintrust.initialized");
 const otelInitializedKey = Symbol.for("kavi.otel.initialized");
 
 const DEFAULT_PROJECT_ID = "cdbbcd5f-8a55-4c4f-b514-12a53ecacf6d";
-const DEFAULT_PROJECT_NAME = "braintrust-aqua-ball";
+const DEFAULT_PROJECT_NAME = "kavi-nyc-trip";
 
 type GlobalWithTelemetry = typeof globalThis & {
   [initializedKey]?: boolean;
