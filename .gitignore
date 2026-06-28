@@ -40,3 +40,5 @@ yarn.lock
 package-lock.json
 npm-shrinkwrap.json
 .env*
+# Added by Braintrust Wizard
+.braintrust.json

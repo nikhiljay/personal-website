@@ -7,8 +7,10 @@ import {
 } from "ai";
 
 import { buildKaviTripSystemPrompt } from "@/app/lib/kavi-trip-ai-context";
+import { ensureKaviBraintrustTelemetry } from "@/app/lib/kavi-braintrust";
 import {
   getKaviChatModel,
+  getKaviChatModelId,
   getKaviChatReasoningEffort,
 } from "@/app/lib/kavi-chat-model";
 import {
@@ -17,6 +19,7 @@ import {
   type PlaceRatingsToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
+import { forwardStreamChunkToBraintrustTtft } from "@/app/lib/kavi-stream-telemetry";
 import {
   parseLocationContext,
   nycCoordinatesFromContext,
@@ -93,6 +96,8 @@ function formatStreamError(error: unknown) {
 }
 
 export async function POST(req: Request) {
+  ensureKaviBraintrustTelemetry();
+
   const {
     messages,
     locationContext: locationContextInput,
@@ -110,6 +115,15 @@ export async function POST(req: Request) {
       };
   const tools = createKaviTripAiTools(locationContext, tripEvents);
   const reasoning = getKaviChatReasoningEffort();
+  const lastUserText = [...messages]
+    .reverse()
+    .find((message) => message.role === "user")
+    ?.parts.filter((part) => part.type === "text")
+    .map((part) => part.text)
+    .join("\n")
+    .trim();
+
+  let streamCallId: string | undefined;
 
   const result = streamText({
     model: getKaviChatModel(),
@@ -121,7 +135,26 @@ export async function POST(req: Request) {
     tools,
     stopWhen: [stopAfterRichPlaceResponse, stepCountIs(5)],
     maxOutputTokens: 4000,
+    telemetry: {
+      functionId: "kavi-trip-chat",
+      recordInputs: true,
+      recordOutputs: true,
+      metadata: {
+        locationMode: locationContext.mode,
+        tripEventCount: tripEvents.length,
+        model: getKaviChatModelId(),
+        ...(lastUserText ? { userMessage: lastUserText.slice(0, 500) } : {}),
+      },
+    },
     ...(reasoning ? { reasoning } : {}),
+    onStart: ({ callId }) => {
+      streamCallId = callId;
+    },
+    onChunk: ({ chunk }) => {
+      if (streamCallId) {
+        forwardStreamChunkToBraintrustTtft(streamCallId, chunk);
+      }
+    },
   });
 
   return result.toUIMessageStreamResponse({
