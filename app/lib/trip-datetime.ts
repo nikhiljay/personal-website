@@ -21,3 +21,7 @@ export function formatNycDateLabel(date = new Date()) {
     day: "numeric",
   });
 }
+
+export function formatEventTemporalLabel(startsAt: string, now = new Date()) {
+  return new Date(startsAt) <= now ? "past" : "upcoming";
+}

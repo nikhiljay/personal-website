@@ -20,7 +20,7 @@ export const KaviAskAiFullscreenHeader = memo(function KaviAskAiFullscreenHeader
 }: KaviAskAiFullscreenHeaderProps) {
   return (
     <CardHeader className="gap-1 bg-popover pb-2.5 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] [--card-spacing:--spacing(5)]">
-      <CardTitle id="ask-ai-title">Ask AI</CardTitle>
+      <CardTitle id="ask-ai-title">Nikhil Agent</CardTitle>
       <CardDescription className="text-sm/relaxed">
         How can I help you today?
       </CardDescription>
@@ -29,7 +29,7 @@ export const KaviAskAiFullscreenHeader = memo(function KaviAskAiFullscreenHeader
           type="button"
           variant="ghost"
           size="icon-sm"
-          aria-label="Close Ask AI"
+          aria-label="Close Nikhil Agent"
           onClick={onClose}
         >
           <XIcon />

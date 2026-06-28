@@ -15,6 +15,8 @@ export type TripEvent = {
   title: string;
   date: string;
   time: string;
+  /** ISO-8601 start instant for temporal comparisons in prompts/tools. */
+  startsAt: string;
   stopId?: string;
   note?: string;
   url?: string;

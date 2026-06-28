@@ -6,7 +6,7 @@ import {
 } from "./kavi-nyc-trip";
 import { savedSpots } from "./nikhil-saved-spots";
 import { savedSpotKindMeta } from "./saved-spot-kinds";
-import { formatNycDateLabel, formatNycNow } from "./trip-datetime";
+import { formatNycDateLabel, formatNycNow, formatEventTemporalLabel } from "./trip-datetime";
 
 function formatSavedSpots() {
   return savedSpots
@@ -26,15 +26,16 @@ function formatTripStops() {
   return stops.join("\n");
 }
 
-function formatSchedule(events: TripEvent[]) {
+function formatSchedule(events: TripEvent[], now = new Date()) {
   if (events.length === 0) {
     return "Schedule unavailable.";
   }
 
   return events
     .map((event) => {
+      const temporal = formatEventTemporalLabel(event.startsAt, now);
       const location = event.note ? ` @ ${event.note}` : "";
-      return `- ${event.date} ${event.time}: ${event.title}${location}`;
+      return `- ${event.date} ${event.time} [${temporal}]: ${event.title}${location}`;
     })
     .join("\n");
 }
@@ -46,6 +47,7 @@ function formatNeighborhoods() {
 export function buildKaviTripSystemPrompt(
   events: TripEvent[],
   currentLocation?: { lat: number; lng: number } | null,
+  now = new Date(),
 ): string {
   const locationContext = currentLocation
     ? "The user's GPS location is in NYC and available. For 'near me' questions, call getCurrentLocation then findNearbySpots with useUserLocation=true (never pass near or default to a trip stop like their hotel)."
@@ -53,11 +55,13 @@ export function buildKaviTripSystemPrompt(
 
   return `You are Nikhil's NYC trip concierge for Kavi's visit (June 25 – July 3, 2026). Answer in Nikhil's warm, helpful voice — concise and mobile-friendly.
 
-Current date and time (America/New_York): ${formatNycNow()}
-Today's schedule date label: ${formatNycDateLabel()}
+Current date and time (America/New_York): ${formatNycNow(now)}
+Today's schedule date label: ${formatNycDateLabel(now)}
 
 Rules:
 - Use only the trip data below. If you don't know, say so.
+- Always compare schedule event dates and [past]/[upcoming] labels against the current NYC datetime above. Entries marked [past] already happened — never call them tonight, today, or upcoming. A matching clock time on a different day is not "tonight".
+- Answer only what was asked. Don't bring up unrelated schedule events (e.g. don't mention flights unless the user asks about travel or the schedule).
 - Use exact spot names as listed (e.g. "Mitr Thai", not "Mitr" or "Mit").
 - "Nearby" means a 15-minute walk or less — findNearbySpots enforces this automatically.
 - For nearby / close / walking-distance / restaurant-list questions, call findNearbySpots once with the appropriate parameters. The tool renders an intro line and rich place cards — do NOT list spot names, addresses, or distances as plain text afterward.
@@ -84,7 +88,7 @@ Key trip stops & highlights:
 ${formatTripStops()}
 
 Schedule:
-${formatSchedule(events)}
+${formatSchedule(events, now)}
 
 Nikhil's saved spots (${savedSpots.length} total):
 ${formatSavedSpots()}`;

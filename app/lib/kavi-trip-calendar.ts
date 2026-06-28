@@ -255,6 +255,7 @@ function toTripEvent(event: ParsedIcsEvent): TripEvent {
     title: summary,
     date: formatEventDate(event.start, displayTimeZone),
     time: formatEventTime(event.start, displayTimeZone),
+    startsAt: event.start.toISOString(),
     stopId,
     note: !stopId && location ? locationNote(location) : undefined,
     url: STATIC_EVENT_URLS[event.uid],

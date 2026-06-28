@@ -134,7 +134,7 @@ export function KaviAskAiChat({
 
   const header = (
     <CardHeader className="shrink-0 gap-1 border-b bg-popover">
-      <CardTitle>Ask AI</CardTitle>
+      <CardTitle>Nikhil Agent</CardTitle>
       <CardDescription className={textSize}>
         How can I help you today?
       </CardDescription>
@@ -144,7 +144,7 @@ export function KaviAskAiChat({
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label="Close Ask AI"
+            aria-label="Close Nikhil Agent"
             onClick={onClose}
           >
             <XIcon />
