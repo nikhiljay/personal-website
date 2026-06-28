@@ -39,6 +39,7 @@ const MAP_STYLE = "mapbox://styles/mapbox/standard";
 const MAP_PITCH = 22;
 
 const MAP_FRAME_PADDING = { top: 2, bottom: 6, left: 8, right: 8 };
+const MAP_FRAME_PAN: [number, number] = [0, 4];
 
 const LABEL_FONT = ["Inter Regular", "Open Sans Regular", "Arial Unicode MS Regular"];
 const MARKER_DOT_RADIUS = 5;
@@ -394,6 +395,7 @@ function applyMapCamera(map: mapboxgl.Map) {
     pitch: MAP_PITCH,
     animate: false,
   });
+  map.panBy(MAP_FRAME_PAN, { animate: false });
 }
 
 function refreshMapDisplay(map: mapboxgl.Map) {

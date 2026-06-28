@@ -149,9 +149,9 @@ export const mapHighlights: MapHighlight[] = [
 
 export const mapHighlightIds = new Set(mapHighlights.map((place) => place.id));
 
-/** Manhattan: Battery Park through upper 70s — north trimmed slightly for default framing. */
+/** Manhattan: Battery Park through Columbus Circle. */
 export const mapBounds: [[number, number], [number, number]] = [
-  [-74.015, 40.704],
+  [-74.015, 40.702],
   [-73.965, 40.768],
 ];
 
