@@ -332,7 +332,7 @@ export function KaviAskAiChat({
   const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
 
   const header = (
-    <CardHeader className="shrink-0 gap-1 border-b bg-popover py-5 [.border-b]:pb-5">
+    <CardHeader className="shrink-0 gap-1 border-b bg-popover py-4 [.border-b]:pb-4">
       <CardTitle>Nikhil Agent</CardTitle>
       <CardDescription className="text-sm/tight">
         How can I help you today?
