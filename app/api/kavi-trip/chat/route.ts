@@ -15,6 +15,7 @@ import {
 } from "@/app/lib/kavi-chat-model";
 import {
   createKaviTripAiTools,
+  type AhlaEventsToolOutput,
   type NearbySpotsToolOutput,
   type PlaceRatingsToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
@@ -83,6 +84,11 @@ const stopAfterToolAnalysis: StopCondition<
 
       if (result.toolName === "getTripSchedule") {
         return true;
+      }
+
+      if (result.toolName === "getAhlaEvents") {
+        const output = result.output as AhlaEventsToolOutput | undefined;
+        return output?.found === true && output.events.length > 0;
       }
 
       return false;

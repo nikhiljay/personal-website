@@ -6,7 +6,9 @@ import { memo, type ReactNode } from "react";
 import { PlaceRatingCard } from "@/app/components/place-rating-card";
 import { LocationToolCard } from "@/app/components/location-tool-card";
 import { ScheduleToolCard } from "@/app/components/schedule-tool-card";
+import { AhlaEventToolCard } from "@/app/components/ahla-event-tool-card";
 import type {
+  AhlaEventsToolOutput,
   CurrentLocationToolOutput,
   NearbySpotsToolOutput,
   PlaceRatingsToolOutput,
@@ -121,6 +123,20 @@ export const MessageAnimated = memo(function MessageAnimated({
 
       renderedParts.push(
         <ScheduleToolCard
+          key={`${message.id}-${part.toolCallId}`}
+          state={part.state}
+          output={output}
+          className="w-full min-w-0 self-stretch"
+        />,
+      );
+      return;
+    }
+
+    if (part.type === "tool-getAhlaEvents") {
+      const output = part.output as AhlaEventsToolOutput | undefined;
+
+      renderedParts.push(
+        <AhlaEventToolCard
           key={`${message.id}-${part.toolCallId}`}
           state={part.state}
           output={output}

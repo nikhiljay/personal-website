@@ -71,9 +71,13 @@ export const ahlaConferenceMeta = {
   kaviAttendance: "From Sunday Jun 28 onward",
 };
 
-/** Kavi's two-track hiring strategy at AHLA 2026. */
+/** Kavi's hiring strategy and conference mindset at AHLA 2026. */
 export const ahlaGoals = {
   conference: `${ahlaConferenceMeta.name}, ${ahlaConferenceMeta.dates} @ ${ahlaConferenceMeta.venue}. ${ahlaConferenceMeta.kaviAttendance}.`,
+  northStar:
+    "Land a mid-to-big law associate job straight out of law school. Kavi starts 3L this fall (Fall 2026) — recruiting window is now.",
+  conferencePriority:
+    "Sessions are secondary. Kavi cares about meeting the right people and maximizing serendipity — receptions, breakfasts, breaks, Dine-Arounds, and hallway intros beat sitting in panels. Attend a session only when a target contact is speaking or it's the best excuse to approach someone afterward.",
   nearTerm:
     "Mid-sized and boutique health-law firms — realistic entry points straight out of law school (NY is densest: Benesch Friedlander, Axinn Veltrop).",
   longTerm:
@@ -81,7 +85,7 @@ export const ahlaGoals = {
   jobTarget:
     "Epstein Becker Green (EBG) Associate, Health Care & Life Sciences, San Francisco — health-law powerhouse, hybrid between boutique depth and national platform.",
   networkingStyle:
-    "Prioritize 'connectors' (association leaders, AHLA staff, planning committee, university-system counsel) who convene people and make intros. Hoyt Sze is the anchor connector — planning committee, Sheppard Mullin partner, UC Office of President alum, sister Felicia Sze (Athene Law SF).",
+    "Prioritize 'connectors' (association leaders, AHLA staff, planning committee, university-system counsel) who convene people and make intros. Hoyt Sze is the anchor connector — planning committee, Sheppard Mullin partner, UC Office of President alum, sister Felicia Sze (Athene Law SF). Stay loose — follow energy, not the agenda.",
 };
 
 export const ahlaContacts: AhlaContact[] = [
@@ -921,6 +925,8 @@ function formatKaviSessionsOnly() {
 /** Structured AHLA context block for the trip concierge system prompt. */
 export function formatAhlaContext(): string {
   return `Kavi's AHLA 2026 goals:
+- North star: ${ahlaGoals.northStar}
+- Conference priority: ${ahlaGoals.conferencePriority}
 - Conference: ${ahlaGoals.conference}
 - Near-term (out of law school): ${ahlaGoals.nearTerm}
 - Long-term: ${ahlaGoals.longTerm}
@@ -965,6 +971,9 @@ ${ahlaSchedulingNotes.map((n) => `- ${n}`).join("\n")}`;
 
 export const ahlaAiRules = [
   "When Kavi asks about AHLA, networking, contacts, connectors, firm targets, or conference sessions, use the AHLA context below — not general knowledge.",
+  "North star: mid-to-big law associate job out of law school. Kavi starts 3L Fall 2026 — frame all advice around hiring, not CLE content.",
+  "Sessions are low priority unless a target contact is speaking or it's a warm approach to someone afterward. Default to networking blocks (receptions, breakfasts, breaks, Dine-Arounds) and serendipity — don't build itineraries around panels.",
+  "For AHLA sessions, networking events, must-attend panels, or where contacts speak, call getAhlaEvents — it renders rich event cards. Do NOT list sessions as bullet points with times/speakers in text.",
   "For schedule/timing questions, use the official agenda (draft 5/7/26): Sun Jun 28 – Wed Jul 1 @ Hilton Midtown. Sat Jun 27 is optional pre-programs only.",
   "Distinguish CONFIRMED vs PLANNED vs PROSPECT contacts. Don't treat prospects as locked meetings.",
   "Respect the two-track strategy: mid-sized/boutique for near-term hiring, Big Law partners for long-term relationships.",

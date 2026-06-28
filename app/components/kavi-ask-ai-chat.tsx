@@ -226,7 +226,7 @@ export function KaviAskAiChat({
                   </EmptyMedia>
                   <EmptyTitle>Hey Kavi 🤏🏽</EmptyTitle>
                   <EmptyDescription className={textSize}>
-                    Ask about your schedule, my saved spots, or neighborhoods. Send
+                    Ask about food recs, your schedule, AHLA, or things to do. Send
                     a message to start.
                   </EmptyDescription>
                 </EmptyHeader>

@@ -33,9 +33,14 @@ import {
   buildScheduleToolOutput,
   type ScheduleToolOutput,
 } from "./kavi-trip-schedule-tool";
+import {
+  buildAhlaEventsToolOutput,
+  type AhlaEventsToolOutput,
+} from "./kavi-ahla-events-tool";
 
 export type { CurrentLocationToolOutput } from "./user-location";
 export type { ScheduleToolOutput } from "./kavi-trip-schedule-tool";
+export type { AhlaEventsToolOutput } from "./kavi-ahla-events-tool";
 
 export const NEARBY_MAX_WALK_SECONDS = 15 * 60;
 /** Neighborhood centroids aren't precise — allow a bit more reach for area searches */
@@ -998,6 +1003,40 @@ export function createKaviTripAiTools(
           ...walking,
         };
       },
+    }),
+    getAhlaEvents: tool({
+      description:
+        "Return AHLA conference sessions and networking events as rich cards (time, speakers, contact status, play/tips). Use for AHLA schedule questions, must-attend sessions, where contacts are speaking, networking events, or conference day planning. Do NOT list event details as plain text — the tool renders cards.",
+      inputSchema: z.object({
+        mustAttendOnly: z
+          .boolean()
+          .optional()
+          .describe(
+            "When true, return only must-attend sessions (EBG, Felicia, Hoyt, Benesch, etc.).",
+          ),
+        priority: z
+          .enum(["must-attend", "recommended", "networking"])
+          .optional()
+          .describe("Filter by priority tier."),
+        day: z
+          .enum(["sun", "mon", "tue", "wed"])
+          .optional()
+          .describe("Conference day filter."),
+        kind: z
+          .enum(["session", "networking", "general", "meal"])
+          .optional()
+          .describe("Event type filter."),
+        sessionIds: z
+          .array(z.string())
+          .optional()
+          .describe("Specific session numbers, e.g. ['9', '18', '20']."),
+        contactName: z
+          .string()
+          .optional()
+          .describe("Filter to events where this contact speaks."),
+      }),
+      execute: async (filter): Promise<AhlaEventsToolOutput> =>
+        buildAhlaEventsToolOutput(filter),
     }),
   };
 }
