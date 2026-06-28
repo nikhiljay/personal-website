@@ -6,7 +6,6 @@ import { registerTelemetry, type Telemetry } from "ai";
 const initializedKey = Symbol.for("kavi.braintrust.initialized");
 const otelInitializedKey = Symbol.for("kavi.otel.initialized");
 
-const DEFAULT_PROJECT_ID = "cdbbcd5f-8a55-4c4f-b514-12a53ecacf6d";
 const DEFAULT_PROJECT_NAME = "kavi-nyc-trip";
 
 type GlobalWithTelemetry = typeof globalThis & {
@@ -30,9 +29,11 @@ function registerBraintrustSdkTelemetry() {
     return;
   }
 
+  const projectId = process.env.BRAINTRUST_PROJECT_ID?.trim();
+
   initLogger({
-    projectId: process.env.BRAINTRUST_PROJECT_ID ?? DEFAULT_PROJECT_ID,
     projectName: process.env.BRAINTRUST_PROJECT_NAME ?? DEFAULT_PROJECT_NAME,
+    ...(projectId ? { projectId } : {}),
     apiKey,
   });
 
