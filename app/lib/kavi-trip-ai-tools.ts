@@ -11,13 +11,16 @@ import {
 import {
   getPlaceCardDataForSpot,
   isKnownSavedSpot,
+  NEARBY_QUERY_SEARCH_RADIUS_METERS,
+  NEARBY_SEARCH_RADIUS_METERS,
   rankPlacesByWalkingDistance,
   searchNearbyGooglePlaces,
+  searchTextGooglePlaces,
   type PlaceCardData,
 } from "./google-places";
 import { resolveTripReferencePoint } from "./kavi-nyc-trip";
 import type { TripEvent } from "./kavi-nyc-trip";
-import { savedSpots } from "./nikhil-saved-spots";
+import { savedSpots, type SavedSpot } from "./nikhil-saved-spots";
 import { savedSpotKindMeta, type SavedSpotKind } from "./saved-spot-kinds";
 import {
   buildCurrentLocationToolOutput,
@@ -35,6 +38,56 @@ export type { CurrentLocationToolOutput } from "./user-location";
 export type { ScheduleToolOutput } from "./kavi-trip-schedule-tool";
 
 export const NEARBY_MAX_WALK_SECONDS = 15 * 60;
+/** Neighborhood centroids aren't precise — allow a bit more reach for area searches */
+export const NEARBY_NEIGHBORHOOD_WALK_SECONDS = 20 * 60;
+
+type NearbySearchOptions = {
+  maxWalkSeconds: number;
+  searchRadiusMeters: number;
+  googleTextQuery?: string;
+};
+
+function formatWalkLimitLabel(maxWalkSeconds: number) {
+  return `${Math.round(maxWalkSeconds / 60)}-minute walk`;
+}
+
+function buildGoogleTextQuery(query: string, referenceName: string | null) {
+  const trimmed = query.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (referenceName && referenceName !== "your location") {
+    return `${trimmed} ${referenceName}`;
+  }
+
+  return trimmed;
+}
+
+function resolveNearbySearchOptions(
+  near: string | undefined,
+  query: string | undefined,
+  referenceName: string | null,
+): NearbySearchOptions {
+  const reference = near ? resolveTripReferencePoint(near) : null;
+  const isNeighborhood = reference?.kind === "neighborhood";
+  const maxWalkSeconds = isNeighborhood
+    ? NEARBY_NEIGHBORHOOD_WALK_SECONDS
+    : NEARBY_MAX_WALK_SECONDS;
+  const trimmedQuery = query?.trim() ?? "";
+  const hasQuery = trimmedQuery.length > 0;
+  const searchRadiusMeters = hasQuery
+    ? NEARBY_QUERY_SEARCH_RADIUS_METERS
+    : NEARBY_SEARCH_RADIUS_METERS;
+
+  return {
+    maxWalkSeconds,
+    searchRadiusMeters,
+    googleTextQuery: hasQuery
+      ? buildGoogleTextQuery(trimmedQuery, referenceName)
+      : undefined,
+  };
+}
 
 export type PlaceRatingsToolOutput =
   | { found: false; error: string }
@@ -141,6 +194,40 @@ function filterSavedSpotsByKind(kind?: string) {
   return savedSpots.filter((spot) => filter.kinds.includes(spot.kind));
 }
 
+function savedSpotSearchText(spot: SavedSpot) {
+  return [
+    spot.name,
+    spot.cuisine,
+    spot.note,
+    ...(spot.tags ?? []),
+    ...(spot.mustOrder ?? []),
+    ...(spot.bestFor ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+export function savedSpotMatchesQuery(spot: SavedSpot, query: string) {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+
+  const haystack = savedSpotSearchText(spot);
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+  return tokens.every((token) => haystack.includes(token));
+}
+
+function filterSavedSpots(kind?: string, query?: string) {
+  const byKind = filterSavedSpotsByKind(kind);
+  if (!query?.trim()) {
+    return byKind;
+  }
+
+  return byKind.filter((spot) => savedSpotMatchesQuery(spot, query));
+}
+
 function googleTypesForKind(kind?: string): string[] {
   const filter = resolveSavedSpotFilter(kind);
   if (filter.mode === "tags") {
@@ -166,7 +253,11 @@ function googleTypesForKind(kind?: string): string[] {
   return [...types];
 }
 
-function spotTypeLabel(kind?: string) {
+function spotTypeLabel(kind?: string, query?: string) {
+  if (query?.trim()) {
+    return `${query.trim()} spots`;
+  }
+
   if (!kind) {
     return "spots";
   }
@@ -217,11 +308,12 @@ function buildNearbyIntro(input: {
   source: "saved" | "google" | "mixed";
   referenceName: string | null;
   kind?: string;
+  query?: string;
   autoFallback?: boolean;
   savedCount?: number;
 }) {
   const reference = formatNearbyReference(input.referenceName);
-  const typeLabel = spotTypeLabel(input.kind);
+  const typeLabel = spotTypeLabel(input.kind, input.query);
 
   if (input.source === "mixed") {
     const savedCount = input.savedCount ?? 0;
@@ -235,7 +327,7 @@ function buildNearbyIntro(input: {
   }
 
   if (input.autoFallback) {
-    return `None of Nikhil's saved spots are within a 15-min walk of ${reference} — here are nearby ${typeLabel} from Google:`;
+    return `None of Nikhil's saved spots are within walking distance of ${reference} — here are nearby ${typeLabel} from Google:`;
   }
 
   return `Here are ${typeLabel} near ${reference} that aren't on Nikhil's saved list:`;
@@ -270,17 +362,26 @@ function resolveNearbySearchContext(
   near: string | undefined,
   useUserLocation: boolean | undefined,
   currentLocation: Coordinates | null | undefined,
-): { origin: Coordinates | null; referenceName: string | null } {
+  query?: string,
+): {
+  origin: Coordinates | null;
+  referenceName: string | null;
+  search: NearbySearchOptions;
+} {
   if (useUserLocation) {
+    const referenceName = currentLocation ? "your location" : null;
     return {
       origin: currentLocation ?? null,
-      referenceName: currentLocation ? "your location" : null,
+      referenceName,
+      search: resolveNearbySearchOptions(near, query, referenceName),
     };
   }
 
+  const referenceName = resolveReferenceName(near, currentLocation);
   return {
     origin: resolveOrigin(near, currentLocation),
-    referenceName: resolveReferenceName(near, currentLocation),
+    referenceName,
+    search: resolveNearbySearchOptions(near, query, referenceName),
   };
 }
 
@@ -362,8 +463,10 @@ async function buildSavedSpotCards(
   origin: Coordinates,
   kind: string | undefined,
   limit: number,
+  query?: string,
+  maxWalkSeconds = NEARBY_MAX_WALK_SECONDS,
 ): Promise<Array<PlaceRatingsToolOutput & { found: true }>> {
-  const candidates = filterSavedSpotsByKind(kind);
+  const candidates = filterSavedSpots(kind, query);
 
   if (candidates.length === 0) {
     return [];
@@ -379,7 +482,7 @@ async function buildSavedSpotCards(
       const walking = walkingDistances[index];
       if (
         !walking ||
-        walking.durationSeconds > NEARBY_MAX_WALK_SECONDS
+        walking.durationSeconds > maxWalkSeconds
       ) {
         return null;
       }
@@ -467,12 +570,23 @@ async function buildGoogleSpotCards(
   limit: number,
   fetchExtra = false,
   excludeSpotIds: string[] = [],
+  search: NearbySearchOptions = {
+    maxWalkSeconds: NEARBY_MAX_WALK_SECONDS,
+    searchRadiusMeters: NEARBY_SEARCH_RADIUS_METERS,
+  },
 ): Promise<Array<PlaceRatingsToolOutput & { found: true }>> {
-  const googlePlaces = await searchNearbyGooglePlaces({
-    origin,
-    includedTypes: googleTypesForKind(kind),
-    maxResultCount: fetchExtra ? 20 : 15,
-  });
+  const googlePlaces = search.googleTextQuery
+    ? await searchTextGooglePlaces({
+        origin,
+        textQuery: search.googleTextQuery,
+        maxResultCount: 20,
+        radiusMeters: search.searchRadiusMeters,
+      })
+    : await searchNearbyGooglePlaces({
+        origin,
+        includedTypes: googleTypesForKind(kind),
+        maxResultCount: fetchExtra ? 20 : 15,
+      });
 
   const excludedIds = new Set(excludeSpotIds);
   const candidates = googlePlaces.filter(
@@ -482,7 +596,7 @@ async function buildGoogleSpotCards(
   const ranked = await rankPlacesByWalkingDistance(
     origin,
     candidates,
-    NEARBY_MAX_WALK_SECONDS,
+    search.maxWalkSeconds,
     limit,
   );
 
@@ -499,20 +613,38 @@ async function buildAutoNearbyPlaces(
   origin: Coordinates,
   kind: string | undefined,
   limit: number,
+  query?: string,
+  search: NearbySearchOptions = {
+    maxWalkSeconds: NEARBY_MAX_WALK_SECONDS,
+    searchRadiusMeters: NEARBY_SEARCH_RADIUS_METERS,
+  },
 ): Promise<{
   places: Array<PlaceRatingsToolOutput & { found: true }>;
   source: "saved" | "google" | "mixed";
   savedCount: number;
 }> {
-  const savedPlaces = await buildSavedSpotCards(origin, kind, limit);
-  const hasKindFilter = Boolean(kind?.trim());
+  const savedPlaces = await buildSavedSpotCards(
+    origin,
+    kind,
+    limit,
+    query,
+    search.maxWalkSeconds,
+  );
+  const hasFilter = Boolean(kind?.trim() || query?.trim());
 
-  if (!hasKindFilter) {
+  if (!hasFilter) {
     if (savedPlaces.length > 0) {
       return { places: savedPlaces, source: "saved", savedCount: savedPlaces.length };
     }
 
-    const googlePlaces = await buildGoogleSpotCards(origin, kind, limit);
+    const googlePlaces = await buildGoogleSpotCards(
+      origin,
+      kind,
+      limit,
+      false,
+      [],
+      search,
+    );
     return { places: googlePlaces, source: "google", savedCount: 0 };
   }
 
@@ -529,6 +661,7 @@ async function buildAutoNearbyPlaces(
     savedPlaces
       .map((place) => place.spotId)
       .filter((spotId): spotId is string => spotId != null),
+    search,
   );
 
   const combined = [...savedPlaces, ...googlePlaces].slice(0, limit);
@@ -545,14 +678,19 @@ async function buildAutoNearbyPlaces(
 function savedListEmptyMessage(
   referenceName: string | null,
   kind?: string,
+  query?: string,
+  maxWalkSeconds = NEARBY_MAX_WALK_SECONDS,
 ) {
   const reference = referenceName ?? "here";
-  const typeLabel = spotTypeLabel(kind);
-  const kindHint = kind
-    ? ` ${typeLabel}`
-    : "";
+  const typeLabel = spotTypeLabel(kind, query);
+  const walkLabel = formatWalkLimitLabel(maxWalkSeconds);
+  const filterHint = query?.trim()
+    ? ` matching "${query.trim()}"`
+    : kind
+      ? ` ${typeLabel}`
+      : "";
 
-  return `None of Nikhil's${kindHint} saved spots are within a 15-min walk of ${reference}. Try a different kind, drop the filter, or ask for Google options.`;
+  return `None of Nikhil's${filterHint} saved spots are within a ${walkLabel} of ${reference}. Try a different search, drop the filter, or ask for Google options.`;
 }
 
 export function createKaviTripAiTools(
@@ -621,7 +759,7 @@ export function createKaviTripAiTools(
     }),
     findNearbySpots: tool({
       description:
-        "Find nearby restaurants/spots within a 15-minute walk, returning rich place cards. For 'near me' / 'around here' questions, set useUserLocation=true and do not pass near. Set source explicitly: saved = Nikhil's list only, google = outside his list, auto = saved first then Google fallback.",
+        "Find nearby restaurants/spots within walking distance, returning rich place cards. GPS/specific-place searches use a 15-minute walk; neighborhood searches (Tribeca, SoHo, etc.) use 20 minutes from the area center. For 'near me' questions, set useUserLocation=true. Pass query for food/dish/cuisine (matcha, ramen, Thai) — keep query on location follow-ups. Pass kind for spot type only (café, bar, brunch). source: saved = Nikhil's list only, google = outside his list, auto = saved first then Google fallback.",
       inputSchema: z.object({
         useUserLocation: z
           .boolean()
@@ -635,11 +773,17 @@ export function createKaviTripAiTools(
           .describe(
             "Named trip landmark only when the user names a specific place (e.g. 'near MoMA'). Never use for 'near me' — set useUserLocation instead.",
           ),
+        query: z
+          .string()
+          .optional()
+          .describe(
+            "Food, dish, or cuisine filter — pass for specific items like matcha, ramen, Thai, pizza, coffee. Do NOT substitute kind=café when the user names a specific item.",
+          ),
         kind: z
           .string()
           .optional()
           .describe(
-            "Filter by type — pass whenever the user asks for a specific kind: brunch, breakfast, restaurant, Café, Casual, Sit-Down, Nice, Bar, or Activity",
+            "Filter by spot type — pass when the user asks for a category: brunch, breakfast, restaurant, Café, Casual, Sit-Down, Nice, Bar, or Activity. Not for specific dishes (use query instead).",
           ),
         source: z
           .enum(["saved", "google", "auto"])
@@ -658,15 +802,18 @@ export function createKaviTripAiTools(
       execute: async ({
         near,
         useUserLocation,
+        query,
         kind,
         source = "auto",
         limit = 5,
       }): Promise<NearbySpotsToolOutput> => {
-        const { origin, referenceName } = resolveNearbySearchContext(
+        const { origin, referenceName, search } = resolveNearbySearchContext(
           near,
           useUserLocation,
           currentLocation,
+          query,
         );
+        const walkLabel = formatWalkLimitLabel(search.maxWalkSeconds);
 
         if (!origin) {
           if (useUserLocation || !near) {
@@ -690,13 +837,16 @@ export function createKaviTripAiTools(
               kind,
               limit,
               true,
+              [],
+              search,
             );
 
             if (googlePlaces.length === 0) {
               return {
                 found: false,
-                error:
-                  "No places outside Nikhil's saved list within a 15-minute walk — try a different area or spot type.",
+                error: query?.trim()
+                  ? `No ${query.trim()} spots outside Nikhil's saved list within a ${walkLabel} of ${referenceName ?? "here"} — try a broader search or different area.`
+                  : `No places outside Nikhil's saved list within a ${walkLabel} — try a different area or spot type.`,
               };
             }
 
@@ -707,6 +857,7 @@ export function createKaviTripAiTools(
                 source: "google",
                 referenceName,
                 kind,
+                query,
               }),
               referenceName,
               places: googlePlaces,
@@ -714,12 +865,23 @@ export function createKaviTripAiTools(
           }
 
           if (source === "saved") {
-            const savedPlaces = await buildSavedSpotCards(origin, kind, limit);
+            const savedPlaces = await buildSavedSpotCards(
+              origin,
+              kind,
+              limit,
+              query,
+              search.maxWalkSeconds,
+            );
 
             if (savedPlaces.length === 0) {
               return {
                 found: false,
-                error: savedListEmptyMessage(referenceName, kind),
+                error: savedListEmptyMessage(
+                  referenceName,
+                  kind,
+                  query,
+                  search.maxWalkSeconds,
+                ),
               };
             }
 
@@ -730,6 +892,7 @@ export function createKaviTripAiTools(
                 source: "saved",
                 referenceName,
                 kind,
+                query,
               }),
               referenceName,
               places: savedPlaces,
@@ -737,13 +900,14 @@ export function createKaviTripAiTools(
           }
 
           const { places, source: resultSource, savedCount } =
-            await buildAutoNearbyPlaces(origin, kind, limit);
+            await buildAutoNearbyPlaces(origin, kind, limit, query, search);
 
           if (places.length === 0) {
             return {
               found: false,
-              error:
-                "No places within a 15-minute walk found nearby — try a different area or spot type.",
+              error: query?.trim()
+                ? `No ${query.trim()} spots within a ${walkLabel} of ${referenceName ?? "here"} — try a broader search or different area.`
+                : `No places within a ${walkLabel} found nearby — try a different area or spot type.`,
             };
           }
 
@@ -754,6 +918,7 @@ export function createKaviTripAiTools(
               source: resultSource,
               referenceName,
               kind,
+              query,
               autoFallback: resultSource === "google",
               savedCount,
             }),

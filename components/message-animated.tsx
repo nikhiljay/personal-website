@@ -249,7 +249,7 @@ export const MessageAnimated = memo(function MessageAnimated({
   return (
     <MessageScrollerItem
       messageId={message.id}
-      scrollAnchor={scrollAnchor ?? isUser}
+      scrollAnchor={scrollAnchor ?? false}
       layoutStable={layoutStable}
     >
       <Message align={isUser ? "end" : "start"} className={textSize}>

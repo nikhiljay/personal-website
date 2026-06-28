@@ -174,6 +174,7 @@ export type TripReferencePoint = {
   name: string;
   lat: number;
   lng: number;
+  kind: "neighborhood" | "place";
 };
 
 type TripReferenceCandidate = {
@@ -181,13 +182,23 @@ type TripReferenceCandidate = {
   name: string;
   lat: number;
   lng: number;
+  kind: "neighborhood" | "place";
 };
 
 const tripReferenceCandidates: TripReferenceCandidate[] = [
-  ...tripStops,
-  ...mapHighlights,
-  ...manhattanNeighborhoods,
-  ...savedSpots,
+  ...tripStops.map((place) => ({ ...place, kind: "place" as const })),
+  ...mapHighlights.map((place) => ({ ...place, kind: "place" as const })),
+  ...manhattanNeighborhoods.map((place) => ({
+    ...place,
+    kind: "neighborhood" as const,
+  })),
+  ...savedSpots.map((place) => ({
+    id: place.id,
+    name: place.name,
+    lat: place.lat,
+    lng: place.lng,
+    kind: "place" as const,
+  })),
 ];
 
 export function resolveTripReferencePoint(
@@ -202,14 +213,24 @@ export function resolveTripReferencePoint(
     (place) => place.id.toLowerCase() === normalized,
   );
   if (byId) {
-    return { name: byId.name, lat: byId.lat, lng: byId.lng };
+    return {
+      name: byId.name,
+      lat: byId.lat,
+      lng: byId.lng,
+      kind: byId.kind,
+    };
   }
 
   const byExactName = tripReferenceCandidates.find(
     (place) => place.name.toLowerCase() === normalized,
   );
   if (byExactName) {
-    return { name: byExactName.name, lat: byExactName.lat, lng: byExactName.lng };
+    return {
+      name: byExactName.name,
+      lat: byExactName.lat,
+      lng: byExactName.lng,
+      kind: byExactName.kind,
+    };
   }
 
   const partialMatches = tripReferenceCandidates.filter(
@@ -230,6 +251,7 @@ export function resolveTripReferencePoint(
     name: bestMatch.name,
     lat: bestMatch.lat,
     lng: bestMatch.lng,
+    kind: bestMatch.kind,
   };
 }
 

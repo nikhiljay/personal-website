@@ -1,7 +1,9 @@
 "use client";
 
 import type { RefObject } from "react";
+import type { UIMessage } from "ai";
 import type { useChat } from "@ai-sdk/react";
+import { useLayoutEffect } from "react";
 import {
   ArrowUpIcon,
   MessageCircleDashedIcon,
@@ -43,6 +45,8 @@ import {
   MessageScrollerItem,
   MessageScrollerProvider,
   MessageScrollerViewport,
+  useMessageScroller,
+  useMessageScrollerScrollable,
 } from "@/components/ui/message-scroller";
 import { cn } from "@/lib/utils";
 
@@ -76,6 +80,51 @@ function getSendButtonColors(
     backgroundColor: scheme === "dark" ? "#f5f5f5" : "#171717",
     color: scheme === "dark" ? "#171717" : "#ffffff",
   };
+}
+
+function ChatBottomPin({
+  isBusy,
+  messages,
+  showFallbackThinking,
+}: {
+  isBusy: boolean;
+  messages: UIMessage[];
+  showFallbackThinking: boolean;
+}) {
+  const { scrollToEnd } = useMessageScroller();
+  const scrollable = useMessageScrollerScrollable();
+  const atBottom = !scrollable.end;
+  const lastMessage = messages.at(-1);
+  const streamContentKey =
+    lastMessage?.parts
+      .map((part) => {
+        if (part.type === "text") {
+          return `t:${part.text.length}`;
+        }
+
+        if (part.type === "reasoning") {
+          return `r:${part.text.length}:${part.state ?? ""}`;
+        }
+
+        if (part.type.startsWith("tool-") && "state" in part) {
+          return `tool:${part.toolCallId}:${part.state}`;
+        }
+
+        return part.type;
+      })
+      .join("|") ?? "";
+  const pinKey = `${messages.length}:${lastMessage?.id ?? ""}:${showFallbackThinking}:${streamContentKey}`;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pinKey encodes message/tool stream updates
+  useLayoutEffect(() => {
+    if (!isBusy || !atBottom) {
+      return;
+    }
+
+    scrollToEnd({ behavior: "auto" });
+  }, [atBottom, isBusy, pinKey, scrollToEnd]);
+
+  return null;
 }
 
 export function KaviAskAiChat({
@@ -184,6 +233,11 @@ export function KaviAskAiChat({
               </Empty>
             ) : (
               <MessageScroller className="h-full touch-auto">
+                <ChatBottomPin
+                  isBusy={isBusy}
+                  messages={messages}
+                  showFallbackThinking={showFallbackThinking}
+                />
                 <MessageScrollerViewport
                   ref={
                     scrollContainerRef as React.RefObject<HTMLDivElement | null>
@@ -198,7 +252,7 @@ export function KaviAskAiChat({
                       <MessageAnimated
                         key={message.id}
                         message={message}
-                        scrollAnchor={message.role === "user"}
+                        scrollAnchor={false}
                         layoutStable={index >= messages.length - 2}
                         textSize={textSize}
                         turnTiming={

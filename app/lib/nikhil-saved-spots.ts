@@ -15,7 +15,7 @@ export type SavedSpot = {
   kind: SavedSpotKind;
   note?: string;
   visited?: boolean;
-  /** e.g. brunch, breakfast — used when filtering findNearbySpots by meal type */
+  /** e.g. brunch, breakfast, matcha — used when filtering findNearbySpots */
   tags?: string[];
   /** Path under /public, e.g. /images/saved-spots/mitr-thai.png */
   photo?: string;
@@ -280,6 +280,20 @@ export const savedSpots: SavedSpot[] = [
     mustOrder: ["truffle tagliolini", "wood-fired pizza", "burrata"],
     bestFor: ["date night", "groups"],
     reservation: "recommended",
+  },
+  {
+    id: "gotan",
+    name: "Gotan",
+    address: "130 Franklin St",
+    lat: 40.7192553,
+    lng: -74.0066082,
+    kind: "cafe",
+    visited: true,
+    tags: ["brunch"],
+    cuisine: "Specialty coffee & café",
+    mustOrder: ["avocado feta toast", "cortado", "grain bowl"],
+    bestFor: ["brunch", "solo", "quick bite"],
+    reservation: "walk-in",
   },
   {
     id: "indian-accent",

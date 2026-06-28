@@ -11,6 +11,11 @@ import {
 const NYC_TIMEZONE = "America/New_York";
 /** ~15 min walk at typical NYC pace */
 export const NEARBY_SEARCH_RADIUS_METERS = 1500;
+/** Wider bias for item/cuisine text search — candidates are still walk-filtered */
+export const NEARBY_QUERY_SEARCH_RADIUS_METERS = 2500;
+
+const GOOGLE_PLACES_FIELD_MASK =
+  "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours,places.primaryType,places.types,places.priceLevel";
 
 export type PlaceCardData = {
   name: string;
@@ -456,8 +461,7 @@ export async function getPlaceCardData(input: {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": apiKey,
-      "X-Goog-FieldMask":
-        "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours,places.primaryType,places.types,places.priceLevel",
+      "X-Goog-FieldMask": GOOGLE_PLACES_FIELD_MASK,
     },
     body: JSON.stringify(body),
   });
@@ -530,8 +534,7 @@ export async function searchNearbyGooglePlaces(input: {
       headers: {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask":
-          "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.photos,places.location,places.currentOpeningHours,places.regularOpeningHours,places.primaryType,places.types,places.priceLevel",
+        "X-Goog-FieldMask": GOOGLE_PLACES_FIELD_MASK,
       },
       body: JSON.stringify({
         locationRestriction: {
@@ -555,12 +558,63 @@ export async function searchNearbyGooglePlaces(input: {
   }
 
   const data = (await response.json()) as GooglePlacesSearchResponse;
+  return googlePlacesToCards(data);
+}
+
+function googlePlacesToCards(data: GooglePlacesSearchResponse): PlaceCardData[] {
   return (data.places ?? [])
     .filter(
       (place) =>
         place.location?.latitude != null && place.location?.longitude != null,
     )
     .map(placeCardFromGoogleResult);
+}
+
+export async function searchTextGooglePlaces(input: {
+  origin: Coordinates;
+  textQuery: string;
+  maxResultCount?: number;
+  radiusMeters?: number;
+}): Promise<PlaceCardData[]> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+  if (!apiKey) {
+    return [];
+  }
+
+  const radius = input.radiusMeters ?? NEARBY_QUERY_SEARCH_RADIUS_METERS;
+
+  const response = await fetch(
+    "https://places.googleapis.com/v1/places:searchText",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": GOOGLE_PLACES_FIELD_MASK,
+      },
+      body: JSON.stringify({
+        textQuery: input.textQuery,
+        // Text Search accepts locationBias (circle), not locationRestriction (circle).
+        locationBias: {
+          circle: {
+            center: {
+              latitude: input.origin.lat,
+              longitude: input.origin.lng,
+            },
+            radius,
+          },
+        },
+        maxResultCount: input.maxResultCount ?? 15,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = (await response.json()) as GooglePlacesSearchResponse;
+  return googlePlacesToCards(data);
 }
 
 export async function rankPlacesByWalkingDistance(
