@@ -145,7 +145,7 @@ export function KaviTripMapSection({
                     setSelectedStopId(null);
                     setSelectedSpotId(isSelected ? null : spot.id);
                   }}
-                  className={`flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-left transition-colors ${
+                  className={`inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-left transition-colors ${
                     isSelected ? "text-fg" : "text-body hover:text-fg"
                   }`}
                 >
