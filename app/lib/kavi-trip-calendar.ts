@@ -7,12 +7,6 @@ const TRIP_END = new Date("2026-07-04T00:00:00-04:00");
 
 export const CALENDAR_REVALIDATE_SECONDS = 900;
 
-const WINDOWS_TIMEZONES: Record<string, string> = {
-  "Pacific Standard Time": "America/Los_Angeles",
-  "Eastern Standard Time": "America/New_York",
-  "Central Standard Time": "America/Chicago",
-};
-
 const stopPatterns: Record<string, RegExp[]> = {
   hilton: [
     /hilton/i,
@@ -100,7 +94,6 @@ function parseIcsDateTime(rawKey: string, value: string) {
     return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
   }
 
-  const tzid = rawKey.match(/TZID=([^;:]+)/)?.[1];
   const year = Number(value.slice(0, 4));
   const month = Number(value.slice(4, 6));
   const day = Number(value.slice(6, 8));
@@ -113,8 +106,9 @@ function parseIcsDateTime(rawKey: string, value: string) {
     return new Date(`${localIso}Z`);
   }
 
-  const timeZone = WINDOWS_TIMEZONES[tzid ?? ""] ?? "America/New_York";
-  return zonedTimeToUtc(localIso, timeZone);
+  // Kavi's NYC trip ICS tags DTSTART with Pacific TZID, but the clock times are
+  // Eastern (event times in NYC). Parse as ET — do not add a PT→ET offset.
+  return zonedTimeToUtc(localIso, TRIP_TIMEZONE);
 }
 
 function zonedTimeToUtc(localIso: string, timeZone: string) {
@@ -253,13 +247,14 @@ function toTripEvent(event: ParsedIcsEvent): TripEvent {
   const summary = cleanIcsText(event.summary || "Untitled");
   const location = cleanIcsText(event.location);
   const stopId = matchStop(summary, location);
-  const timeZone = eventTimeZone(event);
+  const isStaticEvent = STATIC_TRIP_EVENTS.some((entry) => entry.uid === event.uid);
+  const displayTimeZone = isStaticEvent ? eventTimeZone(event) : TRIP_TIMEZONE;
 
   return {
     id: event.uid || `${summary}-${event.start.toISOString()}`,
     title: summary,
-    date: formatEventDate(event.start, timeZone),
-    time: formatEventTime(event.start, timeZone),
+    date: formatEventDate(event.start, displayTimeZone),
+    time: formatEventTime(event.start, displayTimeZone),
     stopId,
     note: !stopId && location ? locationNote(location) : undefined,
     url: STATIC_EVENT_URLS[event.uid],

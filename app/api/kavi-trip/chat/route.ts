@@ -12,6 +12,7 @@ import {
   createKaviTripAiTools,
   type NearbySpotsToolOutput,
   type PlaceRatingsToolOutput,
+  type ScheduleToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
 import {
@@ -64,6 +65,11 @@ const stopAfterRichPlaceResponse: StopCondition<
       return output?.found === true && output.places.length > 0;
     }
 
+    if (result.toolName === "getTripSchedule") {
+      const output = result.output as ScheduleToolOutput | undefined;
+      return output?.found === true && output.events.length > 0;
+    }
+
     if (result.toolName !== "getPlaceRatings") {
       return false;
     }
@@ -103,7 +109,7 @@ export async function POST(req: Request) {
     : parseLegacyCurrentLocation(legacyCurrentLocation) ?? {
         mode: "unavailable" as const,
       };
-  const tools = createKaviTripAiTools(locationContext);
+  const tools = createKaviTripAiTools(locationContext, tripEvents);
 
   const result = streamText({
     model: gateway("openai/gpt-4o-mini"),

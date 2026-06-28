@@ -4,10 +4,12 @@ import type { UIMessage } from "ai";
 
 import { PlaceRatingCard } from "@/app/components/place-rating-card";
 import { LocationToolCard } from "@/app/components/location-tool-card";
+import { ScheduleToolCard } from "@/app/components/schedule-tool-card";
 import type {
   CurrentLocationToolOutput,
   NearbySpotsToolOutput,
   PlaceRatingsToolOutput,
+  ScheduleToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
 import { sanitizeAssistantText } from "@/app/lib/sanitize-assistant-text";
 import { MessageMarkdown } from "@/components/message-markdown";
@@ -52,6 +54,19 @@ export function MessageAnimated({
                   state={part.state}
                   output={output}
                   textSize={textSize}
+                />
+              );
+            }
+
+            if (part.type === "tool-getTripSchedule") {
+              const output = part.output as ScheduleToolOutput | undefined;
+
+              return (
+                <ScheduleToolCard
+                  key={`${message.id}-${part.toolCallId}`}
+                  state={part.state}
+                  output={output}
+                  className="w-full min-w-0 self-stretch"
                 />
               );
             }

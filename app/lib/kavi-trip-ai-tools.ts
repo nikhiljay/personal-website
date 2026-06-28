@@ -16,6 +16,7 @@ import {
   type PlaceCardData,
 } from "./google-places";
 import { resolveTripReferencePoint } from "./kavi-nyc-trip";
+import type { TripEvent } from "./kavi-nyc-trip";
 import { savedSpots } from "./nikhil-saved-spots";
 import { savedSpotKindMeta, type SavedSpotKind } from "./saved-spot-kinds";
 import {
@@ -25,7 +26,13 @@ import {
   type UserLocationContext,
 } from "./user-location";
 
+import {
+  buildScheduleToolOutput,
+  type ScheduleToolOutput,
+} from "./kavi-trip-schedule-tool";
+
 export type { CurrentLocationToolOutput } from "./user-location";
+export type { ScheduleToolOutput } from "./kavi-trip-schedule-tool";
 
 export const NEARBY_MAX_WALK_SECONDS = 15 * 60;
 
@@ -425,7 +432,10 @@ function savedListEmptyMessage(
   return `None of Nikhil's${kindHint} saved spots are within a 15-min walk of ${reference}. Try a different kind, drop the filter, or ask for Google options.`;
 }
 
-export function createKaviTripAiTools(locationContext: UserLocationContext) {
+export function createKaviTripAiTools(
+  locationContext: UserLocationContext,
+  tripEvents: TripEvent[],
+) {
   const currentLocation = nycCoordinatesFromContext(locationContext);
 
   return {
@@ -435,6 +445,26 @@ export function createKaviTripAiTools(locationContext: UserLocationContext) {
       inputSchema: z.object({}),
       execute: async (): Promise<CurrentLocationToolOutput> =>
         await buildCurrentLocationToolOutput(locationContext),
+    }),
+    getTripSchedule: tool({
+      description:
+        "Get Kavi's NYC trip schedule as rich event cards. Use for schedule questions, what's on today/tomorrow, event times, flights, and dinners. Do not list events as plain text afterward.",
+      inputSchema: z.object({
+        relativeDay: z
+          .enum(["today", "tomorrow", "yesterday"])
+          .optional()
+          .describe(
+            "Use for today, tomorrow, or yesterday — resolved in NYC time. Preferred over date for relative questions.",
+          ),
+        date: z
+          .string()
+          .optional()
+          .describe(
+            "Named day only, e.g. 'Jun 28' or 'Sun, Jun 28'. Do not use for tomorrow/today — use relativeDay instead.",
+          ),
+      }),
+      execute: async ({ date, relativeDay }): Promise<ScheduleToolOutput> =>
+        buildScheduleToolOutput(tripEvents, { date, relativeDay }),
     }),
     findNearbySpots: tool({
       description:
