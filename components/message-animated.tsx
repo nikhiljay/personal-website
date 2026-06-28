@@ -3,7 +3,9 @@
 import type { UIMessage } from "ai";
 
 import { PlaceRatingCard } from "@/app/components/place-rating-card";
+import { LocationToolCard } from "@/app/components/location-tool-card";
 import type {
+  CurrentLocationToolOutput,
   NearbySpotsToolOutput,
   PlaceRatingsToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
@@ -39,6 +41,21 @@ export function MessageAnimated({
       <Message align={isUser ? "end" : "start"} className={textSize}>
         <MessageContent className={isUser ? undefined : "[&>*]:w-full [&>*]:min-w-0"}>
           {message.parts.map((part, index) => {
+            if (part.type === "tool-getCurrentLocation") {
+              const output = part.output as
+                | CurrentLocationToolOutput
+                | undefined;
+
+              return (
+                <LocationToolCard
+                  key={`${message.id}-${part.toolCallId}`}
+                  state={part.state}
+                  output={output}
+                  textSize={textSize}
+                />
+              );
+            }
+
             if (part.type === "tool-findNearbySpots") {
               if (part.state !== "output-available") {
                 return (

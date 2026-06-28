@@ -18,6 +18,14 @@ import {
 import { resolveTripReferencePoint } from "./kavi-nyc-trip";
 import { savedSpots } from "./nikhil-saved-spots";
 import { savedSpotKindMeta, type SavedSpotKind } from "./saved-spot-kinds";
+import {
+  buildCurrentLocationToolOutput,
+  nycCoordinatesFromContext,
+  type CurrentLocationToolOutput,
+  type UserLocationContext,
+} from "./user-location";
+
+export type { CurrentLocationToolOutput } from "./user-location";
 
 export const NEARBY_MAX_WALK_SECONDS = 15 * 60;
 
@@ -387,8 +395,17 @@ function savedListEmptyMessage(
   return `None of Nikhil's${kindHint} saved spots are within a 15-min walk of ${reference}. Try a different kind, drop the filter, or ask for Google options.`;
 }
 
-export function createKaviTripAiTools(currentLocation?: Coordinates | null) {
+export function createKaviTripAiTools(locationContext: UserLocationContext) {
+  const currentLocation = nycCoordinatesFromContext(locationContext);
+
   return {
+    getCurrentLocation: tool({
+      description:
+        "Check the user's current location. Call this before 'near me' questions or whenever proximity to the user matters. Returns whether location is available and in NYC.",
+      inputSchema: z.object({}),
+      execute: async (): Promise<CurrentLocationToolOutput> =>
+        buildCurrentLocationToolOutput(locationContext),
+    }),
     findNearbySpots: tool({
       description:
         "Find nearby restaurants/spots within a 15-minute walk, returning rich place cards. Set source explicitly: saved = Nikhil's list only, google = outside his list, auto = saved first then Google fallback.",

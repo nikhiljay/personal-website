@@ -11,6 +11,9 @@ type UseCurrentLocationOptions = {
 type CurrentLocationState = {
   location: Coordinates | null;
   isSimulated: boolean;
+  enabled: boolean;
+  permissionDenied: boolean;
+  isSupported: boolean;
 };
 
 function readSimulatedLocation() {
@@ -35,6 +38,9 @@ export function useCurrentLocation(
     useState<Coordinates | null>(null);
   const [enabled, setEnabled] = useState(!requireInteraction);
   const [location, setLocation] = useState<Coordinates | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const isSupported =
+    typeof navigator !== "undefined" && Boolean(navigator.geolocation);
 
   useEffect(() => {
     const simulated = readSimulatedLocation();
@@ -66,19 +72,23 @@ export function useCurrentLocation(
       return;
     }
 
-    if (!enabled || !navigator.geolocation) {
+    if (!enabled || !isSupported) {
       return;
     }
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
+        setPermissionDenied(false);
         setLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
       },
-      () => {
+      (error) => {
         setLocation(null);
+        if (error.code === error.PERMISSION_DENIED) {
+          setPermissionDenied(true);
+        }
       },
       {
         enableHighAccuracy: true,
@@ -90,10 +100,13 @@ export function useCurrentLocation(
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [enabled, simulatedLocation]);
+  }, [enabled, simulatedLocation, isSupported]);
 
   return {
     location,
     isSimulated: Boolean(simulatedLocation),
+    enabled,
+    permissionDenied,
+    isSupported,
   };
 }

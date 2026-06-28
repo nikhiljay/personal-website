@@ -14,7 +14,10 @@ import {
   type PlaceRatingsToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
-import { isInNyc, type Coordinates } from "@/app/lib/geo";
+import {
+  parseLocationContext,
+  nycCoordinatesFromContext,
+} from "@/app/lib/user-location";
 
 export const maxDuration = 30;
 
@@ -28,9 +31,7 @@ async function loadTripEvents() {
 
 // Place cards are the response — skip a second LLM turn (saves a Gateway call and
 // avoids free-tier rate limits that surfaced as "An error occurred.").
-function parseCurrentLocation(
-  value: unknown,
-): Coordinates | null {
+function parseLegacyCurrentLocation(value: unknown) {
   if (
     !value ||
     typeof value !== "object" ||
@@ -42,8 +43,11 @@ function parseCurrentLocation(
     return null;
   }
 
-  const location = { lat: value.lat, lng: value.lng };
-  return isInNyc(location) ? location : null;
+  return parseLocationContext({
+    mode: "in_nyc",
+    lat: value.lat,
+    lng: value.lng,
+  });
 }
 
 const stopAfterRichPlaceResponse: StopCondition<
@@ -86,16 +90,26 @@ function formatStreamError(error: unknown) {
 export async function POST(req: Request) {
   const {
     messages,
-    currentLocation,
-  }: { messages: UIMessage[]; currentLocation?: unknown } = await req.json();
+    locationContext: locationContextInput,
+    currentLocation: legacyCurrentLocation,
+  }: {
+    messages: UIMessage[];
+    locationContext?: unknown;
+    currentLocation?: unknown;
+  } = await req.json();
   const tripEvents = await loadTripEvents();
-  const tools = createKaviTripAiTools(parseCurrentLocation(currentLocation));
+  const locationContext = locationContextInput
+    ? parseLocationContext(locationContextInput)
+    : parseLegacyCurrentLocation(legacyCurrentLocation) ?? {
+        mode: "unavailable" as const,
+      };
+  const tools = createKaviTripAiTools(locationContext);
 
   const result = streamText({
     model: gateway("openai/gpt-4o-mini"),
     system: buildKaviTripSystemPrompt(
       tripEvents,
-      parseCurrentLocation(currentLocation),
+      nycCoordinatesFromContext(locationContext),
     ),
     messages: await convertToModelMessages(messages),
     tools,

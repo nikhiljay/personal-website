@@ -9,7 +9,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { useCurrentLocation } from "../hooks/use-current-location";
 import { useMediaQuery } from "../hooks/use-media-query";
-import { isInNyc, type Coordinates } from "../lib/geo";
+import {
+  buildLocationContext,
+  type UserLocationContext,
+} from "../lib/user-location";
 import { KaviAskAiChat } from "./kavi-ask-ai-chat";
 import { KaviAskAiFab } from "./kavi-ask-ai-fab";
 import { KaviAskAiFullscreen } from "./kavi-ask-ai-fullscreen";
@@ -17,25 +20,26 @@ import { KaviAskAiPopover } from "./kavi-ask-ai-popover";
 
 const chatTransport = new DefaultChatTransport({ api: "/api/kavi-trip/chat" });
 
-function resolveChatLocation(
-  location: Coordinates | null,
-  isSimulated: boolean,
-) {
-  if (!location) {
-    return null;
-  }
-
-  return isSimulated || isInNyc(location) ? location : null;
-}
-
 export function KaviAskAi() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const fabRef = useRef<HTMLButtonElement>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const { location, isSimulated } = useCurrentLocation({ requireInteraction: true });
-  const chatLocationRef = useRef<Coordinates | null>(null);
-  chatLocationRef.current = resolveChatLocation(location, isSimulated);
+  const {
+    location,
+    isSimulated,
+    enabled,
+    permissionDenied,
+    isSupported,
+  } = useCurrentLocation({ requireInteraction: true });
+  const locationContextRef = useRef<UserLocationContext>({ mode: "unavailable" });
+  locationContextRef.current = buildLocationContext({
+    location,
+    isSimulated,
+    enabled,
+    permissionDenied,
+    isSupported,
+  });
   const chat = useChat({ transport: chatTransport });
   const closeChat = useCallback(() => setOpen(false), []);
 
@@ -47,7 +51,7 @@ export function KaviAskAi() {
     status: chat.status,
     error: chat.error,
     stop: chat.stop,
-    getCurrentLocation: () => chatLocationRef.current,
+    getLocationContext: () => locationContextRef.current,
   };
 
   return (

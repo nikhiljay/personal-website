@@ -8,7 +8,7 @@ import {
   XIcon,
 } from "lucide-react";
 
-import type { Coordinates } from "@/app/lib/geo";
+import type { UserLocationContext } from "@/app/lib/user-location";
 import { usePreferredColorScheme } from "@/app/hooks/use-preferred-color-scheme";
 import { MessageAnimated } from "@/components/message-animated";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ type KaviAskAiChatProps = {
   status: ReturnType<typeof useChat>["status"];
   error: ReturnType<typeof useChat>["error"];
   stop: ReturnType<typeof useChat>["stop"];
-  getCurrentLocation: () => Coordinates | null;
+  getLocationContext: () => UserLocationContext;
 };
 
 function getSendButtonColors(
@@ -93,7 +93,7 @@ export function KaviAskAiChat({
   status,
   error,
   stop,
-  getCurrentLocation,
+  getLocationContext,
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
   const colorScheme = usePreferredColorScheme();
@@ -108,10 +108,9 @@ export function KaviAskAiChat({
     }
 
     setInput("");
-    const currentLocation = getCurrentLocation();
     await sendMessage(
       { text: trimmed },
-      currentLocation ? { body: { currentLocation } } : undefined,
+      { body: { locationContext: getLocationContext() } },
     );
   };
 

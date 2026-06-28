@@ -52,6 +52,16 @@
   backface-visibility: hidden;
 }
 
+.trip-map-current-location--inactive .trip-map-current-location-dot {
+  background: #a3a3a3;
+  animation: none;
+  transform: scale(0.88);
+}
+
+.trip-map-current-location--inactive .trip-map-current-location-label {
+  color: #a3a3a3;
+}
+
 @keyframes trip-map-location-breathe {
   0%,
   100% {
@@ -70,6 +80,14 @@
 @media (prefers-color-scheme: dark) {
   .trip-map-current-location-dot {
     background: #0a84ff;
+  }
+
+  .trip-map-current-location--inactive .trip-map-current-location-dot {
+    background: #737373;
+  }
+
+  .trip-map-current-location--inactive .trip-map-current-location-label {
+    color: #737373;
   }
 
   .trip-map-current-location-label {
