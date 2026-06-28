@@ -448,7 +448,7 @@ export function createKaviTripAiTools(
     }),
     getTripSchedule: tool({
       description:
-        "Get Kavi's NYC trip schedule as rich event cards. Use for schedule questions, what's on today/tomorrow, event times, flights, and dinners. Do not list events as plain text afterward.",
+        "Get Kavi's NYC trip schedule as rich event cards. Omit filters for the full trip schedule. Filter to one day via relativeDay, weekday, or date. Do not list events as plain text afterward.",
       inputSchema: z.object({
         relativeDay: z
           .enum(["today", "tomorrow", "yesterday"])
@@ -456,15 +456,29 @@ export function createKaviTripAiTools(
           .describe(
             "Use for today, tomorrow, or yesterday — resolved in NYC time. Preferred over date for relative questions.",
           ),
+        weekday: z
+          .enum([
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+          ])
+          .optional()
+          .describe(
+            "Use when the user names a weekday (e.g. Monday). Preferred over guessing a date string.",
+          ),
         date: z
           .string()
           .optional()
           .describe(
-            "Named day only, e.g. 'Jun 28' or 'Sun, Jun 28'. Do not use for tomorrow/today — use relativeDay instead.",
+            "Specific calendar day only, e.g. 'Jun 29' or 'Mon, Jun 29'. For weekdays use weekday instead.",
           ),
       }),
-      execute: async ({ date, relativeDay }): Promise<ScheduleToolOutput> =>
-        buildScheduleToolOutput(tripEvents, { date, relativeDay }),
+      execute: async ({ date, relativeDay, weekday }): Promise<ScheduleToolOutput> =>
+        buildScheduleToolOutput(tripEvents, { date, relativeDay, weekday }),
     }),
     findNearbySpots: tool({
       description:

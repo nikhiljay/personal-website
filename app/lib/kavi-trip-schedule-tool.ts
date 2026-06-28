@@ -23,6 +23,56 @@ export type ScheduleToolOutput =
 export type ScheduleFilter = {
   date?: string;
   relativeDay?: RelativeTripDay;
+  weekday?: WeekdayName;
+};
+
+export type WeekdayName =
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday"
+  | "saturday"
+  | "sunday";
+
+const WEEKDAY_PREFIX: Record<WeekdayName, string> = {
+  monday: "Mon",
+  tuesday: "Tue",
+  wednesday: "Wed",
+  thursday: "Thu",
+  friday: "Fri",
+  saturday: "Sat",
+  sunday: "Sun",
+};
+
+const WEEKDAY_LABEL: Record<WeekdayName, string> = {
+  monday: "Monday",
+  tuesday: "Tuesday",
+  wednesday: "Wednesday",
+  thursday: "Thursday",
+  friday: "Friday",
+  saturday: "Saturday",
+  sunday: "Sunday",
+};
+
+const WEEKDAY_ALIASES: Record<string, WeekdayName> = {
+  monday: "monday",
+  mon: "monday",
+  tuesday: "tuesday",
+  tue: "tuesday",
+  tues: "tuesday",
+  wednesday: "wednesday",
+  wed: "wednesday",
+  thursday: "thursday",
+  thu: "thursday",
+  thur: "thursday",
+  thurs: "thursday",
+  friday: "friday",
+  fri: "friday",
+  saturday: "saturday",
+  sat: "saturday",
+  sunday: "sunday",
+  sun: "sunday",
 };
 
 function ymdInTripTimezone(date = new Date()) {
@@ -78,11 +128,119 @@ function normalizeRelativeDayFromText(
   return undefined;
 }
 
+function normalizeWeekdayName(value: string | undefined): WeekdayName | undefined {
+  if (!value?.trim()) {
+    return undefined;
+  }
+
+  const normalized = value.trim().toLowerCase().replace(/[.,]/g, "");
+  return WEEKDAY_ALIASES[normalized];
+}
+
+const MONTH_ALIASES: Record<string, string> = {
+  january: "jan",
+  february: "feb",
+  march: "mar",
+  april: "apr",
+  may: "may",
+  june: "jun",
+  july: "jul",
+  august: "aug",
+  september: "sep",
+  october: "oct",
+  november: "nov",
+  december: "dec",
+};
+
+function expandDateQueryVariants(query: string) {
+  const normalized = query.trim().toLowerCase().replace(/\s+/g, " ");
+  const variants = new Set<string>([normalized]);
+
+  for (const [full, short] of Object.entries(MONTH_ALIASES)) {
+    if (normalized.includes(full)) {
+      variants.add(normalized.replace(full, short));
+    }
+  }
+
+  const ymd = query.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (ymd) {
+    variants.add(
+      formatTripDayLabel(`${ymd[1]}-${ymd[2]}-${ymd[3]}`).toLowerCase(),
+    );
+  }
+
+  const slash = query.trim().match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+  if (slash) {
+    const year = slash[3]
+      ? slash[3].length === 2
+        ? `20${slash[3]}`
+        : slash[3]
+      : "2026";
+    const month = slash[1].padStart(2, "0");
+    const day = slash[2].padStart(2, "0");
+    variants.add(formatTripDayLabel(`${year}-${month}-${day}`).toLowerCase());
+  }
+
+  return [...variants];
+}
+
+function tripDayLabelFromDateQuery(dateQuery: string) {
+  const trimmed = dateQuery.trim();
+  const ymd = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (ymd) {
+    return formatTripDayLabel(trimmed);
+  }
+
+  const slash = trimmed.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+  if (slash) {
+    const year = slash[3]
+      ? slash[3].length === 2
+        ? `20${slash[3]}`
+        : slash[3]
+      : "2026";
+    const month = slash[1].padStart(2, "0");
+    const day = slash[2].padStart(2, "0");
+    return formatTripDayLabel(`${year}-${month}-${day}`);
+  }
+
+  return null;
+}
+
+function eventMatchesDateQuery(eventDate: string, dateQuery: string) {
+  const eventLower = eventDate.toLowerCase();
+  return expandDateQueryVariants(dateQuery).some(
+    (variant) => eventLower === variant || eventLower.includes(variant),
+  );
+}
+
+function eventMatchesWeekdayPrefix(eventDate: string, weekdayPrefix: string) {
+  return new RegExp(`^${weekdayPrefix}\\b`, "i").test(eventDate);
+}
+
 function resolveScheduleFilter(filter?: ScheduleFilter): {
   relativeDay?: RelativeTripDay;
+  weekdayPrefix?: string;
   dateQuery?: string;
   resolvedLabel?: string;
 } {
+  const weekdayFromParam = filter?.weekday
+    ? WEEKDAY_PREFIX[filter.weekday]
+    : undefined;
+  const weekdayFromDate = normalizeWeekdayName(filter?.date);
+  const weekdayPrefix = weekdayFromParam ?? (
+    weekdayFromDate ? WEEKDAY_PREFIX[weekdayFromDate] : undefined
+  );
+
+  if (weekdayPrefix) {
+    const weekdayName = filter?.weekday ?? weekdayFromDate;
+    return {
+      weekdayPrefix,
+      resolvedLabel: weekdayName
+        ? WEEKDAY_LABEL[weekdayName]
+        : weekdayPrefix,
+    };
+  }
+
   const relativeFromDay = normalizeRelativeDayFromText(filter?.relativeDay);
   const relativeFromDate = normalizeRelativeDayFromText(filter?.date);
 
@@ -125,18 +283,23 @@ export function buildScheduleToolOutput(
   tripEvents: TripEvent[],
   filter?: ScheduleFilter,
 ): ScheduleToolOutput {
-  const { relativeDay, dateQuery, resolvedLabel } = resolveScheduleFilter(
-    filter,
-  );
+  const { relativeDay, weekdayPrefix, dateQuery, resolvedLabel } =
+    resolveScheduleFilter(filter);
   let events = tripEvents;
 
-  if (relativeDay) {
+  if (weekdayPrefix) {
+    events = events.filter((event) =>
+      eventMatchesWeekdayPrefix(event.date, weekdayPrefix),
+    );
+  } else if (relativeDay) {
     const dayLabel = tripDayLabelForRelative(relativeDay);
     events = events.filter((event) => event.date === dayLabel);
   } else if (dateQuery) {
-    const query = dateQuery.toLowerCase();
+    const exactDayLabel = tripDayLabelFromDateQuery(dateQuery);
     events = events.filter((event) =>
-      event.date.toLowerCase().includes(query),
+      exactDayLabel
+        ? event.date === exactDayLabel
+        : eventMatchesDateQuery(event.date, dateQuery),
     );
   }
 
