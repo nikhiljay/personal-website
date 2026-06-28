@@ -413,7 +413,8 @@ export function buildAhlaEventsToolOutput(
   if (events.length === 0) {
     return {
       found: false,
-      error: "No AHLA events matched that filter — try a different day, drop filters, or ask for must-attend sessions.",
+      error:
+        "No AHLA events matched that lookup. Retry with broader criteria — e.g. pass only day, or drop mustAttendOnly/priority filters.",
     };
   }
 

@@ -14,8 +14,9 @@ import type {
   PlaceRatingsToolOutput,
   ScheduleToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
-import { sanitizeAssistantText } from "@/app/lib/sanitize-assistant-text";
-import { MessageMarkdown } from "@/components/message-markdown";
+import {
+  AssistantMessageContent,
+} from "@/components/message-markdown";
 import {
   ReasoningBlock,
   type ThoughtTurnTiming,
@@ -42,6 +43,65 @@ function getReasoningBlockKey(ownerId: string, flushIndex: number) {
     : `${ownerId}-reasoning-${flushIndex}`;
 }
 
+function getMessagePartsSignature(message: UIMessage) {
+  return message.parts
+    .map((part, index) => {
+      if (part.type === "text") {
+        return `t${index}:${part.text.length}:${part.state ?? ""}`;
+      }
+
+      if (part.type === "reasoning") {
+        return `r${index}:${part.text.length}:${part.state ?? ""}`;
+      }
+
+      if (part.type.startsWith("tool-") && "state" in part) {
+        return `tool${index}:${part.toolCallId}:${part.state}`;
+      }
+
+      return `${part.type}${index}`;
+    })
+    .join("|");
+}
+
+function areMessageAnimatedPropsEqual(
+  prev: MessageAnimatedProps,
+  next: MessageAnimatedProps,
+) {
+  if (
+    prev.message === next.message &&
+    prev.scrollerMessageId === next.scrollerMessageId &&
+    prev.layoutStable === next.layoutStable &&
+    prev.scrollAnchor === next.scrollAnchor &&
+    prev.textSize === next.textSize &&
+    prev.turnTiming === next.turnTiming &&
+    prev.userVariant === next.userVariant &&
+    prev.assistantVariant === next.assistantVariant
+  ) {
+    return true;
+  }
+
+  if (prev.message.id !== next.message.id) {
+    return false;
+  }
+
+  if (
+    prev.scrollerMessageId !== next.scrollerMessageId ||
+    prev.layoutStable !== next.layoutStable ||
+    prev.scrollAnchor !== next.scrollAnchor ||
+    prev.textSize !== next.textSize ||
+    prev.turnTiming !== next.turnTiming ||
+    prev.userVariant !== next.userVariant ||
+    prev.assistantVariant !== next.assistantVariant
+  ) {
+    return false;
+  }
+
+  return (
+    getMessagePartsSignature(prev.message) ===
+    getMessagePartsSignature(next.message)
+  );
+}
+
 function flushReasoningBlock(
   elements: ReactNode[],
   text: string,
@@ -58,6 +118,32 @@ function flushReasoningBlock(
       turnTiming={useTurnTiming ? turnTiming : undefined}
       className="w-full min-w-0 self-stretch"
     />,
+  );
+}
+
+function hasPriorAssistantText(message: UIMessage, partIndex: number) {
+  return message.parts
+    .slice(0, partIndex)
+    .some((priorPart) => priorPart.type === "text" && priorPart.text.trim());
+}
+
+function appendToolPullingLine(
+  elements: ReactNode[],
+  key: string,
+  label: string,
+  textSize: string,
+  assistantVariant: React.ComponentProps<typeof Bubble>["variant"],
+) {
+  elements.push(
+    <Bubble
+      key={key}
+      variant={assistantVariant}
+      className="w-full min-w-0 self-stretch"
+    >
+      <BubbleContent className={cn(textSize, "overflow-visible text-muted-foreground")}>
+        {label}
+      </BubbleContent>
+    </Bubble>,
   );
 }
 
@@ -144,6 +230,20 @@ export const MessageAnimated = memo(function MessageAnimated({
     if (part.type === "tool-getAhlaEvents") {
       const output = part.output as AhlaEventsToolOutput | undefined;
 
+      if (part.state === "output-available" && output && !output.found) {
+        return;
+      }
+
+      if (!hasPriorAssistantText(message, index)) {
+        appendToolPullingLine(
+          renderedParts,
+          `${message.id}-${part.toolCallId}-pulling`,
+          "Pulling AHLA sessions…",
+          textSize,
+          assistantVariant,
+        );
+      }
+
       renderedParts.push(
         <AhlaEventToolCard
           key={`${message.id}-${part.toolCallId}`}
@@ -156,6 +256,16 @@ export const MessageAnimated = memo(function MessageAnimated({
     }
 
     if (part.type === "tool-findNearbySpots") {
+      if (!hasPriorAssistantText(message, index)) {
+        appendToolPullingLine(
+          renderedParts,
+          `${message.id}-${part.toolCallId}-pulling`,
+          "Pulling restaurants…",
+          textSize,
+          assistantVariant,
+        );
+      }
+
       if (part.state !== "output-available") {
         renderedParts.push(
           <PlaceRatingCard
@@ -174,26 +284,11 @@ export const MessageAnimated = memo(function MessageAnimated({
         return;
       }
 
-      const hasPriorText = message.parts
-        .slice(0, index)
-        .some(
-          (priorPart) => priorPart.type === "text" && priorPart.text.trim(),
-        );
-
       renderedParts.push(
         <div
           key={`${message.id}-${part.toolCallId}`}
           className="flex w-full min-w-0 flex-col gap-2 self-stretch"
         >
-          {!hasPriorText && output.intro ? (
-            <Bubble variant={assistantVariant}>
-              <BubbleContent className={cn(textSize, "overflow-visible")}>
-                <MessageMarkdown>
-                  {sanitizeAssistantText(output.intro)}
-                </MessageMarkdown>
-              </BubbleContent>
-            </Bubble>
-          ) : null}
           {output.places.map((place) => (
             <PlaceRatingCard
               key={`${part.toolCallId}-${place.spotId ?? place.name}`}
@@ -235,9 +330,17 @@ export const MessageAnimated = memo(function MessageAnimated({
       return;
     }
 
+    const isStreamingText =
+      part.state === "streaming" ||
+      (turnTiming?.isActive === true &&
+        part.state !== "done" &&
+        index === message.parts.length - 1);
+
     renderedParts.push(
       <Bubble
-        key={`${message.id}-text-${part.text.slice(0, 24)}`}
+        // Part order is stable; index is the safest key while text length grows.
+        // biome-ignore lint/suspicious/noArrayIndexKey: text parts have no stable id
+        key={`${message.id}-text-${index}`}
         variant={isUser ? userVariant : assistantVariant}
         className={!isUser ? "w-full min-w-0 self-stretch" : undefined}
       >
@@ -245,9 +348,10 @@ export const MessageAnimated = memo(function MessageAnimated({
           {isUser ? (
             <span className="whitespace-pre-wrap">{part.text}</span>
           ) : (
-            <MessageMarkdown>
-              {sanitizeAssistantText(part.text)}
-            </MessageMarkdown>
+            <AssistantMessageContent
+              text={part.text}
+              isStreaming={isStreamingText}
+            />
           )}
         </BubbleContent>
       </Bubble>,
@@ -290,4 +394,4 @@ export const MessageAnimated = memo(function MessageAnimated({
       </Message>
     </MessageScrollerItem>
   );
-});
+}, areMessageAnimatedPropsEqual);

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+import { memo, useMemo } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { sanitizeAssistantText } from "@/app/lib/sanitize-assistant-text";
 import { cn } from "@/lib/utils";
 
 type MessageMarkdownProps = {
@@ -31,7 +33,10 @@ const messageMarkdownComponents = {
   ),
 };
 
-export function MessageMarkdown({ children, className }: MessageMarkdownProps) {
+export const MessageMarkdown = memo(function MessageMarkdown({
+  children,
+  className,
+}: MessageMarkdownProps) {
   return (
     <div className={cn("min-w-0", className)}>
       <Markdown remarkPlugins={[remarkGfm]} components={messageMarkdownComponents}>
@@ -39,4 +44,28 @@ export function MessageMarkdown({ children, className }: MessageMarkdownProps) {
       </Markdown>
     </div>
   );
-}
+});
+
+type AssistantMessageContentProps = {
+  text: string;
+  isStreaming?: boolean;
+  className?: string;
+};
+
+export const AssistantMessageContent = memo(function AssistantMessageContent({
+  text,
+  isStreaming = false,
+  className,
+}: AssistantMessageContentProps) {
+  const sanitized = useMemo(() => sanitizeAssistantText(text), [text]);
+
+  if (isStreaming) {
+    return (
+      <div className={cn("min-w-0 whitespace-pre-wrap", className)}>
+        {sanitized}
+      </div>
+    );
+  }
+
+  return <MessageMarkdown className={className}>{sanitized}</MessageMarkdown>;
+});

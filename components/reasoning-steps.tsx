@@ -82,11 +82,22 @@ export function ReasoningBody({
     return null;
   }
 
+  if (isStreaming) {
+    return (
+      <div
+        className={cn(
+          "reasoning-body-muted min-w-0 whitespace-pre-wrap",
+          REASONING_TEXT_CLASS,
+        )}
+      >
+        {trimmed}
+      </div>
+    );
+  }
+
   return (
     <div className={cn("min-w-0", REASONING_TEXT_CLASS)}>
-      <ReasoningInlineMarkdown isActive={isStreaming}>
-        {trimmed}
-      </ReasoningInlineMarkdown>
+      <ReasoningInlineMarkdown isActive={false}>{trimmed}</ReasoningInlineMarkdown>
     </div>
   );
 }

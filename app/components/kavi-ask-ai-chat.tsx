@@ -3,7 +3,13 @@
 import type { RefObject } from "react";
 import type { UIMessage } from "ai";
 import type { useChat } from "@ai-sdk/react";
-import { useLayoutEffect, useMemo } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 import {
   ArrowUpIcon,
   MessageCircleDashedIcon,
@@ -43,7 +49,6 @@ import {
   MessageScrollerProvider,
   MessageScrollerViewport,
   useMessageScroller,
-  useMessageScrollerScrollable,
 } from "@/components/ui/message-scroller";
 import { cn } from "@/lib/utils";
 
@@ -87,21 +92,15 @@ function getSendButtonColors(
   };
 }
 
-function ChatBottomPin({
-  isBusy,
-  messages,
-  showFallbackThinking,
-}: {
-  isBusy: boolean;
-  messages: UIMessage[];
-  showFallbackThinking: boolean;
-}) {
-  const { scrollToEnd } = useMessageScroller();
-  const scrollable = useMessageScrollerScrollable();
-  const atBottom = !scrollable.end;
+function getStreamRevision(messages: UIMessage[]) {
   const lastMessage = messages.at(-1);
+
+  if (!lastMessage) {
+    return "0";
+  }
+
   const streamContentKey =
-    lastMessage?.parts
+    lastMessage.parts
       .map((part) => {
         if (part.type === "text") {
           return `t:${part.text.length}`;
@@ -118,16 +117,139 @@ function ChatBottomPin({
         return part.type;
       })
       .join("|") ?? "";
-  const pinKey = `${messages.length}:${lastMessage?.id ?? ""}:${showFallbackThinking}:${streamContentKey}`;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pinKey encodes message/tool stream updates
+  return `${messages.length}:${lastMessage.id}:${streamContentKey}`;
+}
+
+const NEAR_BOTTOM_THRESHOLD_PX = 96;
+
+function isNearBottom(viewport: HTMLElement) {
+  return (
+    viewport.scrollHeight -
+      viewport.scrollTop -
+      viewport.clientHeight <=
+    NEAR_BOTTOM_THRESHOLD_PX
+  );
+}
+
+/** Pin scroll to bottom during streaming; coalesced to one scroll per frame. */
+function ChatBottomPin({
+  isBusy,
+  streamRevision,
+  viewportRef,
+}: {
+  isBusy: boolean;
+  streamRevision: string;
+  viewportRef: RefObject<HTMLElement | null>;
+}) {
+  const { scrollToEnd } = useMessageScroller();
+  const stickToBottomRef = useRef(false);
+  const wasBusyRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const programmaticScrollRef = useRef(false);
+
+  const scheduleScrollToEnd = useCallback(() => {
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        programmaticScrollRef.current = true;
+        scrollToEnd({ behavior: "auto" });
+        requestAnimationFrame(() => {
+          programmaticScrollRef.current = false;
+        });
+      });
+    });
+  }, [scrollToEnd]);
+
+  const cancelScheduledScroll = useCallback(() => {
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
+
   useLayoutEffect(() => {
-    if (!isBusy || !atBottom) {
+    if (isBusy) {
+      stickToBottomRef.current = true;
+    }
+  }, [isBusy]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: streamRevision encodes stream growth
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) {
       return;
     }
 
-    scrollToEnd({ behavior: "auto" });
-  }, [atBottom, isBusy, pinKey, scrollToEnd]);
+    const shouldPin =
+      stickToBottomRef.current || (isBusy && isNearBottom(viewport));
+
+    if (!shouldPin) {
+      return;
+    }
+
+    stickToBottomRef.current = true;
+    scheduleScrollToEnd();
+
+    return cancelScheduledScroll;
+  }, [cancelScheduledScroll, isBusy, scheduleScrollToEnd, streamRevision, viewportRef]);
+
+  useLayoutEffect(() => {
+    if (wasBusyRef.current && !isBusy && stickToBottomRef.current) {
+      scheduleScrollToEnd();
+    }
+
+    wasBusyRef.current = isBusy;
+  }, [isBusy, scheduleScrollToEnd]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-bind when message list mounts viewport content
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) {
+      return;
+    }
+
+    const handleScroll = () => {
+      if (programmaticScrollRef.current) {
+        return;
+      }
+
+      stickToBottomRef.current = isNearBottom(viewport);
+    };
+
+    viewport.addEventListener("scroll", handleScroll, { passive: true });
+    return () => viewport.removeEventListener("scroll", handleScroll);
+  }, [streamRevision, viewportRef]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-bind when message list mounts viewport content
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const content = viewport.querySelector(
+      '[data-slot="message-scroller-content"]',
+    );
+    if (!content) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (!stickToBottomRef.current) {
+        return;
+      }
+
+      scheduleScrollToEnd();
+    });
+
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [scheduleScrollToEnd, streamRevision, viewportRef]);
 
   return null;
 }
@@ -146,6 +268,17 @@ export function KaviAskAiChat({
   stop,
   getLocationContext,
 }: KaviAskAiChatProps) {
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const mergeViewportRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      viewportRef.current = node;
+
+      if (scrollContainerRef) {
+        scrollContainerRef.current = node;
+      }
+    },
+    [scrollContainerRef],
+  );
   const isBusy = status === "submitted" || status === "streaming";
   const lastMessage = messages.at(-1);
 
@@ -172,6 +305,10 @@ export function KaviAskAiChat({
   const latestRenderableAssistantId =
     displayMessages.findLast((message) => message.role === "assistant")?.id ??
     null;
+  const streamRevision = useMemo(
+    () => getStreamRevision(displayMessages),
+    [displayMessages],
+  );
   const colorScheme = usePreferredColorScheme();
   const isSubmitDisabled = !input.trim() || isBusy;
   const sendButtonColors = getSendButtonColors(colorScheme, isSubmitDisabled);
@@ -248,13 +385,11 @@ export function KaviAskAiChat({
               <MessageScroller className="h-full touch-auto">
                 <ChatBottomPin
                   isBusy={isBusy}
-                  messages={displayMessages}
-                  showFallbackThinking={showFallbackThinking}
+                  streamRevision={streamRevision}
+                  viewportRef={viewportRef}
                 />
                 <MessageScrollerViewport
-                  ref={
-                    scrollContainerRef as React.RefObject<HTMLDivElement | null>
-                  }
+                  ref={mergeViewportRef}
                   className={isFullscreen ? "touch-auto" : undefined}
                 >
                   <MessageScrollerContent

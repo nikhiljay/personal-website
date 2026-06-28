@@ -56,6 +56,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  /* Native buttons keep UA border width; shadcn's border-border color makes it visible. */
+  button {
+    border-width: 0;
+    background-color: transparent;
+  }
 }
 
 @layer components {

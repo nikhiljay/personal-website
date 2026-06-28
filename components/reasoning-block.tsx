@@ -37,10 +37,7 @@ function ThoughtHeader({
   return (
     <Marker className="w-auto text-sm leading-none">
       <MarkerContent className="leading-none">
-        Thought{" "}
-        <span className="text-muted-foreground/45">
-          for {Math.max(1, elapsedSeconds)}s
-        </span>
+        Thought for {Math.max(1, elapsedSeconds)}s
       </MarkerContent>
     </Marker>
   );
@@ -61,13 +58,19 @@ export function ReasoningBlock({
   className,
   turnTiming,
 }: ReasoningBlockProps) {
-  const displayText = useMemo(() => flattenReasoningText(text), [text]);
   const isPendingTurnTiming =
     turnTiming?.isActive === true &&
     state !== "streaming" &&
     state !== "done" &&
-    displayText.trim().length === 0;
+    text.trim().length === 0;
   const isStreaming = state === "streaming" || isPendingTurnTiming;
+  const displayText = useMemo(() => {
+    if (isStreaming) {
+      return text.trim();
+    }
+
+    return flattenReasoningText(text);
+  }, [isStreaming, text]);
   const [open, setOpen] = useState(false);
   const startedAtRef = useRef<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(1);
@@ -122,7 +125,7 @@ export function ReasoningBlock({
         }
         aria-expanded={hasExpandableBody ? open : undefined}
         className={cn(
-          "flex w-full items-baseline gap-[0.25em] rounded-md text-left transition-colors",
+          "flex w-full items-center gap-[0.25em] rounded-md border-0 bg-transparent p-0 text-left outline-none transition-colors focus-visible:outline-none",
           !hasExpandableBody && "cursor-default disabled:opacity-100",
         )}
       >
@@ -132,7 +135,7 @@ export function ReasoningBlock({
         />
         <ChevronRightIcon
           className={cn(
-            "relative top-[0.1em] size-3 shrink-0 text-muted-foreground/45 transition-transform duration-200 ease-out",
+            "size-3 shrink-0 text-muted-foreground transition-transform duration-200 ease-out",
             open && hasExpandableBody && "rotate-90",
           )}
           aria-hidden="true"
@@ -183,7 +186,7 @@ export function ThinkingIndicator({
     >
       <ThoughtHeader isStreaming elapsedSeconds={1} />
       <ChevronRightIcon
-        className="size-3 shrink-0 text-muted-foreground/45"
+        className="size-3 shrink-0 text-muted-foreground"
         aria-hidden
       />
     </div>

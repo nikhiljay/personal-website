@@ -172,16 +172,7 @@ export function AhlaEventToolCard({
   }
 
   if (state === "output-available" && output && !output.found) {
-    return (
-      <p
-        className={cn(
-          "w-full min-w-0 self-stretch text-sm leading-relaxed text-muted-foreground",
-          className,
-        )}
-      >
-        {output.error}
-      </p>
-    );
+    return null;
   }
 
   if (state === "output-error") {
