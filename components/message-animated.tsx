@@ -14,7 +14,10 @@ import type {
 } from "@/app/lib/kavi-trip-ai-tools";
 import { sanitizeAssistantText } from "@/app/lib/sanitize-assistant-text";
 import { MessageMarkdown } from "@/components/message-markdown";
-import { ReasoningBlock, type ThoughtTurnTiming } from "@/components/reasoning-block";
+import {
+  ReasoningBlock,
+  type ThoughtTurnTiming,
+} from "@/components/reasoning-block";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Message, MessageContent } from "@/components/ui/message";
 import { MessageScrollerItem } from "@/components/ui/message-scroller";
@@ -36,10 +39,6 @@ function flushReasoningBlock(
   key: string,
   turnTiming?: ThoughtTurnTiming,
 ) {
-  if (!text.trim() && state !== "streaming") {
-    return;
-  }
-
   elements.push(
     <ReasoningBlock
       key={key}
@@ -64,25 +63,31 @@ export function MessageAnimated({
   const renderedParts: ReactNode[] = [];
   let reasoningText = "";
   let reasoningState: "streaming" | "done" | undefined;
-  let reasoningKey = "";
+  let reasoningFlushIndex = 0;
 
   const flushReasoning = () => {
+    const hasContent =
+      reasoningText.trim().length > 0 || reasoningState === "streaming";
+
+    if (!hasContent) {
+      return;
+    }
+
     flushReasoningBlock(
       renderedParts,
       reasoningText,
       reasoningState,
-      reasoningKey || `${message.id}-reasoning`,
+      `${message.id}-reasoning-${reasoningFlushIndex}`,
       turnTiming,
     );
+    reasoningFlushIndex += 1;
     reasoningText = "";
     reasoningState = undefined;
-    reasoningKey = "";
   };
 
   message.parts.forEach((part, index) => {
     if (part.type === "reasoning") {
       reasoningText += part.text;
-      reasoningKey = `${message.id}-reasoning-${index}`;
       if (part.state === "streaming") {
         reasoningState = "streaming";
       } else if (reasoningState !== "streaming") {
@@ -222,6 +227,20 @@ export function MessageAnimated({
 
   flushReasoning();
 
+  if (
+    turnTiming?.isActive &&
+    reasoningFlushIndex === 0 &&
+    !message.parts.some((part) => part.type === "reasoning")
+  ) {
+    flushReasoningBlock(
+      renderedParts,
+      "",
+      undefined,
+      `${message.id}-reasoning-pending`,
+      turnTiming,
+    );
+  }
+
   return (
     <MessageScrollerItem
       messageId={message.id}
@@ -229,7 +248,11 @@ export function MessageAnimated({
     >
       <Message align={isUser ? "end" : "start"} className={textSize}>
         <MessageContent
-          className={isUser ? undefined : "[&>*]:w-full [&>*]:min-w-0"}
+          className={
+            isUser
+              ? undefined
+              : "[&>*]:w-full [&>*]:min-w-0 gap-1.5 [&>[data-slot=reasoning-block]+*]:-mt-1.5"
+          }
         >
           {renderedParts}
         </MessageContent>

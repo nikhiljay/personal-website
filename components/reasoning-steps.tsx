@@ -10,21 +10,38 @@ import "./reasoning-body.css";
 
 type ReasoningInlineMarkdownProps = {
   children: string;
+  isActive?: boolean;
 };
 
-function ReasoningInlineMarkdown({ children }: ReasoningInlineMarkdownProps) {
+function ReasoningInlineMarkdown({
+  children,
+  isActive = false,
+}: ReasoningInlineMarkdownProps) {
+  const blockClass = isActive ? "reasoning-body-active" : "reasoning-body-muted";
+
   return (
     <Markdown
       remarkPlugins={[remarkGfm]}
       components={{
-        p: ({ children: content }) => <>{content}</>,
+        p: ({ children: content }) => (
+          <p className={cn("mb-2 last:mb-0", blockClass)}>{content}</p>
+        ),
+        ul: ({ children: content }) => (
+          <ul className={cn("mb-2 list-disc pl-4 last:mb-0", blockClass)}>
+            {content}
+          </ul>
+        ),
+        ol: ({ children: content }) => (
+          <ol className={cn("mb-2 list-decimal pl-4 last:mb-0", blockClass)}>
+            {content}
+          </ol>
+        ),
+        li: ({ children: content }) => <li className="mb-0.5">{content}</li>,
         strong: ({ children: content }) => (
           <strong className="font-medium">{content}</strong>
         ),
         code: ({ children: content }) => (
-          <code
-            className="rounded-sm bg-muted/60 px-1 py-0.5 font-mono text-[0.6875rem]"
-          >
+          <code className="rounded-sm bg-muted/60 px-1 py-0.5 font-mono text-[0.6875rem]">
             {content}
           </code>
         ),
@@ -34,13 +51,6 @@ function ReasoningInlineMarkdown({ children }: ReasoningInlineMarkdownProps) {
       {children}
     </Markdown>
   );
-}
-
-function splitReasoningParagraphs(text: string) {
-  return text
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
 }
 
 export function ReasoningBody({
@@ -54,7 +64,7 @@ export function ReasoningBody({
 
   if (!trimmed && isStreaming) {
     return (
-      <p className={cn("reasoning-body-muted", REASONING_TEXT_CLASS)}>…</p>
+      <div className={cn("reasoning-body-muted", REASONING_TEXT_CLASS)}>…</div>
     );
   }
 
@@ -62,27 +72,11 @@ export function ReasoningBody({
     return null;
   }
 
-  const paragraphs = splitReasoningParagraphs(trimmed);
-  const blocks =
-    paragraphs.length > 0 ? paragraphs : [trimmed];
-
   return (
     <div className={cn("min-w-0", REASONING_TEXT_CLASS)}>
-      {blocks.map((paragraph, index) => {
-        const isActive = isStreaming && index === blocks.length - 1;
-
-        return (
-          <p
-            key={paragraph.slice(0, 64)}
-            className={cn(
-              "mb-2 last:mb-0",
-              isActive ? "reasoning-body-active" : "reasoning-body-muted",
-            )}
-          >
-            <ReasoningInlineMarkdown>{paragraph}</ReasoningInlineMarkdown>
-          </p>
-        );
-      })}
+      <ReasoningInlineMarkdown isActive={isStreaming}>
+        {trimmed}
+      </ReasoningInlineMarkdown>
     </div>
   );
 }

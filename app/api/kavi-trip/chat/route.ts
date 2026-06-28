@@ -15,7 +15,6 @@ import {
   createKaviTripAiTools,
   type NearbySpotsToolOutput,
   type PlaceRatingsToolOutput,
-  type ScheduleToolOutput,
 } from "@/app/lib/kavi-trip-ai-tools";
 import { getTripEventsFromCalendar } from "@/app/lib/kavi-trip-calendar";
 import {
@@ -33,8 +32,6 @@ async function loadTripEvents() {
   }
 }
 
-// Place cards are the response — skip a second LLM turn (saves a Gateway call and
-// avoids free-tier rate limits that surfaced as "An error occurred.").
 function parseLegacyCurrentLocation(value: unknown) {
   if (
     !value ||
@@ -54,6 +51,10 @@ function parseLegacyCurrentLocation(value: unknown) {
   });
 }
 
+// Place cards are the response — skip a second LLM turn (saves a Gateway call and
+// avoids free-tier rate limits that surfaced as "An error occurred.").
+// Schedule cards are NOT included: many schedule questions need a follow-up
+// answer (e.g. which days need food recs) after the tool runs.
 const stopAfterRichPlaceResponse: StopCondition<
   ReturnType<typeof createKaviTripAiTools>
 > = ({ steps }) => {
@@ -66,11 +67,6 @@ const stopAfterRichPlaceResponse: StopCondition<
     if (result.toolName === "findNearbySpots") {
       const output = result.output as NearbySpotsToolOutput | undefined;
       return output?.found === true && output.places.length > 0;
-    }
-
-    if (result.toolName === "getTripSchedule") {
-      const output = result.output as ScheduleToolOutput | undefined;
-      return output?.found === true && output.events.length > 0;
     }
 
     if (result.toolName !== "getPlaceRatings") {

@@ -125,8 +125,14 @@ function googlePhotoProxyUrl(photoName: string) {
   return `/api/places/photo?name=${encodeURIComponent(photoName)}`;
 }
 
-function parseTimeToken(time: string) {
-  const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+type ParsedTime = {
+  hour: number;
+  minutes: string;
+  period?: string;
+};
+
+function parseTimeToken(time: string): ParsedTime | null {
+  const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
   if (!match) {
     return null;
   }
@@ -134,7 +140,54 @@ function parseTimeToken(time: string) {
   return {
     hour: Number(match[1]),
     minutes: match[2],
-    period: match[3].toLowerCase(),
+    period: match[3]?.toLowerCase(),
+  };
+}
+
+function inferStartPeriod(start: ParsedTime, end: ParsedTime & { period: string }) {
+  if (end.period === "pm") {
+    if (start.hour > end.hour) {
+      return "pm";
+    }
+    if (start.hour < end.hour) {
+      return "am";
+    }
+    return "pm";
+  }
+
+  return start.hour > end.hour ? "pm" : "am";
+}
+
+function inferEndPeriod(start: ParsedTime & { period: string }, end: ParsedTime) {
+  if (start.period === "am") {
+    return end.hour <= start.hour ? "pm" : "am";
+  }
+
+  return "pm";
+}
+
+function resolvePeriods(start: ParsedTime, end: ParsedTime) {
+  if (start.period && end.period) {
+    return { start, end };
+  }
+
+  if (start.period && !end.period) {
+    return {
+      start,
+      end: { ...end, period: inferEndPeriod(start as ParsedTime & { period: string }, end) },
+    };
+  }
+
+  if (!start.period && end.period) {
+    return {
+      start: { ...start, period: inferStartPeriod(start, end as ParsedTime & { period: string }) },
+      end,
+    };
+  }
+
+  return {
+    start: { ...start, period: "pm" },
+    end: { ...end, period: "pm" },
   };
 }
 
@@ -152,12 +205,14 @@ function formatTimeValue(
 }
 
 function formatTimeRange(startStr: string, endStr: string) {
-  const start = parseTimeToken(startStr);
-  const end = parseTimeToken(endStr);
+  const rawStart = parseTimeToken(startStr);
+  const rawEnd = parseTimeToken(endStr);
 
-  if (!start || !end) {
+  if (!rawStart || !rawEnd) {
     return `${startStr.trim()}–${endStr.trim()}`;
   }
+
+  const { start, end } = resolvePeriods(rawStart, rawEnd);
 
   if (start.period === end.period) {
     const startPart = formatTimeValue(start.hour, start.minutes, false);

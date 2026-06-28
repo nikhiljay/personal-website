@@ -132,6 +132,7 @@ export function ScheduleToolCard({
 
     return (
       <div
+        data-slot="schedule-card"
         className={cn(
           "w-full min-w-0 self-stretch overflow-hidden rounded-xl border border-border bg-background",
           className,

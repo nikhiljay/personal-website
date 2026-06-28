@@ -1,0 +1,27 @@
+@keyframes shimmering-text-slide {
+  from {
+    background-position: 100% center;
+  }
+
+  to {
+    background-position: 0% center;
+  }
+}
+
+.shimmering-text {
+  animation: shimmering-text-slide var(--shimmer-duration, 1.6s) linear
+    var(--shimmer-delay, 0s) infinite;
+}
+
+.shimmering-text-once {
+  animation-iteration-count: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmering-text {
+    animation: none;
+    -webkit-text-fill-color: unset;
+    color: var(--muted-foreground);
+    background-image: none;
+  }
+}

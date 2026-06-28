@@ -80,7 +80,19 @@ export function useVisualViewportKeyboard(active: boolean) {
     let dismissEnd = 0;
     let dismissing = false;
 
+    // The pre-lift only makes sense where focusing an input actually summons a
+    // software keyboard — i.e. touch-primary devices. On a fine-pointer device
+    // (desktop/laptop with a mouse) no keyboard appears, so predicting one would
+    // shoot the input up by the guessed inset and snap it back. There, skip the
+    // prediction entirely and let sync track the (unchanging) viewport.
+    const canSoftKeyboard =
+      window.matchMedia?.("(pointer: coarse)").matches ?? false;
+
     const onFocusIn = (event: FocusEvent) => {
+      if (!canSoftKeyboard) {
+        return;
+      }
+
       const target = event.target;
       if (
         !(target instanceof HTMLElement) ||
@@ -114,6 +126,10 @@ export function useVisualViewportKeyboard(active: boolean) {
     };
 
     const onFocusOut = (event: FocusEvent) => {
+      if (!canSoftKeyboard) {
+        return;
+      }
+
       const target = event.target;
       if (
         !(target instanceof HTMLElement) ||

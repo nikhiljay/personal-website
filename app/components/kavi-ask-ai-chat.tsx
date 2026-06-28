@@ -1,6 +1,7 @@
 "use client";
 
 import type { RefObject } from "react";
+import { useRef, useState } from "react";
 import type { useChat } from "@ai-sdk/react";
 import {
   ArrowUpIcon,
@@ -12,8 +13,9 @@ import type { UserLocationContext } from "@/app/lib/user-location";
 import { usePreferredColorScheme } from "@/app/hooks/use-preferred-color-scheme";
 import { useThoughtTurnTiming } from "@/app/hooks/use-thought-turn-timing";
 import { MessageAnimated } from "@/components/message-animated";
-import { ThinkingIndicator } from "@/components/reasoning-block";
+import { ReasoningBlock } from "@/components/reasoning-block";
 import { Button } from "@/components/ui/button";
+import { Message, MessageContent } from "@/components/ui/message";
 import {
   Card,
   CardAction,
@@ -92,10 +94,39 @@ export function KaviAskAiChat({
   getLocationContext,
 }: KaviAskAiChatProps) {
   const isBusy = status === "submitted" || status === "streaming";
-  const thoughtTurn = useThoughtTurnTiming(status);
+  const [savedThoughtSeconds, setSavedThoughtSeconds] = useState<
+    Record<string, number>
+  >({});
   const lastMessage = messages.at(-1);
   const latestAssistantMessageId =
     lastMessage?.role === "assistant" ? lastMessage.id : null;
+  const latestAssistantMessageIdRef = useRef(latestAssistantMessageId);
+  latestAssistantMessageIdRef.current = latestAssistantMessageId;
+
+  const thoughtTurn = useThoughtTurnTiming(status, (elapsed) => {
+    const messageId = latestAssistantMessageIdRef.current;
+    if (!messageId) {
+      return;
+    }
+
+    setSavedThoughtSeconds((current) => ({
+      ...current,
+      [messageId]: elapsed,
+    }));
+  });
+
+  const getTurnTimingForMessage = (messageId: string) => {
+    if (messageId === latestAssistantMessageId) {
+      return thoughtTurn;
+    }
+
+    const saved = savedThoughtSeconds[messageId];
+    if (saved == null) {
+      return undefined;
+    }
+
+    return { isActive: false, elapsedSeconds: saved };
+  };
   const hasStreamingAssistant =
     lastMessage?.role === "assistant" &&
     lastMessage.parts.some(
@@ -105,7 +136,9 @@ export function KaviAskAiChat({
         part.type.startsWith("tool-"),
     );
   const showFallbackThinking =
-    thoughtTurn.isActive && !hasStreamingAssistant;
+    thoughtTurn.isActive &&
+    !hasStreamingAssistant &&
+    lastMessage?.role !== "assistant";
   const colorScheme = usePreferredColorScheme();
   const isSubmitDisabled = !input.trim() || isBusy;
   const sendButtonColors = getSendButtonColors(colorScheme, isSubmitDisabled);
@@ -197,15 +230,23 @@ export function KaviAskAiChat({
                         scrollAnchor={message.role === "user"}
                         textSize={textSize}
                         turnTiming={
-                          message.id === latestAssistantMessageId
-                            ? thoughtTurn
+                          message.role === "assistant"
+                            ? getTurnTimingForMessage(message.id)
                             : undefined
                         }
                       />
                     ))}
                     {showFallbackThinking ? (
                       <MessageScrollerItem messageId="thinking">
-                        <ThinkingIndicator isActive={thoughtTurn.isActive} />
+                        <Message align="start" className={textSize}>
+                          <MessageContent className="[&>*]:w-full [&>*]:min-w-0 gap-1.5 [&>[data-slot=reasoning-block]+*]:-mt-1.5">
+                            <ReasoningBlock
+                              text=""
+                              turnTiming={thoughtTurn}
+                              className="w-full min-w-0 self-stretch"
+                            />
+                          </MessageContent>
+                        </Message>
                       </MessageScrollerItem>
                     ) : null}
                   </MessageScrollerContent>
