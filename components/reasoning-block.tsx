@@ -120,7 +120,7 @@ export function ReasoningBlock({
     <div
       data-slot="reasoning-block"
       className={cn(
-        "flex w-full min-w-0 flex-col self-stretch pt-1.5 pb-3",
+        "flex w-full min-w-0 flex-col self-stretch pt-2.5 pb-3",
         "has-[+[data-slot=schedule-card]]:pb-4",
         className,
       )}
@@ -189,7 +189,7 @@ export function ThinkingIndicator({
   return (
     <div
       data-slot="reasoning-block"
-      className={cn("flex w-full items-center gap-[0.25em] pt-1.5 pb-3", className)}
+      className={cn("flex w-full items-center gap-[0.25em] pt-2.5 pb-3", className)}
       role="status"
     >
       <ThoughtHeader isStreaming elapsedSeconds={1} />
