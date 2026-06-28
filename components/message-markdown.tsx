@@ -48,24 +48,14 @@ export const MessageMarkdown = memo(function MessageMarkdown({
 
 type AssistantMessageContentProps = {
   text: string;
-  isStreaming?: boolean;
   className?: string;
 };
 
 export const AssistantMessageContent = memo(function AssistantMessageContent({
   text,
-  isStreaming = false,
   className,
 }: AssistantMessageContentProps) {
   const sanitized = useMemo(() => sanitizeAssistantText(text), [text]);
-
-  if (isStreaming) {
-    return (
-      <div className={cn("min-w-0 whitespace-pre-wrap", className)}>
-        {sanitized}
-      </div>
-    );
-  }
 
   return <MessageMarkdown className={className}>{sanitized}</MessageMarkdown>;
 });

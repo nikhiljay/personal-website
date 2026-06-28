@@ -330,12 +330,6 @@ export const MessageAnimated = memo(function MessageAnimated({
       return;
     }
 
-    const isStreamingText =
-      part.state === "streaming" ||
-      (turnTiming?.isActive === true &&
-        part.state !== "done" &&
-        index === message.parts.length - 1);
-
     renderedParts.push(
       <Bubble
         // Part order is stable; index is the safest key while text length grows.
@@ -348,10 +342,7 @@ export const MessageAnimated = memo(function MessageAnimated({
           {isUser ? (
             <span className="whitespace-pre-wrap">{part.text}</span>
           ) : (
-            <AssistantMessageContent
-              text={part.text}
-              isStreaming={isStreamingText}
-            />
+            <AssistantMessageContent text={part.text} />
           )}
         </BubbleContent>
       </Bubble>,
