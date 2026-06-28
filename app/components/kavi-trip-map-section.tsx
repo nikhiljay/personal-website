@@ -77,7 +77,7 @@ export function KaviTripMapSection({
 
   return (
     <>
-      <AnimateIn>
+      <AnimateIn stagger={1}>
         <LazyTripMap
           activeSavedSpotKinds={activeKinds}
           currentLocation={mapCurrentLocation}
@@ -94,7 +94,7 @@ export function KaviTripMapSection({
         />
       </AnimateIn>
 
-      <AnimateIn className="mt-10">
+      <AnimateIn className="mt-10" stagger={2}>
         <section className="flex flex-col gap-3">
         <h2 className="section-label">Nikhil&apos;s saved spots</h2>
         <ul className="m-0 flex flex-wrap gap-x-4 gap-y-1 p-0 text-[12px] leading-5">
@@ -169,7 +169,7 @@ export function KaviTripMapSection({
       </AnimateIn>
 
       {tripEvents.length > 0 ? (
-        <AnimateIn>
+        <AnimateIn stagger={3}>
           <KaviTripSchedule
             events={tripEvents}
             selectedStopId={selectedStopId}
