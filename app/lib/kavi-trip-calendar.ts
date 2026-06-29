@@ -99,12 +99,6 @@ const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
     start: new Date("2026-06-29T16:45:00-04:00"),
   },
   {
-    uid: "tue-jun-30-health-care-ai",
-    summary: "Session 11: Health Care AI is Hot, Legal Risk is Not",
-    location: "Hilton Midtown",
-    start: new Date("2026-06-30T10:45:00-04:00"),
-  },
-  {
     uid: "tue-jun-30-womens-health",
     summary: "Session 30: Navigating the Women's Health Triumvirate",
     location: "Hilton Midtown",
