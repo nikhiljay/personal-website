@@ -54,7 +54,7 @@ function EventTitle({ title }: { title: string }) {
 
     return (
       <>
-        <div className="text-fg">
+        <div className="text-fg leading-snug">
           {before}
           <button
             type="button"
@@ -73,7 +73,7 @@ function EventTitle({ title }: { title: string }) {
     );
   }
 
-  return <div className="text-fg">{title}</div>;
+  return <div className="text-fg leading-snug">{title}</div>;
 }
 
 function EventNote({ note, url }: { note: string; url?: string }) {
@@ -151,7 +151,7 @@ export function KaviTripSchedule({
                     <div className="pt-0.5 text-[13px] leading-5 text-muted tabular-nums">
                       {event.time}
                     </div>
-                    <div className="flex min-w-0 flex-col gap-0 text-[15px] leading-[1.7]">
+                    <div className="flex min-w-0 flex-col gap-0 text-[15px]">
                       <EventTitle title={event.title} />
                       {stop ? (
                         <button

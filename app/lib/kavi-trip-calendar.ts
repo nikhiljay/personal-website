@@ -50,6 +50,7 @@ const CALENDAR_EVENT_EXCLUSIONS = [
 /** Coarse calendar blocks replaced by granular static entries. */
 const CALENDAR_EVENT_REPLACEMENTS: { ymd: string; pattern: RegExp }[] = [
   { ymd: "2026-06-29", pattern: /^conference day 1$/i },
+  { ymd: "2026-06-30", pattern: /^conference day 2$/i },
 ];
 
 const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
@@ -79,21 +80,35 @@ const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
   },
   {
     uid: "mon-jun-29-life-sciences",
-    summary: "Session 2: Life Sciences panel",
+    summary:
+      "Session 2: Evolving Rules, Expanding Risks: Regulatory and Compliance Challenges in Life Sciences",
     location: "Hilton Midtown",
     start: new Date("2026-06-29T13:45:00-04:00"),
   },
   {
     uid: "mon-jun-29-health-care-ai",
-    summary: "Session 11: Health Care AI panel",
+    summary: "Session 11: Health Care AI is Hot, Legal Risk is Not",
     location: "Hilton Midtown",
     start: new Date("2026-06-29T15:15:00-04:00"),
   },
   {
     uid: "mon-jun-29-felicia-sze",
-    summary: "Session 18: Felicia Sze panel",
+    summary:
+      "Session 18: Real or Imagined — Legal Ethical Issues in Providing F&A Advice",
     location: "Hilton Midtown",
     start: new Date("2026-06-29T16:45:00-04:00"),
+  },
+  {
+    uid: "tue-jun-30-health-care-ai",
+    summary: "Session 11: Health Care AI is Hot, Legal Risk is Not",
+    location: "Hilton Midtown",
+    start: new Date("2026-06-30T10:45:00-04:00"),
+  },
+  {
+    uid: "tue-jun-30-womens-health",
+    summary: "Session 30: Navigating the Women's Health Triumvirate",
+    location: "Hilton Midtown",
+    start: new Date("2026-06-30T10:45:00-04:00"),
   },
 ];
 

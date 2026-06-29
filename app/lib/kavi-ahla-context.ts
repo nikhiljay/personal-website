@@ -862,6 +862,7 @@ export const ahlaEbgTarget = {
 
 export const ahlaSchedulingNotes = [
   "Mon panels: Life Sciences (Session 2, 1:45), Health Care AI (Session 11, 3:15), Felicia Sze (Session 18, 4:45).",
+  "Tue panels: Health Care AI is Hot (Session 11, 10:45) and Women's Health (Session 30, 10:45) — same concurrent block; pick one or split time.",
   "Tue 1:45 clash: Waltz Session 5 repeat vs Margia Corner Session 33 — if Waltz caught Mon, take Corner (Sheppard partner, reachable via Hoyt).",
   "Sunday evening (Welcome Reception → Dine-Arounds) is the single highest-leverage networking block.",
   "Breakfast (Mon/Tue 7:00–8:30) overlaps with 8:00 welcome — use 7:00–7:55 for table networking, then get seated for keynote.",
