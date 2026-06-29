@@ -86,6 +86,22 @@ export const tripStops: TripStop[] = [
     lng: -74.0087,
     kind: "dinner",
   },
+  {
+    id: "tartinery",
+    name: "Tartinery",
+    address: "645 5th Ave",
+    lat: 40.759046,
+    lng: -73.976911,
+    kind: "coffee",
+  },
+  {
+    id: "jacks-wife-freda",
+    name: "Jack's Wife Freda",
+    address: "72 University Pl",
+    lat: 40.734415,
+    lng: -73.991988,
+    kind: "dinner",
+  },
 ];
 
 export const manhattanNeighborhoods: Neighborhood[] = [

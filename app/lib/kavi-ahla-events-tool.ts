@@ -52,6 +52,7 @@ export type AhlaEventsFilter = {
 const MUST_ATTEND_SESSION_IDS = new Set(["9", "18", "20", "26"]);
 
 const SESSION_TIPS: Record<string, string> = {
+  "2": "Jonathan Porter (Husch Blackwell) on life-sciences compliance — Mon 1:45 pick.",
   "year-in-review":
     "Kim Looney is on the panel — hang back after and mention interest in EBG's SF health-care group.",
   "9": "Most important single session for EBG. Approach George Breen afterward with a genuine question and SF office interest.",

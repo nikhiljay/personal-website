@@ -23,6 +23,8 @@ const stopPatterns: Record<string, RegExp[]> = {
   paley: [/paley/i],
   "thai-diner": [/thai diner/i],
   musaafer: [/musaafer/i],
+  tartinery: [/tartinery/i],
+  "jacks-wife-freda": [/jack'?s wife freda/i],
 };
 
 type ParsedIcsEvent = {
@@ -43,6 +45,11 @@ const STATIC_EVENT_URLS: Record<string, string> = {
 const CALENDAR_EVENT_EXCLUSIONS = [
   /jd health law advising/i,
   /flight\s+jfk\s*(?:-->|→|->)\s*sfo/i,
+];
+
+/** Coarse calendar blocks replaced by granular static entries. */
+const CALENDAR_EVENT_REPLACEMENTS: { ymd: string; pattern: RegExp }[] = [
+  { ymd: "2026-06-29", pattern: /^conference day 1$/i },
 ];
 
 const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
@@ -69,6 +76,24 @@ const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
     summary: "Enjoy 4th of July weekend with Nikhil!",
     location: "",
     start: new Date("2026-07-03T18:30:00-07:00"),
+  },
+  {
+    uid: "mon-jun-29-life-sciences",
+    summary: "Session 2: Life Sciences panel",
+    location: "Hilton Midtown",
+    start: new Date("2026-06-29T13:45:00-04:00"),
+  },
+  {
+    uid: "mon-jun-29-health-care-ai",
+    summary: "Session 11: Health Care AI panel",
+    location: "Hilton Midtown",
+    start: new Date("2026-06-29T15:15:00-04:00"),
+  },
+  {
+    uid: "mon-jun-29-felicia-sze",
+    summary: "Session 18: Felicia Sze panel",
+    location: "Hilton Midtown",
+    start: new Date("2026-06-29T16:45:00-04:00"),
   },
 ];
 
@@ -226,9 +251,21 @@ function locationNote(location: string) {
   return venue || cleaned;
 }
 
+function eventYmdInTripTimezone(date: Date) {
+  return date.toLocaleDateString("en-CA", { timeZone: TRIP_TIMEZONE });
+}
+
 function isExcludedCalendarEvent(event: ParsedIcsEvent) {
   const summary = cleanIcsText(event.summary);
-  return CALENDAR_EVENT_EXCLUSIONS.some((pattern) => pattern.test(summary));
+  if (CALENDAR_EVENT_EXCLUSIONS.some((pattern) => pattern.test(summary))) {
+    return true;
+  }
+
+  const ymd = eventYmdInTripTimezone(event.start);
+  return CALENDAR_EVENT_REPLACEMENTS.some(
+    (replacement) =>
+      replacement.ymd === ymd && replacement.pattern.test(summary),
+  );
 }
 
 function isTripEvent(event: ParsedIcsEvent) {
