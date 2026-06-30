@@ -77,7 +77,7 @@ export const ahlaGoals = {
   northStar:
     "Land a mid-to-big law associate job straight out of law school. Kavi starts 3L this fall (Fall 2026) — recruiting window is now.",
   conferencePriority:
-    "Maximize learning about health law — sit in strong panels, follow substantive threads, and absorb how practitioners actually think about the work. Networking is secondary right now; many attorneys have been cold or dismissive once they learn she's a student, so don't push a hustle-heavy playbook.",
+    "Panels only — maximize learning about health law. Skip receptions and networking events unless she changes her mind. She's sick of networking after repeated cold shoulders; don't push social events.",
   nearTerm:
     "Mid-sized and boutique health-law firms — realistic entry points straight out of law school (NY is densest: Benesch Friedlander, Axinn Veltrop).",
   longTerm:
@@ -85,7 +85,7 @@ export const ahlaGoals = {
   jobTarget:
     "Epstein Becker Green (EBG) Associate, Health Care & Life Sciences, San Francisco — health-law powerhouse, hybrid between boutique depth and national platform.",
   networkingStyle:
-    "When networking happens, prioritize warm paths (Hoyt Sze, confirmed/planned contacts, connectors). Don't grind cold intros — a lot of attorneys are giving her the cold shoulder once they hear 'student.' Follow energy; it's OK to bail on a dead conversation and go learn something instead.",
+    "Off the table for now except confirmed friend meals (Diliani, Kamya). No grinding receptions, mixers, or 'work the room' advice. Hoyt relationship is fine if organic — don't funnel her toward more attorney intros.",
 };
 
 /** People to steer away from — background only; do not raise unprompted. */
@@ -97,16 +97,25 @@ export const ahlaAvoidContacts = [
     reason:
       "Called Kavi at 12:30am — inappropriate. Do not suggest meeting or warm intros. Never bring up unprompted. If EBG comes up, point to Kim Looney or George Breen instead.",
   },
+  {
+    name: "Felicia Sze",
+    firm: "Athene Law",
+    title: "Managing Partner",
+    reason:
+      "Rough conference conversation — blunt, brutally honest, felt like put-downs. Do not suggest follow-ups, Hoyt intros, or 'circle back' unless Kavi brings it up. Session 18 is fine to attend for panel content only.",
+  },
 ];
 
 /** In-the-moment conference reality — shapes tone and advice. */
 export const ahlaConferenceMindset = {
   currentFocus:
-    "Switched gears from networking-first to learning-first. Use the rest of the conference to build real health-law literacy — panels, Q&A, hallway takeaways — not to force every conversation into a job pitch.",
+    "Panels-only mode for the rest of the trip. Show up for substantive sessions, take notes, leave. Skip receptions and networking blocks unless she explicitly changes her mind.",
   onTheGround:
-    "Many attorneys disregard her or go cold once they find out she's a law student. That's the live dynamic — normalize it, don't over-coach through it, and don't make her feel like she's failing at networking.",
+    "Done with networking — sick of it after cold shoulders and one especially rough Felicia Sze conversation (blunt, dismissive). Validate that without dwelling unless she brings it up. Don't frame skipping receptions as quitting.",
   selfCare:
     "New city, long days, conference social pressure. Remind her to eat, sleep, hydrate, and keep her guard up — trust her instincts, leave situations that feel off, and it's fine to skip an event for downtime.",
+  eventDefaults:
+    "YES: concurrent sessions, general sessions, friend lunches already on the calendar. NO by default: welcome/networking receptions, MoMA-style mixers, firm receptions (Morgan Lewis, Sheppard Mullin, etc.), breakfast networking tables, coffee-break schmoozing.",
 };
 
 export const ahlaContacts: AhlaContact[] = [
@@ -209,8 +218,8 @@ export const ahlaContacts: AhlaContact[] = [
     status: "prospect",
     tier: "mid-sized",
     market: "ca",
-    rationale: "Hoyt's sister — SF health-law boutique founder, strong near-term target. Not free before conference; meet at her session or via Hoyt intro.",
-    notes: "Speaks Session 18 Mon 4:45 & Wed 11:30.",
+    rationale: "Was a near-term SF target via Hoyt — deprioritized after a rough, dismissive conversation at the conference.",
+    notes: "Session 18 speaker. Do not suggest follow-ups unless Kavi asks. Panel attendance for learning only.",
   },
   {
     name: "George Breen",
@@ -288,7 +297,7 @@ export const ahlaConnectors: AhlaConnector[] = [
     name: "Hoyt Sze",
     firm: "Sheppard Mullin",
     title: "Partner",
-    rationale: "Planning committee connector — can intro Felicia, David Cade, and other Sheppard partners (Margia Corner, Steven Chiu).",
+    rationale: "Planning committee connector — can intro David Cade and other Sheppard partners (Margia Corner, Steven Chiu). Felicia intro path is closed unless Kavi revisits.",
     access: "direct",
     notes: "Already connected Kavi to a dinner. Continue relationship.",
   },
@@ -965,6 +974,7 @@ Conference mindset (current):
 - Focus: ${ahlaConferenceMindset.currentFocus}
 - On the ground: ${ahlaConferenceMindset.onTheGround}
 - Self-care: ${ahlaConferenceMindset.selfCare}
+- Event defaults: ${ahlaConferenceMindset.eventDefaults}
 
 Avoid (background only — do not mention unless directly relevant):
 ${ahlaAvoidContacts.map((c) => `- ${c.name}, ${c.title} @ ${c.firm} — ${c.reason}`).join("\n")}
@@ -1007,17 +1017,18 @@ ${ahlaSchedulingNotes.map((n) => `- ${n}`).join("\n")}`;
 
 export const ahlaAiRules = [
   "When Kavi asks about AHLA, networking, contacts, connectors, firm targets, or conference sessions, use the AHLA context below — not general knowledge.",
-  "North star is still a mid-to-big law associate job out of law school, but her current conference mode is learning-first — panels and health-law substance beat forced networking.",
-  "Many attorneys go cold once they learn she's a student. Don't push aggressive networking, cold approaches, or make her feel she's failing socially. Warm paths (confirmed/planned contacts, Hoyt) are fine; grinding is not.",
-  "Prioritize substantive sessions and learning takeaways. Receptions and breaks are optional — fine to skip for rest or a solo meal.",
+  "North star is still a mid-to-big law associate job out of law school, but her current conference mode is panels-only — learning health law, not networking.",
+  "Default NO to receptions, mixers, firm events, and networking blocks. Default YES to substantive sessions. Friend lunches on the calendar (Diliani, Kamya) are fine.",
+  "She's sick of networking — don't push social events, cold approaches, or make her feel she's quitting by skipping receptions. Support the panels-only plan.",
+  "Felicia Sze — rough, dismissive conversation at the conference. Do not suggest follow-ups, Hoyt intros, or 'you should meet her again' unless Kavi brings it up. Session 18 for content only.",
+  "Many attorneys go cold once they learn she's a student. Don't push aggressive networking even for warm contacts unless she asks.",
   "Take care of her: new city, long days. Nudge sleep, food, hydration, and keeping her guard up when something feels off. Trust her instincts.",
   "Cliff Barnes (EBG retired partner) — avoid entirely. Do not suggest meeting or bring up unprompted. If EBG comes up, steer to Kim Looney or George Breen.",
   "For AHLA sessions, networking events, must-attend panels, or where contacts speak, call getAhlaEvents — it renders rich event cards. Do NOT list sessions as bullet points with times/speakers in text.",
   "For schedule/timing questions, use the official agenda (draft 5/7/26): Sun Jun 28 – Wed Jul 1 @ Hilton Midtown. Sat Jun 27 is optional pre-programs only.",
   "Distinguish CONFIRMED vs PLANNED vs PROSPECT contacts. Don't treat prospects as locked meetings.",
-  "Respect the two-track strategy: mid-sized/boutique for near-term hiring, Big Law partners for long-term relationships.",
-  "For 'how to play' event questions, give practical advice without a networking-hustle tone — what the event is good for, when to leave, when rest beats another reception.",
-  "Hoyt Sze is the anchor — route David Cade and Felicia Sze intros through him when possible. Teshia Birts and Laura Alfredo are direct-reach connectors.",
+  "For 'how to play' event questions, respect panels-only mode — if it's a reception, say it's skippable; if it's a session, help her get the most learning from it.",
+  "Hoyt Sze is still a good relationship — don't push Felicia intros or more attorney meet-and-greets through him. Teshia Birts and Laura Alfredo are connectors only if she asks.",
   "CHAI on the agenda = Coalition for Health AI (Brenton Hill), not Chai Discovery.",
   "Joel Richlan is unverified in the attendee list — flag if asked.",
   "Wahida Bhuyan (not Wahita) is solo counsel, not a firm hire target.",

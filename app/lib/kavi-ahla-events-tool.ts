@@ -56,7 +56,7 @@ const SESSION_TIPS: Record<string, string> = {
   "year-in-review":
     "Kim Looney is on the panel — hang back after and mention interest in EBG's SF health-care group.",
   "9": "Most important single session for EBG. Approach George Breen afterward with a genuine question and SF office interest.",
-  "18": "Felicia Sze — top near-term target, warm intro via Hoyt.",
+  "18": "Substantive F&A ethics panel — go for the learning, not a Felicia follow-up.",
   "20": "Anchor contact Hoyt Sze — reinforce the relationship; mention you came for his panel.",
   "26": "Benesch Friedlander is a top near-term NY target — Rachel Hold-Weiss leads this panel.",
   "11": "Planned contact Alicia Macklin speaks — attend then introduce yourself.",
