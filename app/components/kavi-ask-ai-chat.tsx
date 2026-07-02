@@ -63,6 +63,7 @@ const PENDING_ASSISTANT_MESSAGE: UIMessage = {
 type KaviAskAiChatProps = {
   className?: string;
   variant?: "card" | "fullscreen";
+  isOpen?: boolean;
   onClose?: () => void;
   scrollContainerRef?: RefObject<Element | null>;
   input: string;
@@ -257,6 +258,7 @@ function ChatBottomPin({
 export function KaviAskAiChat({
   className,
   variant = "card",
+  isOpen = false,
   onClose,
   scrollContainerRef,
   input,
@@ -269,6 +271,7 @@ export function KaviAskAiChat({
   getLocationContext,
 }: KaviAskAiChatProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
   const mergeViewportRef = useCallback(
     (node: HTMLDivElement | null) => {
       viewportRef.current = node;
@@ -330,6 +333,20 @@ export function KaviAskAiChat({
   const isFullscreen = variant === "fullscreen";
   const textSize = "text-sm/relaxed";
   const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      footerRef.current
+        ?.querySelector<HTMLInputElement>('[data-slot="input-group-control"]')
+        ?.focus({ preventScroll: isFullscreen });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [isFullscreen, isOpen]);
 
   const header = (
     <CardHeader className="shrink-0 gap-1 border-b bg-popover py-4 [.border-b]:pb-4">
@@ -442,6 +459,7 @@ export function KaviAskAiChat({
           ) : null}
 
           <CardFooter
+            ref={footerRef}
             className={cn(
               "kavi-ask-ai-chat-footer shrink-0 flex-col gap-2 bg-popover",
               isFullscreen &&

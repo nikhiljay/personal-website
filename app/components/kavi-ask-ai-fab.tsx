@@ -48,7 +48,7 @@ export const KaviAskAiFab = forwardRef<HTMLButtonElement, KaviAskAiFabProps>(
           isDesktop && "bottom-6",
           className,
         )}
-        aria-label="Open Nikhil Agent for your NYC trip"
+        aria-label="Open or close Nikhil Agent"
       >
         <MessageCircleIcon
           className="size-4 transition-[fill] duration-200"

@@ -2,10 +2,8 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { useCurrentLocation } from "../hooks/use-current-location";
 import { useMediaQuery } from "../hooks/use-media-query";
@@ -41,9 +39,68 @@ export function KaviAskAi() {
     isSupported,
   });
   const chat = useChat({ transport: chatTransport });
-  const closeChat = useCallback(() => setOpen(false), []);
+  const openRef = useRef(open);
+  openRef.current = open;
+
+  const restoreChatTriggerFocus = useCallback(() => {
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      active.closest('[data-slot="input-group-control"]')
+    ) {
+      active.blur();
+    }
+
+    fabRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const closeChat = useCallback(() => {
+    setOpen(false);
+    requestAnimationFrame(() => {
+      restoreChatTriggerFocus();
+    });
+  }, [restoreChatTriggerFocus]);
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      setOpen(nextOpen);
+      if (!nextOpen) {
+        requestAnimationFrame(() => {
+          restoreChatTriggerFocus();
+        });
+      }
+    },
+    [restoreChatTriggerFocus],
+  );
+
+  const toggleChat = useCallback(() => setOpen((current) => !current), []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "c" && event.key !== "C") {
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+        return;
+      }
+      const target = event.target;
+      if (
+        openRef.current &&
+        target instanceof HTMLElement &&
+        target.closest("input, textarea, select, [contenteditable='true']")
+      ) {
+        return;
+      }
+      event.preventDefault();
+      toggleChat();
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
+  }, [toggleChat]);
 
   const chatProps = {
+    isOpen: open,
     input,
     setInput,
     messages: chat.messages,
@@ -55,19 +112,19 @@ export function KaviAskAi() {
   };
 
   return (
-    <TooltipProvider>
+    <>
       {createPortal(
         <>
           <KaviAskAiFab
             ref={fabRef}
-            onClick={() => setOpen((current) => !current)}
+            onClick={toggleChat}
             aria-expanded={open}
             className={!isDesktop && open ? "pointer-events-none opacity-0" : undefined}
           />
           {isDesktop ? (
             <KaviAskAiPopover
               open={open}
-              onOpenChange={setOpen}
+              onOpenChange={handleOpenChange}
               fabRef={fabRef}
             >
               <KaviAskAiChat variant="card" className="h-full" {...chatProps} />
@@ -88,6 +145,6 @@ export function KaviAskAi() {
           )}
         </KaviAskAiFullscreen>
       ) : null}
-    </TooltipProvider>
+    </>
   );
 }
