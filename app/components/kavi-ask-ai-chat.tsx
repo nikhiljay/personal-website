@@ -335,14 +335,14 @@ export function KaviAskAiChat({
   const inputTextSize = "text-sm/relaxed md:text-sm/relaxed";
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || isFullscreen) {
       return;
     }
 
     const frame = requestAnimationFrame(() => {
       footerRef.current
         ?.querySelector<HTMLInputElement>('[data-slot="input-group-control"]')
-        ?.focus({ preventScroll: isFullscreen });
+        ?.focus();
     });
 
     return () => cancelAnimationFrame(frame);
