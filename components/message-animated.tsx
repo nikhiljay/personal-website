@@ -164,8 +164,15 @@ export const MessageAnimated = memo(function MessageAnimated({
   let reasoningText = "";
   let reasoningState: "streaming" | "done" | undefined;
   let reasoningFlushIndex = 0;
+  const isActiveTurn = turnTiming?.isActive === true;
 
-  const flushReasoning = () => {
+  // A reasoning block only genuinely streams while this assistant turn is still
+  // active. If the part is followed by other content (isTrailing === false) the
+  // model has already moved on, and once the turn ends a still-"streaming" part
+  // (e.g. a provider that never emits `reasoning-end`, or a turn truncated mid-
+  // thought) must be treated as done — otherwise the "Thinking" spinner sticks
+  // forever.
+  const flushReasoning = (isTrailing: boolean) => {
     const hasContent =
       reasoningText.trim().length > 0 || reasoningState === "streaming";
 
@@ -173,13 +180,21 @@ export const MessageAnimated = memo(function MessageAnimated({
       return;
     }
 
+    const isStreaming =
+      reasoningState === "streaming" && isTrailing && isActiveTurn;
+    const effectiveState: "streaming" | "done" | undefined = isStreaming
+      ? "streaming"
+      : reasoningState === "streaming"
+        ? "done"
+        : reasoningState;
+
     flushReasoningBlock(
       renderedParts,
       reasoningText,
-      reasoningState,
+      effectiveState,
       getReasoningBlockKey(reasoningOwnerId, reasoningFlushIndex),
       turnTiming,
-      reasoningState === "streaming",
+      isStreaming,
     );
     reasoningFlushIndex += 1;
     reasoningText = "";
@@ -197,7 +212,7 @@ export const MessageAnimated = memo(function MessageAnimated({
       return;
     }
 
-    flushReasoning();
+    flushReasoning(false);
 
     if (part.type === "tool-getCurrentLocation") {
       const output = part.output as CurrentLocationToolOutput | undefined;
@@ -349,7 +364,7 @@ export const MessageAnimated = memo(function MessageAnimated({
     );
   });
 
-  flushReasoning();
+  flushReasoning(true);
 
   if (
     turnTiming?.isActive &&

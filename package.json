@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "start:mobile": "next start -H 0.0.0.0",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@ai-sdk/gateway": "^4.0.2",
@@ -39,13 +39,20 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4.3.1",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
     "tailwindcss": "^4.3.1",
     "typescript": "^5.8.0"
   },
+  "trustedDependencies": [
+    "unrs-resolver"
+  ],
   "browserslist": [
     "chrome >= 92",
     "edge >= 92",
