@@ -53,6 +53,18 @@ const CALENDAR_EVENT_REPLACEMENTS: { ymd: string; pattern: RegExp }[] = [
   { ymd: "2026-06-30", pattern: /^conference day 2$/i },
 ];
 
+/**
+ * Social events keyed from SF where DTSTART TZID reflects the real zone.
+ * Most trip ICS entries tag Pacific but use Eastern clock times — do not
+ * blanket-convert those; only honor TZID for these summaries.
+ */
+const REAL_ICS_TIMEZONE_PATTERNS = [
+  /drinks with .*nami/i,
+  /coffee with .*shri/i,
+  /dinner\s*(?:w\/|with)\s*shobha/i,
+  /drinks with .*pranav/i,
+];
+
 const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
   {
     uid: "flight-outbound-dl365",
@@ -120,7 +132,38 @@ function unfoldIcs(text: string) {
   return lines;
 }
 
-function parseIcsDateTime(rawKey: string, value: string) {
+function cleanIcsText(value: string) {
+  return value.replace(/\\,/g, ",").replace(/\\n/g, " ").trim();
+}
+
+function usesRealIcsTimezone(summary: string) {
+  const text = cleanIcsText(summary);
+  return REAL_ICS_TIMEZONE_PATTERNS.some((pattern) => pattern.test(text));
+}
+
+function icsTimeZoneFromRawKey(rawKey: string) {
+  if (/pacific/i.test(rawKey)) {
+    return SF_TIMEZONE;
+  }
+
+  if (/eastern/i.test(rawKey)) {
+    return TRIP_TIMEZONE;
+  }
+
+  return TRIP_TIMEZONE;
+}
+
+function eventStartTimeZone(rawKey: string, summary: string) {
+  if (!usesRealIcsTimezone(summary)) {
+    // Kavi's NYC trip ICS tags DTSTART with Pacific TZID, but the clock times are
+    // Eastern (event times in NYC). Parse as ET — do not add a PT→ET offset.
+    return TRIP_TIMEZONE;
+  }
+
+  return icsTimeZoneFromRawKey(rawKey);
+}
+
+function parseIcsDateTime(rawKey: string, value: string, timeZone = TRIP_TIMEZONE) {
   if (rawKey.includes("VALUE=DATE") || value.length === 8) {
     const year = Number(value.slice(0, 4));
     const month = Number(value.slice(4, 6));
@@ -140,9 +183,7 @@ function parseIcsDateTime(rawKey: string, value: string) {
     return new Date(`${localIso}Z`);
   }
 
-  // Kavi's NYC trip ICS tags DTSTART with Pacific TZID, but the clock times are
-  // Eastern (event times in NYC). Parse as ET — do not add a PT→ET offset.
-  return zonedTimeToUtc(localIso, TRIP_TIMEZONE);
+  return zonedTimeToUtc(localIso, timeZone);
 }
 
 function zonedTimeToUtc(localIso: string, timeZone: string) {
@@ -166,12 +207,17 @@ function parseIcsEvents(text: string): ParsedIcsEvent[] {
 
     if (line === "END:VEVENT") {
       if (inEvent && current.summary && current.startIso) {
+        const startKey = current.startKey ?? "DTSTART";
         events.push({
           uid: current.uid ?? `${current.summary}-${current.startIso}`,
           summary: current.summary,
           location: current.location ?? "",
           status: current.status,
-          start: parseIcsDateTime(current.startKey ?? "DTSTART", current.startIso),
+          start: parseIcsDateTime(
+            startKey,
+            current.startIso,
+            eventStartTimeZone(startKey, current.summary),
+          ),
         });
       }
 
@@ -231,10 +277,6 @@ function eventTimeZone(event: ParsedIcsEvent) {
   }
 
   return TRIP_TIMEZONE;
-}
-
-function cleanIcsText(value: string) {
-  return value.replace(/\\,/g, ",").replace(/\\n/g, " ").trim();
 }
 
 function matchStop(summary: string, location: string) {
