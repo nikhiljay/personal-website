@@ -38,8 +38,8 @@ type ParsedIcsEvent = {
 const STATIC_EVENT_URLS: Record<string, string> = {
   "flight-outbound-dl365":
     "https://live.flighty.app/22b947272-3ac9-461b-b67d-8205cd341685",
-  "flight-return-dl679":
-    "https://live.flighty.app/28d386992-f86a-47b3-bf95-268dd3f971a7",
+  "flight-return-dl668":
+    "https://live.flighty.app/29e16dcbd-0486-42c5-8a97-f0d550caf06d",
 };
 
 const CALENDAR_EVENT_EXCLUSIONS = [
@@ -67,16 +67,16 @@ const STATIC_TRIP_EVENTS: ParsedIcsEvent[] = [
     start: new Date("2026-06-26T19:00:00-04:00"),
   },
   {
-    uid: "flight-return-dl679",
+    uid: "flight-return-dl668",
     summary: "Fly home",
-    location: "DL 679 · JFK 2:55 PM → SFO 6:30 PM",
-    start: new Date("2026-07-03T14:55:00-04:00"),
+    location: "DL 668 · JFK 7:00 AM → SFO 10:15 AM",
+    start: new Date("2026-07-03T07:00:00-04:00"),
   },
   {
     uid: "july-4-weekend-sf",
     summary: "Enjoy 4th of July weekend with Nikhil!",
     location: "",
-    start: new Date("2026-07-03T18:30:00-07:00"),
+    start: new Date("2026-07-03T10:15:00-07:00"),
   },
   {
     uid: "mon-jun-29-life-sciences",
