@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   Dialog,
@@ -39,12 +39,15 @@ const researchImages = [
 ] as const;
 
 const IMAGE_COUNT = researchImages.length;
+const SWIPE_THRESHOLD_PX = 40;
 
 export function ResearchExpandable() {
   const [expanded, setExpanded] = useState(false);
   const [freeTimeExpanded, setFreeTimeExpanded] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const didSwipeRef = useRef(false);
   const lightboxImage = researchImages[lightboxIndex];
 
   function openLightbox(index: number) {
@@ -58,6 +61,37 @@ export function ResearchExpandable() {
 
   function showNext() {
     setLightboxIndex((current) => (current + 1) % IMAGE_COUNT);
+  }
+
+  function onLightboxTouchStart(event: React.TouchEvent) {
+    const touch = event.changedTouches[0];
+    if (!touch) {
+      return;
+    }
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    didSwipeRef.current = false;
+  }
+
+  function onLightboxTouchEnd(event: React.TouchEvent) {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches[0];
+    touchStartRef.current = null;
+    if (!start || !touch) {
+      return;
+    }
+
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy)) {
+      return;
+    }
+
+    didSwipeRef.current = true;
+    if (dx < 0) {
+      showNext();
+    } else {
+      showPrev();
+    }
   }
 
   useEffect(() => {
@@ -93,7 +127,10 @@ export function ResearchExpandable() {
         <SerifEm>Chasing novel experiences</SerifEm>. Currently diving into{" "}
         <button
           type="button"
-          onClick={() => setExpanded((open) => !open)}
+          onClick={() => {
+            setExpanded((open) => !open);
+            setFreeTimeExpanded(false);
+          }}
           aria-expanded={expanded}
           className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
         >
@@ -102,7 +139,10 @@ export function ResearchExpandable() {
         with a focus on post-training, RL, and long-horizon agents. In my{" "}
         <button
           type="button"
-          onClick={() => setFreeTimeExpanded((open) => !open)}
+          onClick={() => {
+            setFreeTimeExpanded((open) => !open);
+            setExpanded(false);
+          }}
           aria-expanded={freeTimeExpanded}
           className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
         >
@@ -148,9 +188,17 @@ export function ResearchExpandable() {
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent
           showCloseButton={false}
-          overlayClassName="bg-black/20 duration-200 supports-backdrop-filter:backdrop-blur-[1px]"
-          className="fixed inset-0 top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 items-center justify-center rounded-none border-0 bg-transparent p-0 shadow-none ring-0 duration-200 sm:max-w-none data-open:zoom-in-95 data-closed:zoom-out-95"
-          onClick={() => setLightboxOpen(false)}
+          overlayClassName="bg-black/45 duration-200 supports-backdrop-filter:backdrop-blur-[1px] sm:bg-black/20"
+          className="fixed inset-0 top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 touch-pan-y items-center justify-center rounded-none border-0 bg-transparent p-0 shadow-none ring-0 duration-200 sm:max-w-none data-open:zoom-in-95 data-closed:zoom-out-95"
+          onClick={() => {
+            if (didSwipeRef.current) {
+              didSwipeRef.current = false;
+              return;
+            }
+            setLightboxOpen(false);
+          }}
+          onTouchStart={onLightboxTouchStart}
+          onTouchEnd={onLightboxTouchEnd}
         >
           <DialogTitle className="sr-only">{lightboxImage.alt}</DialogTitle>
           <button
@@ -169,7 +217,7 @@ export function ResearchExpandable() {
             src={lightboxImage.src}
             alt={lightboxImage.alt}
             draggable={false}
-            className="h-auto max-h-[85vh] w-[80vw] rounded-[3px] select-none [-webkit-user-drag:none]"
+            className="h-auto max-h-[90vh] w-[90vw] touch-pan-y rounded-[3px] select-none [-webkit-user-drag:none] sm:max-h-[85vh] sm:w-[80vw]"
             onClick={(event) => event.stopPropagation()}
             onDragStart={(event) => event.preventDefault()}
           />

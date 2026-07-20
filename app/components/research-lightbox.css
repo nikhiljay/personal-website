@@ -2,7 +2,7 @@
   position: absolute;
   top: 50%;
   z-index: 1;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 2.5rem;
@@ -19,6 +19,12 @@
   user-select: none;
   transform: translateY(-50%);
   transition: color 0.15s ease;
+}
+
+@media (min-width: 640px) {
+  .research-lightbox__nav {
+    display: flex;
+  }
 }
 
 .research-lightbox__nav:focus,
