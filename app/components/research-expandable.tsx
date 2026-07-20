@@ -154,7 +154,7 @@ export function ResearchExpandable() {
         >
           research
         </button>{" "}
-        with focus on post-training, RL, and long-horizon agents. In my free
+        with a focus on post-training, RL, and long-horizon agents. In my free
         time, you&apos;ll find me{" "}
         <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
           training
