@@ -14,7 +14,9 @@ export function ExpandableAside({
   return (
     <div className={`expandable-aside ${open ? "is-open" : ""}`.trim()}>
       <div className="expandable-aside__measure" aria-hidden={!open}>
-        <div className="expandable-aside__content">{children}</div>
+        <div className="expandable-aside__content text-[13px] leading-[1.65]">
+          {children}
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { ExpandLink } from "./expand-link";
 import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
 import "./research-lightbox.css";
@@ -125,29 +126,29 @@ export function ResearchExpandable() {
     <>
       <p>
         <SerifEm>Chasing novel experiences</SerifEm>. Currently diving into{" "}
-        <button
-          type="button"
-          onClick={() => {
-            setExpanded((open) => !open);
-            setFreeTimeExpanded(false);
+        <ExpandLink
+          expanded={expanded}
+          onOpenChange={(open) => {
+            setExpanded(open);
+            if (open) {
+              setFreeTimeExpanded(false);
+            }
           }}
-          aria-expanded={expanded}
-          className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
         >
           research
-        </button>{" "}
+        </ExpandLink>{" "}
         with a focus on post-training, RL, and long-horizon agents. In my{" "}
-        <button
-          type="button"
-          onClick={() => {
-            setFreeTimeExpanded((open) => !open);
-            setExpanded(false);
+        <ExpandLink
+          expanded={freeTimeExpanded}
+          onOpenChange={(open) => {
+            setFreeTimeExpanded(open);
+            if (open) {
+              setExpanded(false);
+            }
           }}
-          aria-expanded={freeTimeExpanded}
-          className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
         >
           free time
-        </button>
+        </ExpandLink>
         , you&apos;ll find me{" "}
         <ExternalLink
           href="https://www.strava.com/athletes/nikhiljay"
@@ -158,30 +159,38 @@ export function ResearchExpandable() {
         for a triathlon, salsa dancing, playing tennis, or at the piano.
       </p>
       <ExpandableAside open={expanded}>
-        <div className="grid grid-cols-2 gap-2 pt-4">
-          {researchImages.map((image, index) => (
-            <button
-              key={image.src}
-              type="button"
-              onClick={() => openLightbox(index)}
-              className="relative aspect-[2620/1775] w-full cursor-zoom-in overflow-hidden rounded-[3px] border-0 bg-transparent p-0 outline-none [-webkit-tap-highlight-color:transparent] focus:outline-none focus-visible:outline-none focus-visible:ring-0"
-              aria-label={`Expand: ${image.alt}`}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                width={image.width}
-                height={image.height}
-                draggable={false}
-                onDragStart={(event) => event.preventDefault()}
-                className={`pointer-events-none absolute inset-0 size-full object-cover select-none [-webkit-user-drag:none]${index === 2 ? " object-left" : ""}`}
-              />
-            </button>
-          ))}
+        <div className="pt-4 sm:pt-3">
+          <p className="text-muted">
+            I&apos;m part of YC Paper Club, bringing together top researchers and
+            founders to discuss the state of the art and what it takes to get it
+            into production. I&apos;m also working through frontier AI research
+            with a Columbia research group.
+          </p>
+          <div className="grid grid-cols-2 gap-2 pt-2.5">
+            {researchImages.map((image, index) => (
+              <button
+                key={image.src}
+                type="button"
+                onClick={() => openLightbox(index)}
+                className="relative aspect-[2620/1775] w-full cursor-zoom-in overflow-hidden rounded-[3px] border-0 bg-transparent p-0 outline-none [-webkit-tap-highlight-color:transparent] focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                aria-label={`Expand: ${image.alt}`}
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={image.width}
+                  height={image.height}
+                  draggable={false}
+                  onDragStart={(event) => event.preventDefault()}
+                  className={`pointer-events-none absolute inset-0 size-full object-cover select-none [-webkit-user-drag:none]${index === 2 ? " object-left" : ""}`}
+                />
+              </button>
+            ))}
+          </div>
         </div>
       </ExpandableAside>
       <ExpandableAside open={freeTimeExpanded}>
-        <div className="pt-5 text-[13px] leading-5 sm:pt-4">
+        <div className="pt-4 text-[13px] leading-5 sm:pt-3">
           <TasteGrid sections={tasteSections} />
         </div>
       </ExpandableAside>
@@ -189,7 +198,7 @@ export function ResearchExpandable() {
         <DialogContent
           showCloseButton={false}
           overlayClassName="bg-black/45 duration-200 supports-backdrop-filter:backdrop-blur-[1px] sm:bg-black/20"
-          className="fixed inset-0 top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 touch-pan-y items-center justify-center rounded-none border-0 bg-transparent p-0 shadow-none ring-0 duration-200 sm:max-w-none data-open:zoom-in-95 data-closed:zoom-out-95"
+          className="fixed inset-0 top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 touch-pan-y items-center justify-center overflow-visible rounded-none border-0 bg-transparent p-0 shadow-none ring-0 duration-200 sm:max-w-none data-open:zoom-in-95 data-closed:zoom-out-95"
           onClick={() => {
             if (didSwipeRef.current) {
               didSwipeRef.current = false;
@@ -201,37 +210,41 @@ export function ResearchExpandable() {
           onTouchEnd={onLightboxTouchEnd}
         >
           <DialogTitle className="sr-only">{lightboxImage.alt}</DialogTitle>
-          <button
-            type="button"
-            className="research-lightbox__nav research-lightbox__nav--prev"
-            aria-label="Previous image"
-            onClick={(event) => {
-              event.stopPropagation();
-              showPrev();
-            }}
-          >
-            <ChevronLeft className="size-5" strokeWidth={1.75} />
-          </button>
-          {/* eslint-disable-next-line @next/next/no-img-element -- need explicit viewport width without next/image sizing caps */}
-          <img
-            src={lightboxImage.src}
-            alt={lightboxImage.alt}
-            draggable={false}
-            className="h-auto max-h-[90vh] w-[90vw] touch-pan-y rounded-[3px] select-none [-webkit-user-drag:none] sm:max-h-[85vh] sm:w-[80vw]"
+          <div
+            className="research-lightbox__frame"
             onClick={(event) => event.stopPropagation()}
-            onDragStart={(event) => event.preventDefault()}
-          />
-          <button
-            type="button"
-            className="research-lightbox__nav research-lightbox__nav--next"
-            aria-label="Next image"
-            onClick={(event) => {
-              event.stopPropagation();
-              showNext();
-            }}
           >
-            <ChevronRight className="size-5" strokeWidth={1.75} />
-          </button>
+            {/* eslint-disable-next-line @next/next/no-img-element -- need explicit viewport width without next/image sizing caps */}
+            <img
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
+              draggable={false}
+              className="block h-auto w-auto max-h-[90vh] max-w-full touch-pan-y rounded-[3px] object-contain select-none [-webkit-user-drag:none] sm:max-h-[85vh]"
+              onDragStart={(event) => event.preventDefault()}
+            />
+            <button
+              type="button"
+              className="research-lightbox__nav research-lightbox__nav--prev"
+              aria-label="Previous image"
+              onClick={(event) => {
+                event.stopPropagation();
+                showPrev();
+              }}
+            >
+              <ChevronLeft className="size-5" strokeWidth={1.75} />
+            </button>
+            <button
+              type="button"
+              className="research-lightbox__nav research-lightbox__nav--next"
+              aria-label="Next image"
+              onClick={(event) => {
+                event.stopPropagation();
+                showNext();
+              }}
+            >
+              <ChevronRight className="size-5" strokeWidth={1.75} />
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
     </>

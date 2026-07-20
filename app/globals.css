@@ -76,7 +76,8 @@
     transition-duration: 200ms;
   }
 
-  .site-link:hover {
+  .site-link:hover,
+  .site-link[aria-expanded="true"] {
     text-decoration-color: light-dark(#888888, #888888);
   }
 

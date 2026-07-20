@@ -10,6 +10,7 @@ import {
 import { usePreferredColorScheme } from "../hooks/use-preferred-color-scheme";
 
 import { MapMarkerDot } from "./map-marker-dot";
+import { ExpandLink } from "./expand-link";
 import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
 import { DeltaLogo } from "./delta-logo";
@@ -56,14 +57,9 @@ function EventTitle({ title }: { title: string }) {
       <>
         <div className="text-fg leading-snug">
           {before}
-          <button
-            type="button"
-            onClick={() => setExpanded((open) => !open)}
-            aria-expanded={expanded}
-            className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
-          >
+          <ExpandLink expanded={expanded} onOpenChange={setExpanded}>
             {name}
-          </button>
+          </ExpandLink>
           {after}
         </div>
         <ExpandableAside open={expanded}>

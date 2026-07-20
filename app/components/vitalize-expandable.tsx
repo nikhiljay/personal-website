@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { ExpandLink } from "./expand-link";
 import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
 
@@ -12,14 +13,9 @@ export function VitalizeExpandable() {
     <>
       <p>
         Co-founder of{" "}
-        <button
-          type="button"
-          onClick={() => setExpanded((open) => !open)}
-          aria-expanded={expanded}
-          className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
-        >
+        <ExpandLink expanded={expanded} onOpenChange={setExpanded}>
           Vitalize
-        </button>
+        </ExpandLink>
         , where I built autonomous labor optimization for hospitals.
       </p>
       <ExpandableAside open={expanded}>
@@ -29,7 +25,10 @@ export function VitalizeExpandable() {
             Vitalize
           </ExternalLink>{" "}
           to run in production at 10 health systems (35+ hospitals), $15M in
-          revenue, and a $30M Series A led by Oak HC/FT and Norwest.
+          revenue, and a $30M Series A led by Oak HC/FT and Norwest. I built
+          time-series models to forecast patient census, gradient-boosted models
+          to predict staffing gaps, and combinatorial optimization to generate
+          schedules that satisfy certifications, staff preferences, and cost.
         </p>
       </ExpandableAside>
     </>

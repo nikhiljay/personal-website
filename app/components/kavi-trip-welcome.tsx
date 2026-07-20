@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { ExpandLink } from "./expand-link";
 import { ExpandableAside } from "./expandable-aside";
 import { SerifEm } from "./serif-em";
 
@@ -12,14 +13,13 @@ export function KaviTripWelcome() {
     <>
       <h1 className="text-[26px] leading-[1.25] font-normal text-fg">
         Welcome to{" "}
-        <button
-          type="button"
-          onClick={() => setExpanded((open) => !open)}
-          aria-expanded={expanded}
+        <ExpandLink
+          expanded={expanded}
+          onOpenChange={setExpanded}
           className="site-link text-fg inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
         >
           New York
-        </button>
+        </ExpandLink>
         , <SerifEm>Kavi</SerifEm>.
       </h1>
       <ExpandableAside open={expanded}>
