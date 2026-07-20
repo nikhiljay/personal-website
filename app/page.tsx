@@ -2,7 +2,7 @@ import { AnimateIn } from "./components/animate-in";
 import { Connect } from "./components/connect";
 import { ExternalLink } from "./components/external-link";
 import { GlowName } from "./components/glow-name";
-import { SerifEm } from "./components/serif-em";
+import { ResearchExpandable } from "./components/research-expandable";
 import { SiteShell } from "./components/site-shell";
 import { SiteStatusBar } from "./components/site-status-bar";
 import { TasteGrid } from "./components/taste-grid";
@@ -24,25 +24,16 @@ export default function HomePage() {
           <ExternalLink href="https://vitalize.care">Vitalize</ExternalLink>,
           where I built autonomous labor optimization for hospitals.
         </AnimateIn>
-        <AnimateIn as="p" stagger={2}>
-          I&apos;m passionate about
-          continuous growth, using data to tell compelling stories, and solving
-          tough engineering problems. Based in San Francisco, CA.
-        </AnimateIn>
-        <AnimateIn as="p" stagger={3}>
-          <SerifEm>Chasing novel experiences</SerifEm>. In my free time, you&apos;ll find me{" "}
-          <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
-            training
-          </ExternalLink>{" "}
-          for a triathlon, salsa dancing, playing tennis, or at the piano.
+        <AnimateIn stagger={2}>
+          <ResearchExpandable />
         </AnimateIn>
       </div>
 
-      <AnimateIn as="section" className="my-12 text-[13px] leading-5" stagger={4}>
+      <AnimateIn as="section" className="my-12 text-[13px] leading-5" stagger={3}>
         <TasteGrid sections={tasteSections} />
       </AnimateIn>
 
-      <AnimateIn stagger={5}>
+      <AnimateIn stagger={4}>
         <Connect />
       </AnimateIn>
     </SiteShell>

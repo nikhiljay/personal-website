@@ -1,0 +1,80 @@
+.research-lightbox {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.research-lightbox.is-open {
+  opacity: 1;
+}
+
+.research-lightbox__image {
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity 0.22s ease,
+    transform 0.28s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.research-lightbox.is-open .research-lightbox__image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.research-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 35%);
+  color: rgb(255 255 255 / 85%);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.research-lightbox__nav:hover {
+  background: rgb(0 0 0 / 55%);
+  color: white;
+}
+
+.research-lightbox__nav--prev {
+  left: max(0.75rem, calc(10vw - 2.75rem));
+}
+
+.research-lightbox__nav--next {
+  right: max(0.75rem, calc(10vw - 2.75rem));
+}
+
+.research-lightbox__count {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  margin: 0;
+  color: rgb(255 255 255 / 70%);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  transform: translateX(-50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-lightbox,
+  .research-lightbox__image,
+  .research-lightbox__nav {
+    transition: none;
+  }
+
+  .research-lightbox:not(.is-open) {
+    visibility: hidden;
+  }
+
+  .research-lightbox.is-open .research-lightbox__image {
+    opacity: 1;
+    transform: none;
+  }
+}
