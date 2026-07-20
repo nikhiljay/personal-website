@@ -70,7 +70,7 @@ function TasteColumn({ section }: { section: TasteSection }) {
   return (
     <div className="w-full sm:w-48">
       <h2 className="text-muted">{section.title}</h2>
-      <div className="mt-4 space-y-3">
+      <div className="mt-2.5 space-y-3">
         {section.items.map((item) => (
           <div key={item.title}>
             <TasteEntry item={item} />
@@ -83,7 +83,7 @@ function TasteColumn({ section }: { section: TasteSection }) {
 
 export function TasteGrid({ sections }: { sections: TasteSection[] }) {
   return (
-    <section className="flex flex-col gap-10 sm:flex-row sm:gap-8">
+    <section className="flex flex-col gap-6 sm:flex-row sm:gap-8">
       {sections.map((section) => (
         <TasteColumn key={section.title} section={section} />
       ))}

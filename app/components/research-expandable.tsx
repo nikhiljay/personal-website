@@ -181,7 +181,7 @@ export function ResearchExpandable() {
         </div>
       </ExpandableAside>
       <ExpandableAside open={freeTimeExpanded}>
-        <div className="pt-4 text-[13px] leading-5">
+        <div className="pt-5 text-[13px] leading-5 sm:pt-4">
           <TasteGrid sections={tasteSections} />
         </div>
       </ExpandableAside>

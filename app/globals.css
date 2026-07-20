@@ -43,11 +43,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
   }
 
   body {
     @apply bg-bg font-sans text-base leading-7;
     color: var(--color-body);
+    overscroll-behavior-y: none;
   }
 
   ::selection {

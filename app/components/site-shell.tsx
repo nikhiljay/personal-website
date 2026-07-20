@@ -8,11 +8,11 @@ export function SiteShell({
   mobileBleed?: boolean;
 }) {
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-dvh bg-bg">
       <main
         className={`mx-auto w-full max-w-[640px] ${
           mobileBleed ? "px-0 md:px-6" : "px-6"
-        } ${compact ? "pt-16 pb-28" : "py-32"}`}
+        } ${compact ? "pt-16 pb-28" : "py-16 md:py-32"}`}
       >
         {children}
       </main>
