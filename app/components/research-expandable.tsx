@@ -161,10 +161,10 @@ export function ResearchExpandable() {
       <ExpandableAside open={expanded}>
         <div className="pt-4 sm:pt-3">
           <p className="text-muted">
-            I&apos;m part of YC Paper Club, collaborating with top researchers
+            I&apos;m a member of YC Paper Club, collaborating with top researchers
             and founders to discuss the state of the art and what it takes to get
-            it into production. I&apos;m also working through frontier AI research
-            with a Columbia research group.
+            it             into production. I also host weekly research sessions with friends
+            from Columbia where we discuss leading frontier AI papers.
           </p>
           <div className="grid grid-cols-2 gap-2 pt-2.5">
             {researchImages.map((image, index) => (
