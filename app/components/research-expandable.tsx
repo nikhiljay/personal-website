@@ -163,7 +163,7 @@ export function ResearchExpandable() {
           <p className="text-muted">
             I&apos;m a member of YC Paper Club, collaborating with top researchers
             and founders to discuss the state of the art and what it takes to get
-            it             into production. I also host weekly research sessions with friends
+            it into production. I also host weekly research sessions with friends
             from Columbia where we discuss leading frontier AI papers.
           </p>
           <div className="grid grid-cols-2 gap-2 pt-2.5">
