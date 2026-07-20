@@ -5,8 +5,6 @@ import { GlowName } from "./components/glow-name";
 import { ResearchExpandable } from "./components/research-expandable";
 import { SiteShell } from "./components/site-shell";
 import { SiteStatusBar } from "./components/site-status-bar";
-import { TasteGrid } from "./components/taste-grid";
-import { tasteSections } from "./lib/taste";
 
 export default function HomePage() {
   return (
@@ -29,11 +27,7 @@ export default function HomePage() {
         </AnimateIn>
       </div>
 
-      <AnimateIn as="section" className="my-12 text-[13px] leading-5" stagger={3}>
-        <TasteGrid sections={tasteSections} />
-      </AnimateIn>
-
-      <AnimateIn stagger={4}>
+      <AnimateIn className="mt-9" stagger={3}>
         <Connect />
       </AnimateIn>
     </SiteShell>

@@ -9,6 +9,8 @@ import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
 import "./research-lightbox.css";
 import { SerifEm } from "./serif-em";
+import { TasteGrid } from "./taste-grid";
+import { tasteSections } from "../lib/taste";
 
 const researchImages = [
   {
@@ -36,6 +38,7 @@ const IMAGE_COUNT = researchImages.length;
 
 export function ResearchExpandable() {
   const [expanded, setExpanded] = useState(false);
+  const [freeTimeExpanded, setFreeTimeExpanded] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -154,8 +157,16 @@ export function ResearchExpandable() {
         >
           research
         </button>{" "}
-        with a focus on post-training, RL, and long-horizon agents. In my free
-        time, you&apos;ll find me{" "}
+        with a focus on post-training, RL, and long-horizon agents. In my{" "}
+        <button
+          type="button"
+          onClick={() => setFreeTimeExpanded((open) => !open)}
+          aria-expanded={freeTimeExpanded}
+          className="site-link inline cursor-pointer border-0 bg-transparent p-0 font-inherit"
+        >
+          free time
+        </button>
+        , you&apos;ll find me{" "}
         <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
           training
         </ExternalLink>{" "}
@@ -182,6 +193,11 @@ export function ResearchExpandable() {
               />
             </button>
           ))}
+        </div>
+      </ExpandableAside>
+      <ExpandableAside open={freeTimeExpanded}>
+        <div className="pt-4 text-[13px] leading-5">
+          <TasteGrid sections={tasteSections} />
         </div>
       </ExpandableAside>
       {mounted && lightboxImage && lightboxIndex != null

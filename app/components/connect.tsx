@@ -21,7 +21,7 @@ const socialLinks = [
 
 export function Connect() {
   return (
-    <footer className="mt-6 flex flex-wrap items-center gap-x-1.5 font-mono text-xs uppercase text-muted">
+    <footer className="flex flex-wrap items-center gap-x-1.5 font-mono text-xs uppercase text-muted">
       {socialLinks.map((link, index) => (
         <span key={link.href} className="contents">
           {index > 0 ? (
