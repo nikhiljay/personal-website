@@ -137,7 +137,7 @@ export function ResearchExpandable() {
         >
           research
         </ExpandLink>{" "}
-        with a focus on post-training, RL, and long-horizon agents. In my{" "}
+        focused on post-training, RL, and long-horizon agents. In my{" "}
         <ExpandLink
           expanded={freeTimeExpanded}
           onOpenChange={(open) => {
@@ -161,9 +161,9 @@ export function ResearchExpandable() {
       <ExpandableAside open={expanded}>
         <div className="pt-4 sm:pt-3">
           <p className="text-muted">
-            I&apos;m part of YC Paper Club, bringing together top researchers and
-            founders to discuss the state of the art and what it takes to get it
-            into production. I&apos;m also working through frontier AI research
+            I&apos;m part of YC Paper Club, collaborating with top researchers
+            and founders to discuss the state of the art and what it takes to get
+            it into production. I&apos;m also working through frontier AI research
             with a Columbia research group.
           </p>
           <div className="grid grid-cols-2 gap-2 pt-2.5">

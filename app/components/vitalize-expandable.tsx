@@ -20,15 +20,12 @@ export function VitalizeExpandable() {
       </p>
       <ExpandableAside open={expanded}>
         <p className="pt-1 text-muted">
-          As CTO, I scaled{" "}
+          As CTO, I led eng &amp; product and scaled{" "}
           <ExternalLink href="https://vitalize.care" showArrow>
             Vitalize
           </ExternalLink>{" "}
           to run in production at 10 health systems (35+ hospitals), $15M in
-          revenue, and a $30M Series A led by Oak HC/FT and Norwest. I built
-          time-series models to forecast patient census, gradient-boosted models
-          to predict staffing gaps, and combinatorial optimization to generate
-          schedules that satisfy certifications, staff preferences, and cost.
+          revenue, and a $30M Series A led by Oak HC/FT and Norwest.
         </p>
       </ExpandableAside>
     </>
