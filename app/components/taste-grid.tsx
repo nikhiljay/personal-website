@@ -1,3 +1,6 @@
+import { Heart } from "lucide-react";
+import Link from "next/link";
+
 import { ExternalLink } from "./external-link";
 import type { TasteItem, TasteSection } from "../lib/taste";
 
@@ -7,6 +10,13 @@ function TasteEntry({ item }: { item: TasteItem }) {
       {" "}
       <span className="text-muted">[{item.location}]</span>
     </>
+  ) : null;
+  const heart = item.heart ? (
+    <Heart
+      aria-hidden="true"
+      className="size-[1.05em] shrink-0 fill-current text-muted"
+      strokeWidth={0}
+    />
   ) : null;
 
   if (item.links) {
@@ -23,9 +33,26 @@ function TasteEntry({ item }: { item: TasteItem }) {
   }
 
   if (item.href) {
+    const link = item.href.startsWith("/") ? (
+      <Link href={item.href} className="site-link">
+        {item.title}
+      </Link>
+    ) : (
+      <ExternalLink href={item.href}>{item.title}</ExternalLink>
+    );
+
+    if (heart) {
+      return (
+        <span className="inline-flex items-center gap-1">
+          {link}
+          {heart}
+        </span>
+      );
+    }
+
     return (
       <>
-        <ExternalLink href={item.href}>{item.title}</ExternalLink>
+        {link}
         {location}
       </>
     );

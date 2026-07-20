@@ -2,6 +2,7 @@ export type TasteItem = {
   title: string;
   location?: string;
   href?: string;
+  heart?: boolean;
   links?: { label: string; href: string }[];
 };
 
@@ -14,78 +15,27 @@ export const tasteSections: TasteSection[] = [
   {
     title: "Stack",
     items: [
-      {
-        title: "Tissot PRX",
-        href: "https://www.tissotwatches.com/en-us/T1374071105100.html",
-      },
-      {
-        title: "Garmin Forerunner 970",
-        href: "https://www.garmin.com/en-US/c/sports-fitness/running-smartwatches/",
-      },
-      {
-        title: "Whoop 5.0",
-        href: "https://www.whoop.com",
-      },
-      {
-        title: "Things 3",
-        href: "https://culturedcode.com/things/",
-      },
-      {
-        title: "Obsidian & iA Writer",
-        links: [
-          { label: "Obsidian", href: "https://obsidian.md" },
-          { label: "iA Writer", href: "https://ia.net/writer" },
-        ],
-      },
-      {
-        title: "Warp",
-        href: "https://www.warp.dev",
-      },
-      {
-        title: "Notion Calendar",
-        href: "https://www.notion.com/product/calendar",
-      },
-      {
-        title: "Copilot Money",
-        href: "https://copilot.money",
-      },
-      {
-        title: "Dia",
-        href: "https://www.diabrowser.com",
-      },
+      { title: "Tissot PRX" },
+      { title: "Garmin Forerunner 970" },
+      { title: "Whoop 5.0" },
+      { title: "Things 3" },
+      { title: "Obsidian & iA Writer" },
+      { title: "Warp" },
+      { title: "Notion Calendar" },
+      { title: "Copilot Money" },
+      { title: "Dia" },
     ],
   },
   {
     title: "Reading",
     items: [
-      {
-        title: "Can't Hurt Me",
-        href: "https://www.amazon.com/Cant-Hurt-Me-Master-Your-Mind/dp/1544512279",
-      },
-      {
-        title: "Becoming",
-        href: "https://www.amazon.com/Becoming-Michelle-Obama/dp/1524763136",
-      },
-      {
-        title: "The Speed of Trust",
-        href: "https://www.amazon.com/Speed-Trust-Thing-affects/dp/0743273296",
-      },
-      {
-        title: "Mistborn",
-        href: "https://www.amazon.com/Mistborn-Final-Empire-Brandon-Sanderson/dp/0765311789",
-      },
-      {
-        title: "Atomic Habits",
-        href: "https://www.amazon.com/Atomic-Habits-Proven-Build-Break/dp/0735211299",
-      },
-      {
-        title: "The Dictionary of Obscure Sorrows",
-        href: "https://www.amazon.com/Dictionary-Obscure-Sorrows-John-Koenig/dp/1501153655",
-      },
-      {
-        title: "Tomorrow, and Tomorrow, and Tomorrow",
-        href: "https://www.amazon.com/Tomorrow-Tomorrow-Gabrielle-Zevin/dp/0593321200",
-      },
+      { title: "Can't Hurt Me" },
+      { title: "Becoming" },
+      { title: "The Speed of Trust" },
+      { title: "Mistborn" },
+      { title: "Atomic Habits" },
+      { title: "The Dictionary of Obscure Sorrows" },
+      { title: "Tomorrow, and Tomorrow, and Tomorrow" },
     ],
   },
   {
@@ -94,47 +44,23 @@ export const tasteSections: TasteSection[] = [
       {
         title: "Kokkari Estiatorio",
         location: "SF",
-        href: "https://kokkari.com/",
       },
       {
         title: "Purple Rice",
         location: "SF",
-        href: "https://www.yelp.com/biz/purple-rice-san-francisco",
       },
       {
         title: "Norcina",
         location: "SF",
-        href: "https://www.norcinasf.com/",
       },
       {
         title: "Che Fico",
         location: "SF",
-        href: "https://chefico.com/",
       },
       {
-        title: "Zareen's",
-        location: "Palo Alto",
-        href: "https://www.zareensrestaurant.com/",
-      },
-      {
-        title: "Mitr Thai",
-        location: "NYC",
-        href: "https://mitrthainyc.com/",
-      },
-      {
-        title: "Adda",
-        location: "NYC",
-        href: "https://www.addanyc.com/",
-      },
-      {
-        title: "Wayan",
-        location: "NYC",
-        href: "https://www.wayan-nyc.com/",
-      },
-      {
-        title: "L'industrie Pizzeria",
-        location: "NYC",
-        href: "https://www.lindustriebk.com/",
+        title: "Kavi in NYC",
+        href: "/kavi-nyc-trip",
+        heart: true,
       },
     ],
   },

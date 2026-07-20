@@ -174,7 +174,7 @@ export function ResearchExpandable() {
                 height={image.height}
                 draggable={false}
                 onDragStart={(event) => event.preventDefault()}
-                className="pointer-events-none absolute inset-0 size-full object-cover select-none [-webkit-user-drag:none]"
+                className={`pointer-events-none absolute inset-0 size-full object-cover select-none [-webkit-user-drag:none]${index === 2 ? " object-left" : ""}`}
               />
             </button>
           ))}
