@@ -76,7 +76,6 @@
     transition-duration: 200ms;
   }
 
-  .site-link:hover,
   .site-link[aria-expanded="true"] {
     text-decoration-color: light-dark(#888888, #888888);
   }
@@ -94,8 +93,14 @@
     transition-duration: 200ms;
   }
 
-  .site-link-icon:hover {
-    border-bottom-color: light-dark(#888888, #888888);
+  @media (hover: hover) {
+    .site-link:hover {
+      text-decoration-color: light-dark(#888888, #888888);
+    }
+
+    .site-link-icon:hover {
+      border-bottom-color: light-dark(#888888, #888888);
+    }
   }
 
   .section-label {
