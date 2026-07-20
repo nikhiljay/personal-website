@@ -19,8 +19,10 @@ export default function HomePage() {
       <div className="text-[15px] leading-[1.7] [&>p:not(:last-child)]:mb-4">
         <AnimateIn as="p" stagger={1}>
           Co-founder of{" "}
-          <ExternalLink href="https://vitalize.care">Vitalize</ExternalLink>,
-          where I built autonomous labor optimization for hospitals.
+          <ExternalLink href="https://vitalize.care" showArrow>
+            Vitalize
+          </ExternalLink>
+          , where I built autonomous labor optimization for hospitals.
         </AnimateIn>
         <AnimateIn stagger={2}>
           <ResearchExpandable />

@@ -2,8 +2,13 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
@@ -33,117 +38,54 @@ const researchImages = [
   },
 ] as const;
 
-const LIGHTBOX_CLOSE_MS = 220;
 const IMAGE_COUNT = researchImages.length;
 
 export function ResearchExpandable() {
   const [expanded, setExpanded] = useState(false);
   const [freeTimeExpanded, setFreeTimeExpanded] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const closeTimeoutRef = useRef<number | null>(null);
-  const titleId = useId();
-  const lightboxActive = lightboxIndex != null;
-  const lightboxImage =
-    lightboxIndex != null ? researchImages[lightboxIndex] : null;
-
-  function clearCloseTimeout() {
-    if (closeTimeoutRef.current != null) {
-      window.clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-  }
-
-  function closeLightbox() {
-    setLightboxOpen(false);
-    clearCloseTimeout();
-    closeTimeoutRef.current = window.setTimeout(() => {
-      setLightboxIndex(null);
-      closeTimeoutRef.current = null;
-    }, LIGHTBOX_CLOSE_MS);
-  }
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const lightboxImage = researchImages[lightboxIndex];
 
   function openLightbox(index: number) {
-    clearCloseTimeout();
     setLightboxIndex(index);
+    setLightboxOpen(true);
   }
 
   function showPrev() {
-    setLightboxIndex((current) => {
-      if (current == null) {
-        return current;
-      }
-      return (current - 1 + IMAGE_COUNT) % IMAGE_COUNT;
-    });
+    setLightboxIndex((current) => (current - 1 + IMAGE_COUNT) % IMAGE_COUNT);
   }
 
   function showNext() {
-    setLightboxIndex((current) => {
-      if (current == null) {
-        return current;
-      }
-      return (current + 1) % IMAGE_COUNT;
-    });
+    setLightboxIndex((current) => (current + 1) % IMAGE_COUNT);
   }
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!lightboxActive) {
+    if (!lightboxOpen) {
       return;
     }
 
-    const frame = requestAnimationFrame(() => {
-      setLightboxOpen(true);
-    });
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      cancelAnimationFrame(frame);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [lightboxActive]);
-
-  useEffect(() => {
-    if (!lightboxActive) {
-      return;
-    }
-
+    // Capture phase so the dialog focus trap can't swallow arrow keys.
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setLightboxOpen(false);
-        clearCloseTimeout();
-        closeTimeoutRef.current = window.setTimeout(() => {
-          setLightboxIndex(null);
-          closeTimeoutRef.current = null;
-        }, LIGHTBOX_CLOSE_MS);
-        return;
-      }
-
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        setLightboxIndex((current) =>
-          current == null ? current : (current - 1 + IMAGE_COUNT) % IMAGE_COUNT,
+        event.stopPropagation();
+        setLightboxIndex(
+          (current) => (current - 1 + IMAGE_COUNT) % IMAGE_COUNT,
         );
         return;
       }
 
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        setLightboxIndex((current) =>
-          current == null ? current : (current + 1) % IMAGE_COUNT,
-        );
+        event.stopPropagation();
+        setLightboxIndex((current) => (current + 1) % IMAGE_COUNT);
       }
     };
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [lightboxActive]);
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
+  }, [lightboxOpen]);
 
   return (
     <>
@@ -167,7 +109,10 @@ export function ResearchExpandable() {
           free time
         </button>
         , you&apos;ll find me{" "}
-        <ExternalLink href="https://www.strava.com/athletes/nikhiljay">
+        <ExternalLink
+          href="https://www.strava.com/athletes/nikhiljay"
+          showArrow
+        >
           training
         </ExternalLink>{" "}
         for a triathlon, salsa dancing, playing tennis, or at the piano.
@@ -179,7 +124,7 @@ export function ResearchExpandable() {
               key={image.src}
               type="button"
               onClick={() => openLightbox(index)}
-              className="cursor-zoom-in border-0 bg-transparent p-0"
+              className="relative aspect-[2620/1775] w-full cursor-zoom-in overflow-hidden rounded-[3px] border-0 bg-transparent p-0 outline-none [-webkit-tap-highlight-color:transparent] focus:outline-none focus-visible:outline-none focus-visible:ring-0"
               aria-label={`Expand: ${image.alt}`}
             >
               <Image
@@ -189,7 +134,7 @@ export function ResearchExpandable() {
                 height={image.height}
                 draggable={false}
                 onDragStart={(event) => event.preventDefault()}
-                className="h-auto w-full rounded-[3px] select-none [-webkit-user-drag:none]"
+                className="pointer-events-none absolute inset-0 size-full object-cover select-none [-webkit-user-drag:none]"
               />
             </button>
           ))}
@@ -200,57 +145,47 @@ export function ResearchExpandable() {
           <TasteGrid sections={tasteSections} />
         </div>
       </ExpandableAside>
-      {mounted && lightboxImage && lightboxIndex != null
-        ? createPortal(
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={titleId}
-              className={`research-lightbox fixed inset-0 z-50 flex items-center justify-center bg-black/70${lightboxOpen ? " is-open" : ""}`}
-              onClick={closeLightbox}
-            >
-              <h2 id={titleId} className="sr-only">
-                {lightboxImage.alt}
-              </h2>
-              <button
-                type="button"
-                className="research-lightbox__nav research-lightbox__nav--prev"
-                aria-label="Previous image"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  showPrev();
-                }}
-              >
-                <ChevronLeft className="size-5" strokeWidth={1.75} />
-              </button>
-              {/* eslint-disable-next-line @next/next/no-img-element -- need explicit viewport width without next/image sizing caps */}
-              <img
-                src={lightboxImage.src}
-                alt={lightboxImage.alt}
-                draggable={false}
-                className="research-lightbox__image rounded-[3px] select-none [-webkit-user-drag:none]"
-                style={{ width: "80vw", height: "auto" }}
-                onClick={(event) => event.stopPropagation()}
-                onDragStart={(event) => event.preventDefault()}
-              />
-              <button
-                type="button"
-                className="research-lightbox__nav research-lightbox__nav--next"
-                aria-label="Next image"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  showNext();
-                }}
-              >
-                <ChevronRight className="size-5" strokeWidth={1.75} />
-              </button>
-              <p className="research-lightbox__count" aria-hidden>
-                {lightboxIndex + 1} / {IMAGE_COUNT}
-              </p>
-            </div>,
-            document.body,
-          )
-        : null}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent
+          showCloseButton={false}
+          overlayClassName="bg-black/20 duration-200 supports-backdrop-filter:backdrop-blur-[1px]"
+          className="fixed inset-0 top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 items-center justify-center rounded-none border-0 bg-transparent p-0 shadow-none ring-0 duration-200 sm:max-w-none data-open:zoom-in-95 data-closed:zoom-out-95"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <DialogTitle className="sr-only">{lightboxImage.alt}</DialogTitle>
+          <button
+            type="button"
+            className="research-lightbox__nav research-lightbox__nav--prev"
+            aria-label="Previous image"
+            onClick={(event) => {
+              event.stopPropagation();
+              showPrev();
+            }}
+          >
+            <ChevronLeft className="size-5" strokeWidth={1.75} />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element -- need explicit viewport width without next/image sizing caps */}
+          <img
+            src={lightboxImage.src}
+            alt={lightboxImage.alt}
+            draggable={false}
+            className="h-auto max-h-[85vh] w-[80vw] rounded-[3px] select-none [-webkit-user-drag:none]"
+            onClick={(event) => event.stopPropagation()}
+            onDragStart={(event) => event.preventDefault()}
+          />
+          <button
+            type="button"
+            className="research-lightbox__nav research-lightbox__nav--next"
+            aria-label="Next image"
+            onClick={(event) => {
+              event.stopPropagation();
+              showNext();
+            }}
+          >
+            <ChevronRight className="size-5" strokeWidth={1.75} />
+          </button>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
