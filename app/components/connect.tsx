@@ -14,7 +14,7 @@ const socialLinks = [
     label: "SUBSTACK",
   },
   {
-    href: "https://twitter.com/nikhiljdsouza",
+    href: "https://twitter.com/nikhildsouza",
     label: "X",
   },
 ] as const;

@@ -42,6 +42,11 @@ export const tasteSections: TasteSection[] = [
     title: "Food",
     items: [
       {
+        title: "Kavi in NYC",
+        href: "/kavi-nyc-trip",
+        heart: true,
+      },
+      {
         title: "Kokkari Estiatorio",
         location: "SF",
       },
@@ -56,11 +61,6 @@ export const tasteSections: TasteSection[] = [
       {
         title: "Che Fico",
         location: "SF",
-      },
-      {
-        title: "Kavi in NYC",
-        href: "/kavi-nyc-trip",
-        heart: true,
       },
     ],
   },

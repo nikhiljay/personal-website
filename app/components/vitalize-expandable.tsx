@@ -24,7 +24,7 @@ export function VitalizeExpandable() {
       </p>
       <ExpandableAside open={expanded}>
         <p className="pt-1 text-muted">
-          Scaled{" "}
+          As CTO, I scaled{" "}
           <ExternalLink href="https://vitalize.care" showArrow>
             Vitalize
           </ExternalLink>{" "}
