@@ -37,6 +37,12 @@ const researchImages = [
     width: 5092,
     height: 2708,
   },
+  {
+    src: "/images/research/book-club-llama3-minhash-v3.jpg",
+    alt: "Deep learning book club annotating Llama 3 data filtering and MinHash de-duplication",
+    width: 3000,
+    height: 1756,
+  },
 ] as const;
 
 const IMAGE_COUNT = researchImages.length;
@@ -180,6 +186,7 @@ export function ResearchExpandable() {
                   alt={image.alt}
                   width={image.width}
                   height={image.height}
+                  quality={90}
                   draggable={false}
                   onDragStart={(event) => event.preventDefault()}
                   className={`pointer-events-none absolute inset-0 size-full object-cover select-none [-webkit-user-drag:none]${index === 2 ? " object-left" : ""}`}
