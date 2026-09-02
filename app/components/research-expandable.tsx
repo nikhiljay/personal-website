@@ -10,13 +10,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { nytRecipes } from "../lib/nyt-recipes";
+import { tasteSections } from "../lib/taste";
 import { ExpandLink } from "./expand-link";
 import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
 import "./research-lightbox.css";
 import { SerifEm } from "./serif-em";
 import { TasteGrid } from "./taste-grid";
-import { tasteSections } from "../lib/taste";
+
+type OpenPanel = "research" | "freeTime" | "recipes" | null;
 
 const researchImages = [
   {
@@ -49,8 +52,7 @@ const IMAGE_COUNT = researchImages.length;
 const SWIPE_THRESHOLD_PX = 40;
 
 export function ResearchExpandable() {
-  const [expanded, setExpanded] = useState(false);
-  const [freeTimeExpanded, setFreeTimeExpanded] = useState(false);
+  const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -133,25 +135,15 @@ export function ResearchExpandable() {
       <p>
         <SerifEm>Chasing novel experiences</SerifEm>. Currently diving into{" "}
         <ExpandLink
-          expanded={expanded}
-          onOpenChange={(open) => {
-            setExpanded(open);
-            if (open) {
-              setFreeTimeExpanded(false);
-            }
-          }}
+          expanded={openPanel === "research"}
+          onOpenChange={(open) => setOpenPanel(open ? "research" : null)}
         >
           research
         </ExpandLink>{" "}
         focused on post-training, RL, and long-horizon agents. In my{" "}
         <ExpandLink
-          expanded={freeTimeExpanded}
-          onOpenChange={(open) => {
-            setFreeTimeExpanded(open);
-            if (open) {
-              setExpanded(false);
-            }
-          }}
+          expanded={openPanel === "freeTime"}
+          onOpenChange={(open) => setOpenPanel(open ? "freeTime" : null)}
         >
           free time
         </ExpandLink>
@@ -162,9 +154,16 @@ export function ResearchExpandable() {
         >
           training
         </ExternalLink>{" "}
-        for a triathlon, salsa dancing, playing tennis, or at the piano.
+        for a triathlon, playing tennis,{" "}
+        <ExpandLink
+          expanded={openPanel === "recipes"}
+          onOpenChange={(open) => setOpenPanel(open ? "recipes" : null)}
+        >
+          learning a new recipe
+        </ExpandLink>
+        , or at the piano.
       </p>
-      <ExpandableAside open={expanded}>
+      <ExpandableAside open={openPanel === "research"}>
         <div className="pt-4 sm:pt-3">
           <p className="text-muted">
             I&apos;m a member of YC Paper Club, collaborating with top researchers
@@ -196,9 +195,20 @@ export function ResearchExpandable() {
           </div>
         </div>
       </ExpandableAside>
-      <ExpandableAside open={freeTimeExpanded}>
+      <ExpandableAside open={openPanel === "freeTime"}>
         <div className="pt-4 text-[13px] leading-5 sm:pt-3">
           <TasteGrid sections={tasteSections} />
+        </div>
+      </ExpandableAside>
+      <ExpandableAside open={openPanel === "recipes"}>
+        <div className="grid grid-cols-1 gap-x-8 gap-y-2.5 pt-4 text-[13px] leading-5 sm:grid-cols-2 sm:pt-3">
+          {nytRecipes.map((recipe) => (
+            <div key={recipe.href} className="min-w-0">
+              <ExternalLink href={recipe.href} className="site-link block truncate">
+                {recipe.title}
+              </ExternalLink>
+            </div>
+          ))}
         </div>
       </ExpandableAside>
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
