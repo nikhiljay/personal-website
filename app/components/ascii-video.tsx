@@ -12,9 +12,11 @@ const geistMono = Geist_Mono({
 });
 
 const CLIPS = [
-  { id: "a" },
+  { id: "a", playbackRate: 1 },
   { id: "b", playbackRate: 1.2 },
 ] as const;
+
+const FIRST_ASPECT = "480 / 268";
 
 type AsciiVideoProps = {
   label: string;
@@ -28,6 +30,7 @@ function createDetachedVideo() {
   video.playsInline = true;
   video.preload = "auto";
   video.crossOrigin = "anonymous";
+  video.loop = false;
   video.setAttribute("playsinline", "");
   video.setAttribute("muted", "");
   return video;
@@ -45,10 +48,29 @@ async function objectUrlFor(id: string) {
   return URL.createObjectURL(blob);
 }
 
+function waitForData(video: HTMLVideoElement) {
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+    return Promise.resolve();
+  }
+  return new Promise<void>((resolve, reject) => {
+    const onData = () => {
+      video.removeEventListener("error", onError);
+      resolve();
+    };
+    const onError = () => {
+      video.removeEventListener("loadeddata", onData);
+      reject(new Error("clip failed"));
+    };
+    video.addEventListener("loadeddata", onData, { once: true });
+    video.addEventListener("error", onError, { once: true });
+  });
+}
+
 export function AsciiVideo({ label, className }: AsciiVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [aspectRatio, setAspectRatio] = useState("16 / 9");
+  const [ready, setReady] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState(FIRST_ASPECT);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -57,62 +79,55 @@ export function AsciiVideo({ label, className }: AsciiVideoProps) {
       return;
     }
 
-    const video = createDetachedVideo();
+    const players = [createDetachedVideo(), createDetachedVideo()];
     const urls: string[] = [];
     const cache = new Map<string, string>();
     let index = 0;
+    let active = 0;
     let disposed = false;
 
     const renderer = createAsciiVideoRenderer({
       canvas,
-      video,
+      video: players[0],
       fontFamily: geistMono.style.fontFamily,
+      onFirstFrame() {
+        if (!disposed) {
+          setReady(true);
+        }
+      },
     });
-
-    const remember = (url: string) => {
-      urls.push(url);
-      return url;
-    };
 
     const loadUrl = async (id: string) => {
       const hit = cache.get(id);
       if (hit) {
         return hit;
       }
-      const url = remember(await objectUrlFor(id));
+      const url = await objectUrlFor(id);
+      urls.push(url);
       cache.set(id, url);
       return url;
     };
 
-    const applyRate = () => {
-      video.playbackRate = CLIPS[index]?.playbackRate ?? 1;
-    };
-
-    const applyAspect = () => {
-      applyRate();
-      if (index !== 0) {
-        return;
-      }
-      if (video.videoWidth > 0 && video.videoHeight > 0) {
-        setAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
-      }
-    };
-
-    const loadClip = async (nextIndex: number) => {
-      const clip = CLIPS[nextIndex] ?? CLIPS[0];
+    const attach = async (player: HTMLVideoElement, clipIndex: number) => {
+      const clip = CLIPS[clipIndex] ?? CLIPS[0];
       if (!clip) {
         return;
       }
-      index = nextIndex;
       const url = await loadUrl(clip.id);
       if (disposed) {
         return;
       }
-      video.src = url;
-      applyRate();
-      const upcoming = CLIPS[(nextIndex + 1) % CLIPS.length];
-      if (upcoming && upcoming.id !== clip.id) {
-        void loadUrl(upcoming.id);
+      if (player.src !== url) {
+        player.src = url;
+      }
+      player.playbackRate = clip.playbackRate ?? 1;
+      player.currentTime = 0;
+      await waitForData(player);
+    };
+
+    const applyAspect = (player: HTMLVideoElement) => {
+      if (player.videoWidth > 0 && player.videoHeight > 0) {
+        setAspectRatio(`${player.videoWidth} / ${player.videoHeight}`);
       }
     };
 
@@ -120,16 +135,28 @@ export function AsciiVideo({ label, className }: AsciiVideoProps) {
       if (CLIPS.length < 2 || disposed) {
         return;
       }
-      void loadClip((index + 1) % CLIPS.length).then(() => {
-        if (!disposed) {
-          void video.play().catch(() => {});
-        }
-      });
+      const nextIndex = (index + 1) % CLIPS.length;
+      const idle = 1 - active;
+      const next = players[idle];
+      if (next.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+        void attach(next, nextIndex).then(() => {
+          if (!disposed) {
+            onEnded();
+          }
+        });
+        return;
+      }
+      index = nextIndex;
+      active = idle;
+      renderer.setVideo(next);
+      void next.play().catch(() => {});
+      const following = (nextIndex + 1) % CLIPS.length;
+      void attach(players[1 - active], following);
     };
 
-    video.loop = CLIPS.length < 2;
-    video.addEventListener("loadedmetadata", applyAspect);
-    video.addEventListener("ended", onEnded);
+    for (const player of players) {
+      player.addEventListener("ended", onEnded);
+    }
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onMotion = () => renderer.setReducedMotion(motion.matches);
@@ -152,16 +179,26 @@ export function AsciiVideo({ label, className }: AsciiVideoProps) {
       renderer.resize();
     });
 
-    void loadClip(0);
+    void attach(players[0], 0)
+      .then(() => {
+        if (disposed) {
+          return;
+        }
+        applyAspect(players[0]);
+        renderer.setVideo(players[0]);
+        void attach(players[1], 1);
+      })
+      .catch(() => {});
 
     return () => {
       disposed = true;
       renderer.dispose();
-      video.pause();
-      video.removeAttribute("src");
-      video.load();
-      video.removeEventListener("loadedmetadata", applyAspect);
-      video.removeEventListener("ended", onEnded);
+      for (const player of players) {
+        player.pause();
+        player.removeAttribute("src");
+        player.load();
+        player.removeEventListener("ended", onEnded);
+      }
       motion.removeEventListener("change", onMotion);
       io.disconnect();
       ro.disconnect();
@@ -175,7 +212,8 @@ export function AsciiVideo({ label, className }: AsciiVideoProps) {
     <figure
       ref={containerRef}
       className={cn(
-        "relative w-full overflow-hidden bg-black",
+        "relative w-full overflow-hidden transition-opacity duration-500 motion-reduce:transition-none",
+        ready ? "opacity-100" : "opacity-0",
         geistMono.className,
         className,
       )}

@@ -3,8 +3,8 @@ const DENSITY =
 
 const CELL_ASPECT = 0.6;
 const TILE_OPACITY = 0.5;
-const GAMMA = 1.6;
-const CHAR_FILL = 0.8;
+const GAMMA = 1.45;
+const CHAR_FILL = 0.82;
 const DPR_CAP = 2;
 const MIN_COLS = 10;
 const MIN_ROWS = 5;
@@ -12,6 +12,7 @@ const MIN_ROWS = 5;
 export type AsciiVideoRenderer = {
   setVisible: (visible: boolean) => void;
   setReducedMotion: (reduced: boolean) => void;
+  setVideo: (next: HTMLVideoElement) => void;
   resize: () => void;
   dispose: () => void;
 };
@@ -21,6 +22,7 @@ type CreateAsciiVideoRendererOptions = {
   video: HTMLVideoElement;
   fontFamily: string;
   cellSizePx?: number;
+  onFirstFrame?: () => void;
 };
 
 function cellSizeForWidth(width: number, override?: number) {
@@ -38,6 +40,7 @@ export function createAsciiVideoRenderer({
   video,
   fontFamily,
   cellSizePx,
+  onFirstFrame,
 }: CreateAsciiVideoRendererOptions): AsciiVideoRenderer {
   const ctx = canvas.getContext("2d", { alpha: false });
   const sample = document.createElement("canvas");
@@ -47,6 +50,7 @@ export function createAsciiVideoRenderer({
     return {
       setVisible() {},
       setReducedMotion() {},
+      setVideo() {},
       resize() {},
       dispose() {},
     };
@@ -55,48 +59,65 @@ export function createAsciiVideoRenderer({
   let disposed = false;
   let visible = true;
   let reducedMotion = false;
+  let current = video;
   let raf = 0;
+  let rvfc = 0;
   let cols = 0;
   let rows = 0;
   let cssW = 0;
   let cssH = 0;
   let lastTime = -1;
   let hasDrawn = false;
+  let announced = false;
+
+  const stopLoop = () => {
+    if (raf) {
+      window.cancelAnimationFrame(raf);
+      raf = 0;
+    }
+    if (rvfc && typeof current.cancelVideoFrameCallback === "function") {
+      current.cancelVideoFrameCallback(rvfc);
+      rvfc = 0;
+    }
+  };
 
   const drawFrame = (force = false) => {
-    if (disposed || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+    if (disposed || current.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
       return;
     }
 
-    if (!force && video.currentTime === lastTime && hasDrawn) {
+    if (!force && current.currentTime === lastTime && hasDrawn) {
       return;
     }
 
-    const vw = video.videoWidth;
-    const vh = video.videoHeight;
+    const vw = current.videoWidth;
+    const vh = current.videoHeight;
     if (!vw || !vh || cols < 1 || rows < 1) {
       return;
     }
 
-    lastTime = video.currentTime;
-    sample.width = cols;
-    sample.height = rows;
+    lastTime = current.currentTime;
+    if (sample.width !== cols || sample.height !== rows) {
+      sample.width = cols;
+      sample.height = rows;
+    }
     sampleCtx.imageSmoothingEnabled = true;
+    sampleCtx.imageSmoothingQuality = "high";
 
     const srcAspect = vw / vh;
     const dstAspect = cssW / cssH;
-    let dx = 0;
-    let dy = 0;
-    let dw = cols;
-    let dh = rows;
+    let sx = 0;
+    let sy = 0;
+    let sw = vw;
+    let sh = vh;
     if (srcAspect > dstAspect) {
-      dw = cols * (srcAspect / dstAspect);
-      dx = (cols - dw) / 2;
+      sw = vh * dstAspect;
+      sx = (vw - sw) / 2;
     } else if (srcAspect < dstAspect) {
-      dh = rows * (dstAspect / srcAspect);
-      dy = (rows - dh) / 2;
+      sh = vw / dstAspect;
+      sy = (vh - sh) / 2;
     }
-    sampleCtx.drawImage(video, dx, dy, dw, dh);
+    sampleCtx.drawImage(current, sx, sy, sw, sh, 0, 0, cols, rows);
 
     const pixels = sampleCtx.getImageData(0, 0, cols, rows).data;
     const dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
@@ -140,6 +161,10 @@ export function createAsciiVideoRenderer({
     }
 
     hasDrawn = true;
+    if (!announced) {
+      announced = true;
+      onFirstFrame?.();
+    }
   };
 
   const tick = () => {
@@ -147,16 +172,17 @@ export function createAsciiVideoRenderer({
       return;
     }
     drawFrame();
-    if (!reducedMotion) {
-      raf = window.requestAnimationFrame(tick);
+    if (reducedMotion) {
+      return;
     }
-  };
-
-  const stopLoop = () => {
-    if (raf) {
-      window.cancelAnimationFrame(raf);
-      raf = 0;
+    if (typeof current.requestVideoFrameCallback === "function") {
+      rvfc = current.requestVideoFrameCallback(() => {
+        rvfc = 0;
+        tick();
+      });
+      return;
     }
+    raf = window.requestAnimationFrame(tick);
   };
 
   const syncPlayback = () => {
@@ -165,21 +191,21 @@ export function createAsciiVideoRenderer({
     }
     if (!visible) {
       stopLoop();
-      video.pause();
+      current.pause();
       return;
     }
     if (reducedMotion) {
       stopLoop();
-      video.pause();
+      current.pause();
       drawFrame(true);
       return;
     }
-    const play = video.play();
+    const play = current.play();
     if (play) {
       void play.catch(() => {});
     }
-    if (!raf) {
-      raf = window.requestAnimationFrame(tick);
+    if (!raf && !rvfc) {
+      tick();
     }
   };
 
@@ -208,14 +234,31 @@ export function createAsciiVideoRenderer({
   };
 
   const onLoaded = () => {
+    lastTime = -1;
     resize();
     syncPlayback();
   };
 
-  video.addEventListener("loadeddata", onLoaded);
-  video.addEventListener("seeked", onLoaded);
+  const bindVideo = (next: HTMLVideoElement) => {
+    if (current === next) {
+      return;
+    }
+    stopLoop();
+    current.removeEventListener("loadeddata", onLoaded);
+    current.removeEventListener("seeked", onLoaded);
+    current = next;
+    current.addEventListener("loadeddata", onLoaded);
+    current.addEventListener("seeked", onLoaded);
+    lastTime = -1;
+    if (current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      onLoaded();
+    }
+  };
 
-  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+  current.addEventListener("loadeddata", onLoaded);
+  current.addEventListener("seeked", onLoaded);
+
+  if (current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
     onLoaded();
   }
 
@@ -228,12 +271,15 @@ export function createAsciiVideoRenderer({
       reducedMotion = next;
       syncPlayback();
     },
+    setVideo(next) {
+      bindVideo(next);
+    },
     resize,
     dispose() {
       disposed = true;
       stopLoop();
-      video.removeEventListener("loadeddata", onLoaded);
-      video.removeEventListener("seeked", onLoaded);
+      current.removeEventListener("loadeddata", onLoaded);
+      current.removeEventListener("seeked", onLoaded);
     },
   };
 }

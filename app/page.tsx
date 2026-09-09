@@ -31,7 +31,7 @@ export default function HomePage() {
       </AnimateIn>
 
       <AnimateIn className="mt-14" stagger={4}>
-        <AsciiVideo label="Animated character mosaic looping two short clips" />
+        <AsciiVideo label="Animated character mosaic of swim and bike training clips" />
       </AnimateIn>
     </SiteShell>
   );
