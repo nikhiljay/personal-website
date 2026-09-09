@@ -1,4 +1,5 @@
 import { AnimateIn } from "./components/animate-in";
+import { AsciiVideo } from "./components/ascii-video";
 import { Connect } from "./components/connect";
 import { GlowName } from "./components/glow-name";
 import { ResearchExpandable } from "./components/research-expandable";
@@ -27,6 +28,10 @@ export default function HomePage() {
 
       <AnimateIn className="mt-9" stagger={3}>
         <Connect />
+      </AnimateIn>
+
+      <AnimateIn className="mt-14" stagger={4}>
+        <AsciiVideo label="Animated character mosaic looping two short clips" />
       </AnimateIn>
     </SiteShell>
   );

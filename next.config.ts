@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  outputFileTracingIncludes: {
+    "/api/m/[id]": ["./content/mosaic/**/*"],
+  },
   experimental: {
     optimizePackageImports: ["mapbox-gl"],
   },
