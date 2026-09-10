@@ -240,15 +240,16 @@ export function createAsciiVideoRenderer({
   };
 
   const bindVideo = (next: HTMLVideoElement) => {
-    if (current === next) {
-      return;
+    if (current !== next) {
+      stopLoop();
+      current.removeEventListener("loadeddata", onLoaded);
+      current.removeEventListener("seeked", onLoaded);
+      current.removeEventListener("playing", onLoaded);
+      current = next;
+      current.addEventListener("loadeddata", onLoaded);
+      current.addEventListener("seeked", onLoaded);
+      current.addEventListener("playing", onLoaded);
     }
-    stopLoop();
-    current.removeEventListener("loadeddata", onLoaded);
-    current.removeEventListener("seeked", onLoaded);
-    current = next;
-    current.addEventListener("loadeddata", onLoaded);
-    current.addEventListener("seeked", onLoaded);
     lastTime = -1;
     if (current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       onLoaded();
@@ -257,6 +258,7 @@ export function createAsciiVideoRenderer({
 
   current.addEventListener("loadeddata", onLoaded);
   current.addEventListener("seeked", onLoaded);
+  current.addEventListener("playing", onLoaded);
 
   if (current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
     onLoaded();
@@ -280,6 +282,7 @@ export function createAsciiVideoRenderer({
       stopLoop();
       current.removeEventListener("loadeddata", onLoaded);
       current.removeEventListener("seeked", onLoaded);
+      current.removeEventListener("playing", onLoaded);
     },
   };
 }
