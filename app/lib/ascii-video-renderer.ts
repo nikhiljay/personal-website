@@ -2,7 +2,7 @@ const DENSITY =
   "#W@8Q&$MHB%DK*+=xahkpqwmzO0XYUCL/\\|()[]{}?~<>!;:^\"',. ";
 
 const CELL_ASPECT = 0.6;
-const TILE_OPACITY = 0.5;
+const TILE_OPACITY = 0.65;
 const GAMMA = 1.45;
 const CHAR_FILL = 0.82;
 const DPR_CAP = 2;
