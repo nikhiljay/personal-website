@@ -38,6 +38,7 @@ function createDetachedVideo() {
 
 async function objectUrlFor(id: string) {
   const response = await fetch(`/api/m/${id}`, {
+    cache: "no-store",
     headers: { Accept: "application/octet-stream" },
   });
   if (!response.ok) {
@@ -53,16 +54,20 @@ function waitForData(video: HTMLVideoElement) {
     return Promise.resolve();
   }
   return new Promise<void>((resolve, reject) => {
-    const onData = () => {
-      video.removeEventListener("error", onError);
-      resolve();
-    };
-    const onError = () => {
+    const finish = (fn: () => void) => {
+      window.clearTimeout(timer);
       video.removeEventListener("loadeddata", onData);
-      reject(new Error("clip failed"));
+      video.removeEventListener("error", onError);
+      fn();
     };
-    video.addEventListener("loadeddata", onData, { once: true });
-    video.addEventListener("error", onError, { once: true });
+    const onData = () => finish(resolve);
+    const onError = () => finish(() => reject(new Error("clip failed")));
+    const timer = window.setTimeout(
+      () => finish(() => reject(new Error("clip timeout"))),
+      8000,
+    );
+    video.addEventListener("loadeddata", onData);
+    video.addEventListener("error", onError);
   });
 }
 
@@ -121,8 +126,10 @@ export function AsciiVideo({ label, className }: AsciiVideoProps) {
         player.src = url;
       }
       player.playbackRate = clip.playbackRate ?? 1;
-      player.currentTime = 0;
       await waitForData(player);
+      if (player.currentTime > 0) {
+        player.currentTime = 0;
+      }
     };
 
     const applyAspect = (player: HTMLVideoElement) => {
@@ -186,6 +193,7 @@ export function AsciiVideo({ label, className }: AsciiVideoProps) {
         }
         applyAspect(players[0]);
         renderer.setVideo(players[0]);
+        setReady(true);
         void attach(players[1], 1);
       })
       .catch(() => {});
