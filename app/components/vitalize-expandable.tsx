@@ -7,7 +7,7 @@ import { ExpandableAside } from "./expandable-aside";
 import { ExternalLink } from "./external-link";
 
 export function VitalizeExpandable() {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <>
