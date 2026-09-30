@@ -24,8 +24,8 @@ export function VitalizeExpandable() {
           <ExternalLink href="https://vitalize.care" showArrow>
             Vitalize
           </ExternalLink>{" "}
-          to run in production at 10 health systems (35+ hospitals), $15M in
-          revenue, and a $30M Series A led by Oak HC/FT and Norwest.
+          to run in production at 10 health systems (35+ hospitals), $10M ARR,
+          and a $30M Series A led by Oak HC/FT and Norwest.
         </p>
       </ExpandableAside>
     </>
