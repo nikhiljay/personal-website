@@ -14,7 +14,7 @@ export function VitalizeExpandable() {
       <p>
         Co-founder of{" "}
         <ExpandLink expanded={expanded} onOpenChange={setExpanded}>
-          Vitalize
+          Vitalize (YC W23)
         </ExpandLink>
         , where I built autonomous labor optimization for hospitals.
       </p>
